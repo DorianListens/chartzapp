@@ -2,7 +2,7 @@
   "name": "Chartzapp",
   "version": "0.0.1",
   "authors": [
-    "Dorian <dorian.scheidt@gmail.com>"
+    "Dorian Scheidt <dorian.scheidt@gmail.com>"
   ],
   "description": "Explore Canadian Campus Community Radio Charts",
   "main": "index.js",

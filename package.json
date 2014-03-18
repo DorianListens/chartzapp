@@ -1,15 +1,15 @@
 {
-  "author": "Simeon Bateman",
-  "name": "Brunch-With-Marionette",
-  "description": "MarionetteJS application template for Brunch.io",
-  "version": "0.0.2",
+  "author": "Dorian Scheidt",
+  "name": "Chartzapp",
+  "description": "An App for exploring Canadian Campus Radio Charts",
+  "version": "0.0.1",
   "homepage": "",
   "repository": {
     "type": "git",
     "url": "git@github.com/simbco/brunch-with-marionette"
   },
   "engines": {
-    "node": "0.8.x",
+    "node": "0.10.x",
     "npm": "1.1.x"
   },
   "scripts": {
@@ -27,7 +27,11 @@
     "sass-brunch": "~1.8.1",
     "coffeelint-brunch": "~1.5.0",
     "auto-reload-brunch": "~1.7.3",
-    "read-components": "~0.6.0"
+    "read-components": "~0.6.0",
+    "express": "~3.4.8",
+    "request": "~2.34.0",
+    "cheerio": "~0.13.1",
+    "deferred": "~0.6.8"
   },
   "main": "index.js",
   "directories": {

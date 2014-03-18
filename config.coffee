@@ -12,7 +12,7 @@ exports.config =
         before: [
           'vendor/scripts/console-helper.js'
           'bower_components/modernizr/modernizr.js'
-          'bower_components/jquery/dist/jquery.min.js'
+          'vendor/scripts/jquery.js'
           'vendor/scripts/underscore.js'
           'vendor/scripts/backbone.js'
           'vendor/scripts/backbone.marionette.js'
@@ -37,3 +37,9 @@ exports.config =
     templates:
       defaultExtension: 'hbs'
       joinTo: 'javascripts/app.js'
+
+  server:
+    path: 'server.coffee'
+    port: 3333
+    base: '/'
+    run: true
