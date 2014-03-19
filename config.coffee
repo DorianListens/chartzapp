@@ -28,10 +28,7 @@ exports.config =
         'stylesheets/vendor.css': /^vendor(\/|\\)styles/
         'test/stylesheets/vendor.css': /^test(\/|\\)vendor(\/|\\)styles(\/|\\)/
       order:
-        before: [
-          'vendor/styles/bootstrap.min.css'
-          'vendor/styles/bootstrap-theme.min.css'
-        ]
+        before: []
         after: []
 
     templates:
