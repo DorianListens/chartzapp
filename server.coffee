@@ -2,6 +2,7 @@ express = require 'express'
 request = require "request"
 deferred = require "deferred"
 cheerio = require "cheerio"
+moment = require 'moment'
 app = express()
 app.use(express.static __dirname+'/public')
 
@@ -13,8 +14,17 @@ exports.startServer = (port, path, callback) ->
   console.log 'Listening on port: '+port
 
   app.get "/chart/:station", (req, res) ->
-      newChart = getChart(req.params.station.toLowerCase(), "2014-03-11", res)
-    return
+      newChart = getChart(req.params.station.toLowerCase(), "", res)
+    # return
+
+  app.get "/chart/:station/:date", (req, res) ->
+      newDate = moment(req.params.date)
+      if newDate.get('day') != 2
+        newDate.set('day', 2)
+      newChart = getChart(req.params.station.toLowerCase(), newDate.format('YYYY-MM-DD'), res)
+  return
+
+
 
 deferredRequest = (url) ->
   d = deferred()
@@ -50,7 +60,12 @@ getChart = (station, week, res) ->
       return
 
     deferred chart_array
-  the_url = "http://www.earshot-online.com/charts/" + station + ".cfm?dWeekOfID=" + week
+
+  if (week == '')
+    the_url = "http://www.earshot-online.com/charts/" + station + ".cfm"
+  else
+    the_url = "http://www.earshot-online.com/charts/" + station + ".cfm?dWeekOfID=" + week
+  console.log the_url
   deferredRequest(the_url).then(chartParse).done (chart_res) ->
     res.send chart_res
     return

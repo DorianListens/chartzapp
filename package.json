@@ -31,7 +31,8 @@
     "express": "~3.4.8",
     "request": "~2.34.0",
     "cheerio": "~0.13.1",
-    "deferred": "~0.6.8"
+    "deferred": "~0.6.8",
+    "moment": "~2.5.1"
   },
   "main": "index.js",
   "directories": {

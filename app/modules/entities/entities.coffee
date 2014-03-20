@@ -30,5 +30,5 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 	App.reqres.setHandler "header:entities", ->
 		API.getHeaders()
 
-	App.reqres.setHandler 'chart:entities', (station) ->
-		API.getCharts(station)
+	App.reqres.setHandler 'chart:entities', ->
+		API.getCharts()

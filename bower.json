@@ -5,7 +5,7 @@
     "Dorian Scheidt <dorian.scheidt@gmail.com>"
   ],
   "description": "Explore Canadian Campus Community Radio Charts",
-  "main": "index.js",
+  "main": "index.html",
   "keywords": [
     "Charts"
   ],

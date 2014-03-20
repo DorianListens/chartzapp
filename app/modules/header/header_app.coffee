@@ -12,6 +12,4 @@ module.exports = App.module 'HeaderApp', (HeaderApp, App, Backbone, Marionette, 
 
 
     HeaderApp.on 'start', ->
-      console.log 'header_app Start'
-
       API.listHeader()
