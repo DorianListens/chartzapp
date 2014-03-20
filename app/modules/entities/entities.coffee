@@ -24,7 +24,7 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 			]
 
 		getCharts: (station) ->
-			new Entities.ChartCollection([], {url: 'charts/ckut'})
+			new Entities.ChartCollection
 
 
 	App.reqres.setHandler "header:entities", ->

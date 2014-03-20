@@ -9,6 +9,7 @@ module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, 
     tagName: "li"
 
   class List.Headers extends Marionette.CompositeView
+    # className: 'fixed'
     template: 'modules/header/list/templates/headers'
     itemView: List.Header
     itemViewContainer: "ul.links"

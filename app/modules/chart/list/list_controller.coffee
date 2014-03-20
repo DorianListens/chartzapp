@@ -66,9 +66,8 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
       @layout.panelRegion.show panelView
 
     changeChart: (charts) ->
-      console.log 'changeChart'
       newStation = document.getElementById("input").value
-      console.log newStation
+      # $("#station").text " " + newStation.toUpperCase()
       charts.url = 'chart/'+newStation
       charts.fetch()
 

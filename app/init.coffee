@@ -1,5 +1,5 @@
 @App = require 'application'
+$(document).foundation()
 
 $ ->
   App.initialize()
-  # document.foundation()
