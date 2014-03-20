@@ -13,11 +13,11 @@ exports.startServer = (port, path, callback) ->
   app.listen port
   console.log 'Listening on port: '+port
 
-  app.get "/chart/:station", (req, res) ->
+  app.get "api/chart/:station", (req, res) ->
       newChart = getChart(req.params.station.toLowerCase(), "", res)
     # return
 
-  app.get "/chart/:station/:date", (req, res) ->
+  app.get "api/chart/:station/:date", (req, res) ->
       newDate = moment(req.params.date)
       if newDate.get('day') != 2
         newDate.set('day', 2)

@@ -12,9 +12,6 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 	class Entities.ChartCollection extends Backbone.Collection
 		model: Entities.ChartItem
 
-
-
-
 	API =
 		getHeaders: ->
 			new Entities.HeaderCollection [
