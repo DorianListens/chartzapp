@@ -9,6 +9,7 @@ class Application extends Backbone.Marionette.Application
         # Freeze the object
         Object.freeze? this
 
+
     @addRegions
         headerRegion: "#header-region"
         mainRegion: "#main-region"
@@ -23,17 +24,20 @@ class Application extends Backbone.Marionette.Application
 
 
     @addInitializer =>
-         @module('FooterApp').start()
+        @module('HeaderApp').start()
+        @module('ChartApp').start()
+        @module('FooterApp').start()
 
     # @addInitializer (options) =>
     #     # Instantiate the router
     #     Router = require 'lib/router'
     #     @router = new Router()
 
-
     @start()
 
-
-
 module.exports = new Application()
-require 'footer_app'
+
+require 'modules/entities/entities'
+require 'modules/header/header_app'
+require 'modules/footer/footer_app'
+require 'modules/chart/chart_app'

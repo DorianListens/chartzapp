@@ -1,18 +1,19 @@
 App = require 'application'
 
-module.exports = App.module("FooterApp", (FooterApp, App, Backbone, Marionette, $, _) =>
+module.exports = App.module "FooterApp", (FooterApp, App, Backbone, Marionette, $, _) =>
 
     FooterApp.startWithParent = false;
+    FooterApp.Show = require 'modules/footer/show/show_controller'
 
-    # API =
-    #   showFooter: ->
-    #     FooterApp.Show.Controller.showFooter()
+    API =
+      showFooter: ->
+        FooterApp.Show.Controller.showFooter()
 
     FooterApp.on "start", ->
       console.log "FooterApp start"
-      # API.showFooter()
+      API.showFooter()
 
-)
+
 
 ###
 
@@ -21,17 +22,17 @@ module.exports = App.module("FooterApp", (FooterApp, App, Backbone, Marionette, 
 ###
 
 # Show Controller
-#
-#   @App.module "FooterApp.Show", (Show, App, Backbone, Marionette, $, _) ->
-#
-#     Show.Controller =
-#       showFooter: ->
-#         footerView = @getFooterView()
-#         App.footerRegion.show footerView
-#
-#       getFooterView: ->
-#         new Show.Footer
-#
+  #
+  # App.module "FooterApp.Show", (Show, App, Backbone, Marionette, $, _) ->
+  #
+  #   Show.Controller =
+  #     showFooter: ->
+  #       footerView = @getFooterView()
+  #       App.footerRegion.show footerView
+  #
+  #     getFooterView: ->
+  #       new Show.Footer
+
 #   # Show View
 #
 #   @App.module "FooterApp.Show", (Show, App, Backbone, Marionette, $, _) ->
