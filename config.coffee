@@ -16,7 +16,7 @@ exports.config =
           'vendor/scripts/underscore.js'
           'vendor/scripts/backbone.js'
           'vendor/scripts/backbone.marionette.js'
-          'bower_components/foundation/foundation.min.js'
+    
         ]
         after: [
           'test/vendor/scripts/test-helper.js'
