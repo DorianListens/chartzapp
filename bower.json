@@ -13,7 +13,7 @@
   "homepage": "dorianlistens.com",
   "private": true,
   "ignore": [
-    "**/.*",
+/*    "**/.*",*/
     "node_modules",
     "bower_components",
     "test",
@@ -25,7 +25,7 @@
   "overrides": {
    "foundation" : {
     "main" : "foundation.min.js"
-   } 
+   }
   }
 
 }
