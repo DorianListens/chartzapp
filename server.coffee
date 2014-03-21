@@ -27,7 +27,7 @@ app.use(express.static __dirname+'/public')
 exports.startServer = (port, path, callback) ->
   # Serve the main page
   port = process.env.PORT || port
-  
+
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
   app.listen port

@@ -15,9 +15,7 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 	API =
 		getHeaders: ->
 			new Entities.HeaderCollection [
-				{ name: "Users" }
-				{ name: "Leads" }
-				{ name: "Appointments" }
+				{ name: "Charts", url: '/' }
 			]
 
 		getCharts: (station) ->
