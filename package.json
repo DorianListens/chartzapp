@@ -18,7 +18,7 @@
     "postinstall": "./node_modules/brunch/bin/brunch build"
   },
   "dependencies": {
-    "brunch" : "~1.x",
+    "brunch" : "1.7.13",
     "coffee-script": "~1.6.3",
     "javascript-brunch": ">= 1.0 < 1.7",
     "coffee-script-brunch": ">= 1.0 < 1.7",
