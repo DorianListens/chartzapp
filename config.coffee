@@ -12,12 +12,12 @@ exports.config =
         'test/javascripts/test-vendor.js': /^test[\\/](?=vendor)/
       order:
         before: [
-          'vendor/scripts/console-helper.js'
-          'vendor/scripts/modernizr.js'
-          'vendor/scripts/jquery.js'
-          'vendor/scripts/underscore.js'
-          'vendor/scripts/backbone.js'
-          'vendor/scripts/backbone.marionette.js'
+          'vendors/scripts/console-helper.js'
+          'vendors/scripts/modernizr.js'
+          'vendors/scripts/jquery.js'
+          'vendors/scripts/underscore.js'
+          'vendors/scripts/backbone.js'
+          'vendors/scripts/backbone.marionette.js'
         ]
         after: [
           'test/vendor/scripts/test-helper.js'
