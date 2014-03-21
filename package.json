@@ -15,7 +15,6 @@
   "scripts": {
     "start": "brunch watch --server",
     "test": "brunch test",
-    "postinstall": "./node_modules/bower/bin/bower install",
     "postinstall": "./node_modules/brunch/bin/brunch build"
   },
   "dependencies": {

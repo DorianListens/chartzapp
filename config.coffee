@@ -11,12 +11,12 @@ exports.config =
       order:
         before: [
           'vendor/scripts/console-helper.js'
-          'bower_components/modernizr/modernizr.js'
+          'vendor/scripts/modernizr.js'
           'vendor/scripts/jquery.js'
           'vendor/scripts/underscore.js'
           'vendor/scripts/backbone.js'
           'vendor/scripts/backbone.marionette.js'
-    
+
         ]
         after: [
           'test/vendor/scripts/test-helper.js'
