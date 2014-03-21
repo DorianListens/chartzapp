@@ -1,13 +1,13 @@
 exports.config =
   # See docs at http://brunch.readthedocs.org/en/latest/config.html.
-  paths:
-    watched: ['app']
+  # paths:
+  #   watched: ['app']
   files:
     javascripts:
       defaultExtension: 'coffee'
       joinTo:
         'javascripts/app.js': /^app/
-        'javascripts/vendor.js': /^(vendor)/
+        'javascripts/vendor.js': /^(vendors)/
         'test/javascripts/test.js': /^test[\\/](?!vendor)/
         'test/javascripts/test-vendor.js': /^test[\\/](?=vendor)/
       order:
@@ -27,7 +27,7 @@ exports.config =
       defaultExtension: 'scss'
       joinTo:
         'stylesheets/app.css': /^app(\/|\\)views(\/|\\)styles(\/|\\)/
-        'stylesheets/vendor.css': /^vendor(\/|\\)styles/
+        'stylesheets/vendor.css': /^vendors(\/|\\)styles/
         'test/stylesheets/vendor.css': /^test(\/|\\)vendor(\/|\\)styles(\/|\\)/
       order:
         before: []
