@@ -15,7 +15,6 @@
   "scripts": {
     "start": "brunch watch --server",
     "test": "brunch test",
-    "postinstall" : "brunch build -c config-release.coffee"
   },
   "dependencies": {
     "brunch" : "~1.7.13",
