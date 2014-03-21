@@ -5,7 +5,7 @@ exports.config =
       defaultExtension: 'coffee'
       joinTo:
         'javascripts/app.js': /^app/
-        'javascripts/vendor.js': /^vendor/
+        'javascripts/vendor.js': /^(vendor\/(?!node))/
         'test/javascripts/test.js': /^test[\\/](?!vendor)/
         'test/javascripts/test-vendor.js': /^test[\\/](?=vendor)/
       order:
