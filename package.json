@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "brunch watch --server",
-    "test": "brunch test",
+    "test": "brunch test"
   },
   "dependencies": {
     "brunch" : "~1.7.13",
