@@ -5,6 +5,10 @@ exports.config =
       defaultExtension: 'coffee'
       joinTo:
         'javascripts/app.js': /^app/
+
+        # the Heroku node build adds a node dir inside /vendor
+        # Make sure to ignore it.
+
         'javascripts/vendor.js': /^(vendor\/(?!node))/
         'test/javascripts/test.js': /^test[\\/](?!vendor)/
         'test/javascripts/test-vendor.js': /^test[\\/](?=vendor)/

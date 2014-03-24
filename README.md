@@ -3,6 +3,8 @@
 A simple web application for interacting with Canadian Campus Radio Charts.
 All data is scraped from [Earshot Online](http://earshot-online.com).
 
+Currently under development.
+
 ## Stack
 
 * [Brunch](brunch.io)
