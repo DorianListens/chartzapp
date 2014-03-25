@@ -63,18 +63,24 @@ exports.startServer = (port, path, callback) ->
   console.log 'Listening on port: '+port
 
   # Get the whole DB
-  app.get "/api/wholething", (req, res) ->
+
+  app.get "/api/db/wholething", (req, res) ->
     Album.find (err, albums) ->
       console.log err if err
       res.send albums
 
+  # Get every entry for a given station
+
   app.get "/api/db/:station" , (req, res) ->
     Album.find {"appearances.station" : "#{req.params.station.toLowerCase()}"} , (err, results) ->
       console.log err if err
-      if results is null
+      if results is 0
         console.log 'no results'
+        res.send results
       else
         res.send results
+
+  # Get a given station for a given week
 
   app.get "/api/db/:station/:date" , (req, res) ->
     newDate = moment(req.params.date)
@@ -82,34 +88,36 @@ exports.startServer = (port, path, callback) ->
       newDate.set('day', 2)
     Album.find {"appearances.station" : "#{req.params.station.toLowerCase()}", "appearances.week" : "#{newDate.format('YYYY-MM-DD')}" } , (err, results) ->
       console.log err if err
-      if results is null
+      if results.length is 0
         console.log 'no results'
+        res.send results
       else
         res.send results
+
+  # Get all enteries for a given artist
+
+  app.get "/api/artists/:artist", (req, res) ->
+    Album.find {"artist" : "#{req.params.artist}"}, (err, results) ->
+      console.log err if err
+      console.log req.params.artist
+      res.send results
 
   # Get most recent chart from a given station
 
   app.get "/api/chart/:station", (req, res) ->
-      newChart = getChart(req.params.station.toLowerCase(), "", res)
+    console.log 'request'
+    newChart = getChart(req.params.station.toLowerCase(), "", res)
 
   # Get a chart from any date for a given station
 
   app.get "/api/chart/:station/:date", (req, res) ->
-
     # Make sure the inputed date is a tuesday, and if not, fix it.
+    newDate = moment(req.params.date)
+    if newDate.get('day') != 2
+      newDate.set('day', 2)
+      theDate = newDate.format('YYYY-MM-DD')
 
-      newDate = moment(req.params.date)
-      if newDate.get('day') != 2
-        newDate.set('day', 2)
-        theDate = newDate.format('YYYY-MM-DD')
-      newChart = getChart(req.params.station.toLowerCase(), theDate, res)
-  # return
-
-
-# Album.find {'artistName' : 'Angel Olsen'} , (err, albums) ->
-#   console.log err if err
-#   console.log albums
-
+    newChart = getChart(req.params.station.toLowerCase(), theDate, res)
 
 # Set up the deferred request.
 
@@ -130,7 +138,7 @@ deferredRequest = (url) ->
 # Go get a chart!
 
 getChart = (station, week, res) ->
-
+  console.log "getChart"
   # Check if we have a specific week. If not, grab the most recent chart
 
   if (week == '')
@@ -145,6 +153,7 @@ getChart = (station, week, res) ->
   # Check the database for the given station and week, and return false if nothing found.
 
   dbQuery = ->
+    console.log 'Making dbQuery'
     Album.find {"appearances.station" : "#{station}", "appearances.week" : "#{week}" } , (err, results) ->
       console.log err if err
     # If nothing is in the DB, make the crawl.
@@ -228,7 +237,7 @@ getChart = (station, week, res) ->
 
     return chart_array
 
-
+  dbQuery()
 
 isHeroku = NODE_ENV?
 if isHeroku
