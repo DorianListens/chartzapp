@@ -1,16 +1,27 @@
 # ChartZapp
 
 A simple web application for interacting with Canadian Campus Radio Charts.
+
 All data is scraped from [Earshot Online](http://earshot-online.com).
 
 Currently under development.
 
 ## Stack
 
+Build:
 * [Brunch](brunch.io)
+
+Lang:
 * [CoffeeScript](http://coffeescript.org/)
-* [NodeJs](http://nodejs.org/)
+
+Back-End:
+* [Node](http://nodejs.org/)
+* [Express](http://expressjs.com/)
+* [MongoDB](https://www.mongodb.org/)
+* [Mongoose](http://mongoosejs.com/)
+
+Front-End:
 * [Backbone](http://backbonejs.org/)
-* [MarionetteJS](http://marionettejs.com/)
+* [Marionette](http://marionettejs.com/)
 * [Handlebars](http://handlebarsjs.com/)
 * [Foundation](https://github.com/zurb/foundation)

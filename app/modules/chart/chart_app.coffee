@@ -12,6 +12,4 @@ module.exports = App.module 'ChartApp', (ChartApp, App, Backbone, Marionette, $,
 
 
     ChartApp.on 'start', ->
-      console.log 'charts_app Start'
-
       API.listChart()

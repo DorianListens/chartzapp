@@ -36,7 +36,7 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
       station = 'ckut'
       charts = App.request 'chart:entities'
-      charts.url = 'api/chart/'+station
+      charts.url = '/api/wholething' #'api/chart/'+station
       charts.fetch()
 
 
