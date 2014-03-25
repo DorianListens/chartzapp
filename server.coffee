@@ -41,7 +41,10 @@ albumSchema = mongoose.Schema
   artist: String
   album: String
   label: String
-  appearances: [appearanceSchema]
+  appearances: [
+    appearanceSchema
+    index: true
+  ]
 
 Album = mongoose.model 'Album', albumSchema
 
@@ -51,6 +54,8 @@ Album = mongoose.model 'Album', albumSchema
 exports.startServer = (port, path, callback) ->
   # Serve the main page
   port = process.env.PORT || port
+
+# Routes #########################################
 
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
@@ -62,6 +67,25 @@ exports.startServer = (port, path, callback) ->
     Album.find (err, albums) ->
       console.log err if err
       res.send albums
+
+  app.get "/api/db/:station" , (req, res) ->
+    Album.find {"appearances.station" : "#{req.params.station.toLowerCase()}"} , (err, results) ->
+      console.log err if err
+      if results is null
+        console.log 'no results'
+      else
+        res.send results
+
+  app.get "/api/db/:station/:date" , (req, res) ->
+    newDate = moment(req.params.date)
+    if newDate.get('day') != 2
+      newDate.set('day', 2)
+    Album.find {"appearances.station" : "#{req.params.station.toLowerCase()}", "appearances.week" : "#{newDate.format('YYYY-MM-DD')}" } , (err, results) ->
+      console.log err if err
+      if results is null
+        console.log 'no results'
+      else
+        res.send results
 
   # Get most recent chart from a given station
 
@@ -77,7 +101,8 @@ exports.startServer = (port, path, callback) ->
       newDate = moment(req.params.date)
       if newDate.get('day') != 2
         newDate.set('day', 2)
-      newChart = getChart(req.params.station.toLowerCase(), newDate.format('YYYY-MM-DD'), res)
+        theDate = newDate.format('YYYY-MM-DD')
+      newChart = getChart(req.params.station.toLowerCase(), theDate, res)
   # return
 
 
@@ -116,26 +141,26 @@ getChart = (station, week, res) ->
     week = currentDate.format('YYYY-MM-DD')
   else
     the_url = "http://www.earshot-online.com/charts/" + station + ".cfm?dWeekOfID=" + week
-  console.log the_url
 
-  Album.find {}, (err, results) ->
-    console.log err if err
-    if results is null
-      console.log 'no results'
-    else
-      keeplooking = true
-      while keeplooking is true
-        for result in results
-          do (result) ->
-            for appear in result.appearances
-              do (appear) ->
-                if appear.station is station and appear.week is week
-                  console.log "found it"
-                  keeplooking = false
-      console.log station
-      console.log week
-      # console.log results
+  # Check the database for the given station and week, and return false if nothing found.
 
+  dbQuery = ->
+    Album.find {"appearances.station" : "#{station}", "appearances.week" : "#{week}" } , (err, results) ->
+      console.log err if err
+    # If nothing is in the DB, make the crawl.
+
+      if results.length is 0
+        console.log 'making Earshot Crawl for #{the_url}'
+        deferredRequest(the_url).then(chartParse).done (chart_res) ->
+          console.log 'Returned'
+          chart_res = addToDb(chart_res)
+          res.send chart_res
+          return
+      else
+        res.send results
+        console.log "found in db #{station}"
+
+  # Load the given url, and grab the chart table
 
   chartParse = (body) ->
     $ = cheerio.load(body)
@@ -158,6 +183,8 @@ getChart = (station, week, res) ->
           label: label
 
     deferred chart_array
+
+  # If the chart is new, add it to the database
 
   addToDb = (chart_array) ->
     console.log "adding to DB"
@@ -182,9 +209,9 @@ getChart = (station, week, res) ->
                 ]
             newAlbum.save (err, newAlbum) ->
               console.log err if err
-              console.log "saved #{record.artist} - #{record.album} to the db for the first time"
+              # console.log "saved #{record.artist} - #{record.album} to the db for the first time"
           else
-            console.log "Found #{record.artist} - #{record.album} in the db"
+            # console.log "Found #{record.artist} - #{record.album} in the db"
             if results.appearances.length > 0
               alreadyAdded = false
               for appear in results.appearances
@@ -194,25 +221,13 @@ getChart = (station, week, res) ->
               if alreadyAdded isnt true
                 results.appearances.push appearance
                 results.save()
-                console.log "Appearance added to the db"
+                # console.log "Appearance added to the db"
               else
-                console.log "Already added this appearance to the db"
+                # console.log "Already added this appearance to the db"
               # console.log results.appearances
 
     return chart_array
-          # return
 
-  # return chart_array
-
-  # Make the request
-
-  deferredRequest(the_url).then(chartParse).done (chart_res) ->
-    console.log 'Returned'
-    chart_res = addToDb(chart_res)
-    res.send chart_res
-    return
-
-  return
 
 
 isHeroku = NODE_ENV?

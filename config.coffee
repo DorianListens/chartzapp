@@ -6,7 +6,7 @@ exports.config =
       joinTo:
         'javascripts/app.js': /^app/
 
-        # the Heroku node build adds a node dir inside /vendor
+        # the Heroku node build adds node stuff inside /vendor
         # Make sure to ignore it.
 
         'javascripts/vendor.js': /^(vendor\/(?!node))/
