@@ -6,7 +6,7 @@ Backbone.Marionette.Renderer.render = (templateName, data) ->
     return
   else
     template = require templateName
-    
+
   return template(data)
 
 do (Backbone) ->
@@ -17,13 +17,6 @@ do (Backbone) ->
 			route = "#" + route if route.charAt(0) is "/"
 			Backbone.history.navigate route, options
       # console.log 'Doing navigate'
-    #
-		# getCurrentRoute: ->
-		# 	Backbone.history.fragment
-
-    # navigate: (route, options = {}) ->
-    #   route = "#" + route if route.charAt(0) is "/"
-		# 	Backbone.history.navigate route, options
 
 		getCurrentRoute: ->
 			frag = Backbone.history.fragment

@@ -15,13 +15,24 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
   class List.Panel extends Marionette.ItemView
     template: "modules/chart/list/templates/panel"
+
+    ui:
+      'stationInput' : '#station_input'
+      'dateInput' : '#date_input'
+
     events:
-      'submit' : (e) ->
-        e.preventDefault()
-        @trigger 'click:submitter'
-      'click button#sort' : (e) ->
-        e.preventDefault()
-        @trigger 'click:sort'
+      'submit' : 'submit'
+      'click button#sort' : 'sort'
+
+    submit: (e) ->
+      e.preventDefault()
+      stationVal = $.trim @ui.stationInput.val()
+      dateVal = $.trim @ui.dateInput.val()
+      @trigger 'click:submitter', stationVal, dateVal
+
+    sort: (e) ->
+      e.preventDefault()
+      @trigger 'click:sort'
 
   class List.ChartItem extends Marionette.ItemView
     template: "modules/chart/list/templates/chartItem"
@@ -40,31 +51,8 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
   class List.Controller extends App.Controllers.Base
 
-    # listCharts: ->
     initialize: ->
-
-      # rentals = App.request "movie:rental:entities"
-      #
-			# App.execute "when:fetched", rentals, =>
-			# 	## perform aggregates / sorting / nesting here
-			# 	## this is helpful when you want to perform operations but only after
-			# 	## all the required dependencies have been fetched and are available
-			# 	rentals.reset rentals.sortBy "runtime"
-      #
-			# @layout = @getLayoutView()
-      #
-			# @listenTo @layout, "show", =>
-			# 	@resultsView rentals
-			# 	@rentalsView rentals
-			# 	@paginationView rentals
-      #
-			# @show @layout,
-			# 	loading:
-			# 		entities: rentals
-
-      station = 'ckut'
-      # url = '/api/db/wholething'
-      charts = App.request 'chart:entities', '/api/db/wholething'
+      charts = App.request 'chart:entities' #, '/api/db/wholething'
       App.execute "when:fetched", charts, =>
         console.log 'fetched'
 
@@ -72,18 +60,23 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
       @listenTo @layout, 'show', =>
         # charts.sort()
-        @showPanel charts
-        @showCharts charts
+        @showPanel() #charts
+        @showCharts() #charts
 
       # App.mainRegion.show @layout
       @show @layout,
         loading:
           entities: charts
 
-    showCharts: (charts) ->
+    showCharts: (station, date) ->
+      charts = App.request 'chart:entities', station, date
+      App.execute "when:fetched", charts, =>
+        console.log 'fetched'
       charts.sort()
       chartsView = @getChartsView charts
-      @layout.tableRegion.show chartsView
+      @show chartsView,
+        region: @layout.tableRegion
+        loading: true
 
     getChartsView: (charts) ->
       new List.Charts
@@ -91,15 +84,16 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
     showPanel: (charts) ->
       panelView = @getPanelView charts
-      panelView.on 'click:submitter', =>
-        @changeChart(charts)
+      @listenTo panelView, 'click:submitter', (station, date) =>
+        @showCharts station, date
+      # panelView.on 'click:submitter', =>
+      #   @changeChart(charts)
       panelView.on 'click:sort', =>
         @sortChart(charts)
-      @layout.panelRegion.show panelView
+      @show panelView, region: @layout.panelRegion
       $(document).foundation()
 
     sortChart: (charts) =>
-      console.log "clicked"
       # charts.comparator = "points"
       charts.sort()
       @showCharts charts

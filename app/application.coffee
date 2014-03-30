@@ -4,12 +4,14 @@ require 'lib/view_helper'
 class Application extends Backbone.Marionette.Application
   initialize: =>
 
-    @rootRoute = ""
+    @rootRoute = "listchart"
 
     @on "initialize:after", (options) ->
       console.log 'initialize:after'
-      # Backbone.history.start()
+
+      @startHistory()
       @navigate(@rootRoute, trigger: true) unless @getCurrentRoute()
+      #@navigate(@rootRoute, trigger: true) unless @getCurrentRoute()
       # Freeze the object
       Object.freeze? this
 
@@ -17,13 +19,6 @@ class Application extends Backbone.Marionette.Application
       headerRegion: "#header-region"
       mainRegion: "#main-region"
       footerRegion: "#footer-region"
-
-  # @commands.setHandler "register:instance", (instance, id) ->
-  #     @register instance, id
-  #
-  # @commands.setHandler "unregister:instance", (instance, id) ->
-  #     @unregister instance, id
-
 
     @addInitializer (options) =>
 
@@ -36,14 +31,7 @@ class Application extends Backbone.Marionette.Application
 
     @addInitializer =>
       @module('HeaderApp').start()
-      @module('ChartApp').start()
       @module('FooterApp').start()
-
-    # @addInitializer (options) =>
-    #     # Instantiate the router
-    #     Router = require 'lib/router'
-    #     @router = new Router()
-
 
     @start()
 

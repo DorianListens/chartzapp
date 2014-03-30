@@ -5,15 +5,13 @@ module.exports = App.module 'ChartApp', (ChartApp, App, Backbone, Marionette, $,
 
     class ChartApp.Router extends Marionette.AppRouter
       appRoutes:
-        "" : "listChart"
+        "listchart" : "listChart"
 
     ChartApp.startWithParent = false
     ChartApp.List = require 'modules/chart/list/list_controller'
 
     API =
       listChart: ->
-        # console.log 'listChart'
-        # # chartList =
         new ChartApp.List.Controller
           region: App.mainRegion
         $(document).foundation()
@@ -21,7 +19,3 @@ module.exports = App.module 'ChartApp', (ChartApp, App, Backbone, Marionette, $,
     App.addInitializer ->
       new ChartApp.Router
         controller: API
-
-
-    ChartApp.on 'start', ->
-      API.listChart()

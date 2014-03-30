@@ -61,23 +61,20 @@ module.exports = App.module "Components.Loading", (Loading, App, Backbone, Mario
 
 	class Loading.LoadingView extends Marionette.ItemView
 		template: false
-		className: "loading-container"
+		className: "loading-container small-1 small-centered columns"
 
 		onShow: ->
       opts = @_getOptions()
       @spinner = new Spinner(opts)
       @spinner.spin()
       @$el.append(@spinner.el)
-      console.log @spinner
-      # @$el.spin opts
 
 		onClose: ->
       @spinner.stop()
-			# @$el.spin false
 
 		_getOptions: ->
 			lines: 10 # The number of lines to draw
-			length: 10 # The length of each line
+			length: 20 # The length of each line
 			width: 1 # The line thickness
 			radius: 7 # The radius of the inner circle
 			corners: 1 # Corner roundness (0..1)
@@ -90,5 +87,5 @@ module.exports = App.module "Components.Loading", (Loading, App, Backbone, Mario
 			hwaccel: false # Whether to use hardware acceleration
 			className: 'spinner' # The CSS class to assign to the spinner
 			zIndex: 2e9 # The z-index (defaults to 2000000000)
-			top: 'auto' # Top position relative to parent in px
-			left: 'auto' # Left position relative to parent in px
+			#top: 50% # Top position relative to parent in px
+			#left: 50% # Left position relative to parent in px

@@ -59,9 +59,21 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 				{ name: "Charts", url: '/' }
 			]
 
-		getCharts: (url) ->
+		getCharts: (station = null, date = null) ->
+			console.log 'getCharts'
+			console.log station
+			if station is null and date is null
+				console.log 'first conditional'
+				chartsUrl = '/api/db/wholething'
+			else if date is null and station isnt null
+				console.log 'second conditional'
+				chartsUrl = 'api/chart/'+station
+			else
+				console.log 'third conditional'
+				chartsUrl = 'api/chart/'+station+'/'+date
+
 			charts = new Entities.ChartCollection
-			charts.url = url
+			charts.url = chartsUrl
 			charts.fetch
 				reset: true
 			charts
@@ -70,5 +82,5 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 	App.reqres.setHandler "header:entities", ->
 		API.getHeaders()
 
-	App.reqres.setHandler 'chart:entities', (url) ->
-		API.getCharts(url)
+	App.reqres.setHandler 'chart:entities', (station, date) ->
+		API.getCharts station, date
