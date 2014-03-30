@@ -1,5 +1,6 @@
 App = require 'application'
 ChartApp = require 'modules/chart/chart_app'
+Controllers = require 'controllers/baseController'
 
 
 module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $, _) =>
@@ -15,44 +16,73 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
   class List.Panel extends Marionette.ItemView
     template: "modules/chart/list/templates/panel"
     events:
-      'click a#submit' : -> @trigger 'click:submitter'
-
+      'submit' : (e) ->
+        e.preventDefault()
+        @trigger 'click:submitter'
+      'click button#sort' : (e) ->
+        e.preventDefault()
+        @trigger 'click:sort'
 
   class List.ChartItem extends Marionette.ItemView
     template: "modules/chart/list/templates/chartItem"
     tagName: 'tr'
-    events:
-      'click' : -> @trigger 'click:chartItem', @model
+
+  class List.Empty extends Marionette.ItemView
+    template: "modules/chart/list/templates/empty"
+    tagName: 'tr'
 
   class List.Charts extends Marionette.CompositeView
     template: "modules/chart/list/templates/charts"
     itemView: List.ChartItem
+    emptyView: List.Empty
     itemViewContainer: "#thecharts"
 
 
-  List.Controller =
+  class List.Controller extends App.Controllers.Base
 
-    listCharts: ->
+    # listCharts: ->
+    initialize: ->
+
+      # rentals = App.request "movie:rental:entities"
+      #
+			# App.execute "when:fetched", rentals, =>
+			# 	## perform aggregates / sorting / nesting here
+			# 	## this is helpful when you want to perform operations but only after
+			# 	## all the required dependencies have been fetched and are available
+			# 	rentals.reset rentals.sortBy "runtime"
+      #
+			# @layout = @getLayoutView()
+      #
+			# @listenTo @layout, "show", =>
+			# 	@resultsView rentals
+			# 	@rentalsView rentals
+			# 	@paginationView rentals
+      #
+			# @show @layout,
+			# 	loading:
+			# 		entities: rentals
 
       station = 'ckut'
-      charts = App.request 'chart:entities'
-      charts.url = '/api/wholething' #'api/chart/'+station
-      charts.fetch()
-
+      # url = '/api/db/wholething'
+      charts = App.request 'chart:entities', '/api/db/wholething'
+      App.execute "when:fetched", charts, =>
+        console.log 'fetched'
 
       @layout = @getLayoutView()
 
-      @layout.on 'show', =>
+      @listenTo @layout, 'show', =>
+        # charts.sort()
         @showPanel charts
         @showCharts charts
 
-      App.mainRegion.show @layout
-
+      # App.mainRegion.show @layout
+      @show @layout,
+        loading:
+          entities: charts
 
     showCharts: (charts) ->
+      charts.sort()
       chartsView = @getChartsView charts
-      chartsView.on 'itemview:click:chartItem', (iv, chartItem) ->
-        App.vent.trigger 'click:chartItem', chartItem
       @layout.tableRegion.show chartsView
 
     getChartsView: (charts) ->
@@ -61,9 +91,18 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
     showPanel: (charts) ->
       panelView = @getPanelView charts
-      panelView.on 'click:submitter', ->
-        List.Controller.changeChart(charts)
+      panelView.on 'click:submitter', =>
+        @changeChart(charts)
+      panelView.on 'click:sort', =>
+        @sortChart(charts)
       @layout.panelRegion.show panelView
+      $(document).foundation()
+
+    sortChart: (charts) =>
+      console.log "clicked"
+      # charts.comparator = "points"
+      charts.sort()
+      @showCharts charts
 
     changeChart: (charts) ->
       newStation = document.getElementById("station_input").value
@@ -72,7 +111,19 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
         charts.url = 'api/chart/'+newStation
       else
         charts.url = 'api/chart/'+newStation+'/'+newDate
-      charts.fetch()
+      charts.fetch
+        success: (collection) =>
+          @showPanel charts
+          charts.sort()
+          @showCharts charts
+
+
+      # charts = App.request 'chart:entities', chartsUrl
+      # App.execute "when:fetched", charts, =>
+      #
+      # @show @layout,
+      #   loading:
+      #     entities: charts
 
     getPanelView: (charts) ->
       new List.Panel

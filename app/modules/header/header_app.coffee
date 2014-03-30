@@ -8,8 +8,11 @@ module.exports = App.module 'HeaderApp', (HeaderApp, App, Backbone, Marionette, 
 
     API =
       listHeader: ->
-        HeaderApp.List.Controller.listHeader()
+        listController = new HeaderApp.List.Controller  #.listHeader()
+          region: App.headerRegion
+        # listController.initialize()
 
 
     HeaderApp.on 'start', ->
+      console.log 'HeaderApp start'
       API.listHeader()

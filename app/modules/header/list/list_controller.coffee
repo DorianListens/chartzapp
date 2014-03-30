@@ -1,7 +1,7 @@
 App = require 'application'
 HeaderApp = require 'modules/header/header_app'
 
-module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, $, _) ->
+module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, $, _) =>
 
 
   class List.Header extends Marionette.ItemView
@@ -14,14 +14,18 @@ module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, 
     itemView: List.Header
     itemViewContainer: "ul.links"
 
-  List.Controller =
+  class List.Controller extends App.Controllers.Base
+
+    initialize: ->
+      @listHeader()
 
     listHeader: ->
       links = App.request "header:entities"
       window.links = links
 
       headerView = @getHeaderView links
-      App.headerRegion.show headerView
+      # App.headerRegion.show headerView
+      @show headerView
 
     getHeaderView: (links) ->
       new List.Headers

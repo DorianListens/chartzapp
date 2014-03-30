@@ -7,3 +7,19 @@
 		</div>
 	</div>
 </div>
+<script>
+$(document).foundation({
+	abide: {
+		validators: {
+			isStation: function (el, required, parent) {
+				console.log(el.value);
+				var toCheck = el.value;
+				var stationCheck = require('stationCheck');
+				var stationList = require('stationList');
+				var valid = stationCheck(stationList, toCheck);
+				return valid
+				}
+			}
+		}
+});
+</script>

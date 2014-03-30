@@ -1,0 +1,39 @@
+Requirements:
+  List of all earshot stations (for validation)
+  Error handling for charts which aren't found
+  Slightly more advanced date handling. Running into trouble when looking on Monday, stuff getting improperly saved, etc.
+  Automated crawling. The database should build itself (whenever I tell it to - start with all of 2013)
+
+
+
+
+API Requests:
+
+Request any single chart:
+  Look in DB
+    if found -> return
+    else -> crawl, add to db, return DB copy.
+    Gotta stop serving crawled data. Only serve stuff from the DB for data consistency.
+
+Request any single week:
+  Check db for all stations for that week
+    if found -> return
+    else crawl the ones that are missing, add to DB, and return.
+
+  Views for this will be more complicated. Accordions, maybe? Initial display is list of stations + their number 1s? Click to expand and display full chart
+
+Request any single Artist:
+  Check DB for instances of that artist
+    if found -> return all of them
+    else -> say "not found", give some database stats (x individual charts, x individual artists), offer other searches
+
+
+Request any single station over any period of time:
+  Check DB, generate list of all missing charts, crawl all missing charts, add to db, return
+  Provide statistical information: aggregated top 30, Album(s) with most appearances, total albums charted
+
+Request any number of stations over any period of time:
+  Same as above, but with more stations
+
+Request any period of time:
+  Same as above, but with all stations

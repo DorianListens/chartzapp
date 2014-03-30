@@ -4,40 +4,66 @@ require 'lib/view_helper'
 class Application extends Backbone.Marionette.Application
   initialize: =>
 
-    @on "initialize:after", (options) =>
-        Backbone.history.start();
-        # Freeze the object
-        Object.freeze? this
+    @rootRoute = ""
 
+    @on "initialize:after", (options) ->
+      console.log 'initialize:after'
+      # Backbone.history.start()
+      @navigate(@rootRoute, trigger: true) unless @getCurrentRoute()
+      # Freeze the object
+      Object.freeze? this
 
     @addRegions
-        headerRegion: "#header-region"
-        mainRegion: "#main-region"
-        footerRegion: "#footer-region"
+      headerRegion: "#header-region"
+      mainRegion: "#main-region"
+      footerRegion: "#footer-region"
+
+  # @commands.setHandler "register:instance", (instance, id) ->
+  #     @register instance, id
+  #
+  # @commands.setHandler "unregister:instance", (instance, id) ->
+  #     @unregister instance, id
 
 
     @addInitializer (options) =>
 
-        AppLayout = require 'views/AppLayout'
-        @layout = new AppLayout()
-        @layout.render()
+      AppLayout = require 'views/AppLayout'
+      @layout = new AppLayout()
+      @layout.render()
 
+    @reqres.setHandler "default:region", =>
+      @mainRegion
 
     @addInitializer =>
-        @module('HeaderApp').start()
-        @module('ChartApp').start()
-        @module('FooterApp').start()
+      @module('HeaderApp').start()
+      @module('ChartApp').start()
+      @module('FooterApp').start()
 
     # @addInitializer (options) =>
     #     # Instantiate the router
     #     Router = require 'lib/router'
     #     @router = new Router()
 
+
     @start()
 
-module.exports = new Application()
+App = new Application()
 
+# I don't understand why I have to do this. ################################
+
+App.commands.setHandler "register:instance", (instance, id) ->
+    App.register instance, id
+
+App.commands.setHandler "unregister:instance", (instance, id) ->
+    App.unregister instance, id
+
+App.rootRoute = ''
+
+module.exports = App
+
+require 'controllers/baseController'
 require 'modules/entities/entities'
+require 'components/loading/loading'
 require 'modules/header/header_app'
 require 'modules/footer/footer_app'
 require 'modules/chart/chart_app'
