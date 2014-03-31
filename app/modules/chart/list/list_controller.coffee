@@ -22,7 +22,6 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
     events:
       'submit' : 'submit'
-      'click button#sort' : 'sort'
 
     submit: (e) ->
       e.preventDefault()
@@ -30,9 +29,8 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
       dateVal = $.trim @ui.dateInput.val()
       @trigger 'click:submitter', stationVal, dateVal
 
-    sort: (e) ->
-      e.preventDefault()
-      @trigger 'click:sort'
+  class List.Aside extends Marionette.ItemView
+    template: "modules/chart/list/templates/aside"
 
   class List.ChartItem extends Marionette.ItemView
     template: "modules/chart/list/templates/chartItem"
@@ -47,36 +45,81 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
     itemView: List.ChartItem
     emptyView: List.Empty
     itemViewContainer: "#thecharts"
+    events:
+      'click th' : 'clickHeader'
+
+    onRender: ->
+      @$("th")
+      .append($("<span>"))
+      .closest("th")
+      .find("span")
+      .addClass("ui-icon icon-none")
+      .end()
+      .find("[column=\"" + @collection.sortAttribute + "\"] span")
+      .removeClass("icon-none")
+      .addClass @sortUpIcon
+
+      @
+
+    clickHeader: (e) ->
+      $el = $(e.currentTarget)
+      ns = $el.attr("column")
+      cs = @collection.sortAttr
+
+      # Toggle sort if the current column is sorted
+      if ns is cs
+        @collection.sortDir *= -1
+      else
+        @collection.sortDir = 1
+
+      # Adjust the indicators.  Reset everything to hide the indicator
+      $el.closest("th").find("span").attr "class", "ui-icon icon-none"
+
+      # Now show the correct icon on the correct column
+      if @collection.sortDir is 1
+        $el.find("span").removeClass("icon-none").addClass @sortUpIcon
+      else
+        $el.find("span").removeClass("icon-none").addClass @sortDnIcon
+
+      # Now sort the collection
+      @collection.sortCharts ns
+      return
+
 
 
   class List.Controller extends App.Controllers.Base
 
     initialize: ->
-      charts = App.request 'chart:entities' #, '/api/db/wholething'
-      App.execute "when:fetched", charts, =>
-        console.log 'fetched'
 
       @layout = @getLayoutView()
 
       @listenTo @layout, 'show', =>
-        # charts.sort()
-        @showPanel() #charts
-        @showCharts() #charts
+        @showPanel()
+        @showCharts()
 
-      # App.mainRegion.show @layout
       @show @layout,
-        loading:
-          entities: charts
+        loading: true
 
     showCharts: (station, date) ->
       charts = App.request 'chart:entities', station, date
+
       App.execute "when:fetched", charts, =>
         console.log 'fetched'
       charts.sort()
       chartsView = @getChartsView charts
+      asideView = @getAsideView charts
+
+      @listenTo charts, 'sort', =>
+        @show chartsView,
+          region: @layout.tableRegion
+
       @show chartsView,
         region: @layout.tableRegion
         loading: true
+      @show asideView,
+        region: @layout.asideRegion
+        loading: true
+
 
     getChartsView: (charts) ->
       new List.Charts
@@ -86,38 +129,13 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
       panelView = @getPanelView charts
       @listenTo panelView, 'click:submitter', (station, date) =>
         @showCharts station, date
-      # panelView.on 'click:submitter', =>
-      #   @changeChart(charts)
-      panelView.on 'click:sort', =>
+
+      @listenTo panelView, 'click:sort', =>
         @sortChart(charts)
-      @show panelView, region: @layout.panelRegion
+
+      @show panelView,
+        region: @layout.panelRegion
       $(document).foundation()
-
-    sortChart: (charts) =>
-      # charts.comparator = "points"
-      charts.sort()
-      @showCharts charts
-
-    changeChart: (charts) ->
-      newStation = document.getElementById("station_input").value
-      newDate = document.getElementById("date_input").value
-      if newDate is ''
-        charts.url = 'api/chart/'+newStation
-      else
-        charts.url = 'api/chart/'+newStation+'/'+newDate
-      charts.fetch
-        success: (collection) =>
-          @showPanel charts
-          charts.sort()
-          @showCharts charts
-
-
-      # charts = App.request 'chart:entities', chartsUrl
-      # App.execute "when:fetched", charts, =>
-      #
-      # @show @layout,
-      #   loading:
-      #     entities: charts
 
     getPanelView: (charts) ->
       new List.Panel
@@ -125,3 +143,7 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
     getLayoutView: ->
       new List.Layout
+
+    getAsideView: (charts) ->
+      new List.Aside
+        collection: charts

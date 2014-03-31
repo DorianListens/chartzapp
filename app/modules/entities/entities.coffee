@@ -26,31 +26,23 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 
 	class Entities.ChartCollection extends Backbone.Collection
 		model: Entities.ChartItem
-		comparator: (collection) ->
-			currentPos = collection.get 'currentPos'
-			return currentPos
+		sortAttr: "points"
+		sortDir: -1
 
-	  # comparator: (property) ->
-	  #   return selectedStrategy.apply Entities.ChartItem.get(property)
-		#
-	  # strategies:
-	  #   points: (model) ->
-	  #     model.get "points"
-		#
-	  #   label: (model) ->
-	  #     model.get "label"
-		#
-	  # changeSort: (sortProperty) ->
-	  #   @comparator = @strategies[sortProperty]
-	  #   return
-		#
-	  # initialize: ->
-	  #   @changeSort "points"
-	  #   console.log @comparator
-	  #   @changeSort "label"
-	  #   console.log @comparator
-	  #   return
-		# #
+		sortCharts: (attr) ->
+			@sortAttr = attr
+			@sort()
+
+		comparator: (a, b) ->
+			a = a.get(@sortAttr)
+			b = b.get(@sortAttr)
+
+			return 0 if a is b
+
+			if @sortDir is 1
+				return if a > b then 1 else -1
+			else
+				return if a > b then -1 else 1
 
 
 	API =
