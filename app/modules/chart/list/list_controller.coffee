@@ -49,8 +49,9 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
     events:
       'click th' : 'clickHeader'
 
-    sortUpIcon: "fi-arrow-up"
-    sortDnIcon: "fi-arrow-down"
+    sortUpIcon: "fi-arrow-down"
+    sortDnIcon: "fi-arrow-up"
+
 
     onRender: ->
       @$("th")
@@ -58,9 +59,12 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
       .closest("th")
       .find("i")
       .addClass("fi-minus-circle size-18")
-      # .end()
-      .find("[column=\"" + @collection.sortAttr + "\"] i")
-      .removeClass("fi-minus")
+
+      console.log @collection.sortAttr
+
+      @$("[column='#{@collection.sortAttr}']")
+      .find("i")
+      .removeClass("fi-minus-circle")
       .addClass @sortUpIcon
 
       @
