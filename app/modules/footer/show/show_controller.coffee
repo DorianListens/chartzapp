@@ -1,9 +1,9 @@
-# Show Controller
 App = require 'application'
 FooterApp = require 'modules/footer/footer_app'
 Controllers = require 'controllers/baseController'
 
-module.exports = App.module "FooterApp.Show", (Show, App, Backbone, Marionette, $, _) =>
+module.exports = App.module "FooterApp.Show",
+(Show, App, Backbone, Marionette, $, _) ->
 
   class Show.Footer extends Marionette.ItemView
     template: '/views/templates/footer'

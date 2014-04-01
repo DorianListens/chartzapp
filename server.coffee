@@ -38,6 +38,7 @@ albumSchema = mongoose.Schema
   album: String
   label: String
   points: Number
+  totalPoints: Number
   currentPos: Number
   appearances: [
     appearanceSchema
@@ -46,14 +47,18 @@ albumSchema = mongoose.Schema
 
 albumSchema.pre 'save', (next) ->
   self = @
-  if self.points is undefined
-    self.points = 0
+  if self.totalPoints is undefined
+    self.totalPoints = 0
   pointSum = 0
   for appearance in @appearances
     do (appearance) ->
       pointSum += (31 - parseInt(appearance.position))
-  self.points = pointSum
+  self.totalPoints = pointSum
   next()
+
+albumSchema.post 'init', ->
+  self = @
+  self.currentPos = @appearances[0].position
 
 
 albumSchema.post 'init', ->
@@ -189,7 +194,7 @@ getChart = (station, week, res) ->
   dbQuery = ->
     console.log 'Making dbQuery'
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
-    { artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
+    { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
       console.log err if err
     # If nothing is in the DB, make the crawl.
 
@@ -197,7 +202,8 @@ getChart = (station, week, res) ->
         console.log "making Earshot Crawl for #{the_url}"
         deferredRequest(the_url).then(chartParse).done (chart_res) ->
           console.log 'Returned'
-          addToDb(chart_res)
+          addToDb(chart_res).done (charts) ->
+            res.send charts
           # res.send chart_res
           # return
         , (err) ->
@@ -205,15 +211,13 @@ getChart = (station, week, res) ->
           res.send err
           return
       else
-        counter = 0
-        for result in results
-          do (result) ->
-            counter++
-            result.currentPos = result.appearances[0].position
-            result.save()
+        # for result in results
+        #   do (result) ->
+        #     counter++
+        #     result.currentPos = result.appearances[0].position
+        #     result.save()
         res.send results
         console.log "found in db #{station}"
-        console.log counter
 
   # Load the given url, and grab the chart table
 
@@ -242,6 +246,7 @@ getChart = (station, week, res) ->
   # If the chart is new, add it to the database
 
   addToDb = (chart_array) ->
+    d = deferred()
     console.log "adding to DB"
     for record in chart_array
       do (record) ->
@@ -281,11 +286,14 @@ getChart = (station, week, res) ->
               else
                 console.log "Already added this appearance to the db"
                 # console.log results.appearances
+    d.resolve Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
+    { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}
+    # , (err, results) ->
+      # results
+    return d.promise()
     # return chart_array
-    # Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
-    # { artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
-    #   res.send results
-    dbQuery()
+
+    # dbQuery()
 
   dbQuery()
 

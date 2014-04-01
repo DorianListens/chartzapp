@@ -1,5 +1,16 @@
 exports.config =
   # See docs at http://brunch.readthedocs.org/en/latest/config.html.
+  plugins:
+    coffeelint:
+      pattern: /^app\/.*\.coffee$/
+      options:
+        indentation:
+          level: "error"
+          value: 2
+        no_tabs:
+          level: "ignore"
+        max_line_length:
+          level: "warn"
   files:
     javascripts:
       defaultExtension: 'coffee'

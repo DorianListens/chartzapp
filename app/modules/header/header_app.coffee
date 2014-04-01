@@ -1,18 +1,17 @@
 App = require 'application'
 
 
-module.exports = App.module 'HeaderApp', (HeaderApp, App, Backbone, Marionette, $, _) =>
+module.exports = App.module 'HeaderApp',
+(HeaderApp, App, Backbone, Marionette, $, _) ->
 
-    HeaderApp.startWithParent = false
-    HeaderApp.List = require 'modules/header/list/list_controller'
+  HeaderApp.startWithParent = false
+  HeaderApp.List = require 'modules/header/list/list_controller'
 
-    API =
-      listHeader: ->
-        listController = new HeaderApp.List.Controller  #.listHeader()
-          region: App.headerRegion
-        # listController.initialize()
+  API =
+    listHeader: ->
+      listController = new HeaderApp.List.Controller
+        region: App.headerRegion
 
-
-    HeaderApp.on 'start', ->
-      console.log 'HeaderApp start'
-      API.listHeader()
+  HeaderApp.on 'start', ->
+    console.log 'HeaderApp start'
+    API.listHeader()

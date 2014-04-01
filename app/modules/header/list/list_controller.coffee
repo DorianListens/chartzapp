@@ -1,7 +1,8 @@
 App = require 'application'
 HeaderApp = require 'modules/header/header_app'
 
-module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, $, _) =>
+module.exports = App.module 'HeaderApp.List',
+(List, App, Backbone, Marionette, $, _) ->
 
 
   class List.Header extends Marionette.ItemView
@@ -9,7 +10,6 @@ module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, 
     tagName: "li"
 
   class List.Headers extends Marionette.CompositeView
-    # className: 'fixed'
     template: 'modules/header/list/templates/headers'
     itemView: List.Header
     itemViewContainer: "ul.links"
@@ -24,7 +24,6 @@ module.exports = App.module 'HeaderApp.List', (List, App, Backbone, Marionette, 
       window.links = links
 
       headerView = @getHeaderView links
-      # App.headerRegion.show headerView
       @show headerView
 
     getHeaderView: (links) ->

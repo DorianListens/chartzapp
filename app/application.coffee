@@ -1,17 +1,15 @@
 require 'lib/view_helper'
 
-
 class Application extends Backbone.Marionette.Application
+
   initialize: =>
 
     @rootRoute = "listchart"
 
     @on "initialize:after", (options) ->
-      console.log 'initialize:after'
 
       @startHistory()
       @navigate(@rootRoute, trigger: true) unless @getCurrentRoute()
-      #@navigate(@rootRoute, trigger: true) unless @getCurrentRoute()
       # Freeze the object
       Object.freeze? this
 
@@ -40,10 +38,10 @@ App = new Application()
 # I don't understand why I have to do this. ################################
 
 App.commands.setHandler "register:instance", (instance, id) ->
-    App.register instance, id
+  App.register instance, id
 
 App.commands.setHandler "unregister:instance", (instance, id) ->
-    App.unregister instance, id
+  App.unregister instance, id
 
 App.rootRoute = ''
 

@@ -3,7 +3,8 @@ ChartApp = require 'modules/chart/chart_app'
 Controllers = require 'controllers/baseController'
 
 
-module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $, _) =>
+module.exports = App.module "ChartApp.List",
+(List, App, Backbone, Marionette, $, _) ->
 
   class List.Layout extends Marionette.Layout
     template: "modules/chart/list/templates/list_layout"
@@ -59,9 +60,6 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
       .closest("th")
       .find("i")
       .addClass("fi-minus-circle size-18")
-
-      console.log @collection.sortAttr
-
       @$("[column='#{@collection.sortAttr}']")
       .find("i")
       .removeClass("fi-minus-circle")
@@ -111,7 +109,7 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
     showCharts: (station, date) ->
       charts = App.request 'chart:entities', station, date
 
-      App.execute "when:fetched", charts, =>
+      App.execute "when:fetched", charts, ->
         console.log 'fetched'
       charts.sort()
       chartsView = @getChartsView charts

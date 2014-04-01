@@ -1,14 +1,15 @@
 App = require 'application'
 
-module.exports = App.module "FooterApp", (FooterApp, App, Backbone, Marionette, $, _) =>
+module.exports = App.module "FooterApp",
+(FooterApp, App, Backbone, Marionette, $, _) ->
 
-    FooterApp.startWithParent = false;
-    FooterApp.Show = require 'modules/footer/show/show_controller'
+  FooterApp.startWithParent = false
+  FooterApp.Show = require 'modules/footer/show/show_controller'
 
-    API =
-      showFooter: ->
-        new FooterApp.Show.Controller
-          region: App.footerRegion
+  API =
+    showFooter: ->
+      new FooterApp.Show.Controller
+        region: App.footerRegion
 
-    FooterApp.on "start", ->
-      API.showFooter()
+  FooterApp.on "start", ->
+    API.showFooter()
