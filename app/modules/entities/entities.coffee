@@ -32,6 +32,7 @@ module.exports = App.module "Entities", (Entities, App, Backbone, Marionette, $,
 		sortCharts: (attr) ->
 			@sortAttr = attr
 			@sort()
+			@trigger "reset"
 
 		comparator: (a, b) ->
 			a = a.get(@sortAttr)

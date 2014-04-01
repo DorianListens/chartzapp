@@ -40,6 +40,7 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
     template: "modules/chart/list/templates/empty"
     tagName: 'tr'
 
+
   class List.Charts extends Marionette.CompositeView
     template: "modules/chart/list/templates/charts"
     itemView: List.ChartItem
@@ -48,20 +49,23 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
     events:
       'click th' : 'clickHeader'
 
+    sortUpIcon: "fi-arrow-up"
+    sortDnIcon: "fi-arrow-down"
+
     onRender: ->
       @$("th")
-      .append($("<span>"))
+      .append($("<i>"))
       .closest("th")
-      .find("span")
-      .addClass("ui-icon icon-none")
-      .end()
-      .find("[column=\"" + @collection.sortAttribute + "\"] span")
-      .removeClass("icon-none")
+      .find("i")
+      .addClass("fi-minus-circle size-18")
+      # .end()
+      .find("[column=\"" + @collection.sortAttr + "\"] i")
+      .removeClass("fi-minus")
       .addClass @sortUpIcon
 
       @
 
-    clickHeader: (e) ->
+    clickHeader: (e) =>
       $el = $(e.currentTarget)
       ns = $el.attr("column")
       cs = @collection.sortAttr
@@ -73,13 +77,14 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
         @collection.sortDir = 1
 
       # Adjust the indicators.  Reset everything to hide the indicator
-      $el.closest("th").find("span").attr "class", "ui-icon icon-none"
+      $("th").find("i").attr "class", "fi-minus-circle size-18"
+        # el.closest
 
       # Now show the correct icon on the correct column
       if @collection.sortDir is 1
-        $el.find("span").removeClass("icon-none").addClass @sortUpIcon
+        $el.find("i").removeClass("fi-minus-circle").addClass @sortUpIcon
       else
-        $el.find("span").removeClass("icon-none").addClass @sortDnIcon
+        $el.find("i").removeClass("fi-minus-circle").addClass @sortDnIcon
 
       # Now sort the collection
       @collection.sortCharts ns
@@ -109,9 +114,9 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
       chartsView = @getChartsView charts
       asideView = @getAsideView charts
 
-      @listenTo charts, 'sort', =>
-        @show chartsView,
-          region: @layout.tableRegion
+      # @listenTo charts, 'sort', =>
+      #   # @show chartsView,
+      #   #   region: @layout.tableRegion
 
       @show chartsView,
         region: @layout.tableRegion
