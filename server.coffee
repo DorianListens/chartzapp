@@ -289,6 +289,6 @@ getChart = (station, week, res) ->
 
   dbQuery()
 
-isHeroku = NODE_ENV?
+isHeroku = process.env.MONGOHQ_URL?
 if isHeroku
   exports.startServer(5000)
