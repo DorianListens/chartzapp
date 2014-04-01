@@ -78,7 +78,6 @@ module.exports = App.module "ChartApp.List", (List, App, Backbone, Marionette, $
 
       # Adjust the indicators.  Reset everything to hide the indicator
       $("th").find("i").attr "class", "fi-minus-circle size-18"
-        # el.closest
 
       # Now show the correct icon on the correct column
       if @collection.sortDir is 1

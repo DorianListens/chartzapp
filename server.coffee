@@ -20,7 +20,8 @@ mongoose = require 'mongoose'
 
 # Setup Database ##################################################
 
-mongoose.connect 'mongodb://localhost/chartz-db'
+mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/chartz-db'
+mongoose.connect mongoUri
 
 db = mongoose.connection
 db.on "error", console.error.bind(console, "connection error:")
