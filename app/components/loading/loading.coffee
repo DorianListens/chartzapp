@@ -29,14 +29,6 @@ module.exports = App.module "Components.Loading",
 
     showRealView: (realView, loadingView, config) ->
       App.execute "when:fetched", config.entities, =>
-        ## ...after the entities are fetched, execute this callback
-        ## ================================================================ ##
-        ## If the region we are trying to insert is not the loadingView then
-        ## we know the user has navigated to a different page while the loading
-        ## view was still open. In that case, we know to manually close the original
-        ## view so its controller is also closed.  We also prevent showing the real
-        ## view (which would snap the user back to the old view unexpectedly)
-        ## ================================================================ ##
         switch config.loadingType
           when "opacity"
             @region.currentView.$el.removeAttr "style"

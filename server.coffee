@@ -1,8 +1,8 @@
 # ###
 
 # The ChartZapp API
-# Responsible for crawling earshot-online.com and returning the requested chart as a JSON array.
-#
+# Responsible for interacting with the DB,
+# crawling Earshot, and returning results
 #
 
 # ###
@@ -13,6 +13,7 @@
 express = require 'express'
 request = require 'request'
 deferred = require 'deferred'
+promisify = deferred.promisify
 cheerio = require 'cheerio'
 moment = require 'moment'
 mongo = require 'mongodb'
@@ -27,6 +28,8 @@ db = mongoose.connection
 db.on "error", console.error.bind(console, "connection error:")
 db.once "open", ->
   console.log 'connected to the db'
+
+# Define schema
 
 appearanceSchema = mongoose.Schema
   week: String
@@ -45,6 +48,8 @@ albumSchema = mongoose.Schema
     index: true
   ]
 
+# Recalculate "total points" on every save
+
 albumSchema.pre 'save', (next) ->
   self = @
   if self.totalPoints is undefined
@@ -56,10 +61,13 @@ albumSchema.pre 'save', (next) ->
   self.totalPoints = pointSum
   next()
 
+# Set current position to whatever is on top of the "appearances" stack
+
 albumSchema.post 'init', ->
   self = @
   self.currentPos = @appearances[0].position
 
+# Set current points on every load ###
 
 albumSchema.post 'init', ->
   self = @
@@ -70,6 +78,8 @@ albumSchema.post 'init', ->
     do (appearance) ->
       pointSum += (31 - parseInt(appearance.position))
   self.points = pointSum
+
+# instantiate the schema
 
 Album = mongoose.model 'Album', albumSchema
 
@@ -92,7 +102,6 @@ exports.startServer = (port, path, callback) ->
 
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
-
 
   # Get the whole DB
 
@@ -120,10 +129,8 @@ exports.startServer = (port, path, callback) ->
       newDate.set('day', 2)
     station = req.params.station.toLowerCase()
     week = newDate.format('YYYY-MM-DD')
-    # Album.find {"appearances.station" : "#{req.params.station.toLowerCase()}", "appearances.week" : "#{newDate.format('YYYY-MM-DD')}" } , (err, results) ->
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
     { artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
-    # Album.aggregate { $match: {appearances: { 'station' : station, 'week' : week}}}, {$sort: { 'appearances.$.position' : -1}}, (err, results) ->
       console.log err if err
       if results.length is 0
         console.log 'no results'
@@ -154,7 +161,6 @@ exports.startServer = (port, path, callback) ->
       theDate = newDate.format('YYYY-MM-DD')
 
     newChart = getChart(req.params.station.toLowerCase(), theDate, res)
-
 
 # Set up the deferred request.
 
@@ -192,6 +198,7 @@ getChart = (station, week, res) ->
   # Check the database for the given station and week, and return false if nothing found.
 
   dbQuery = ->
+    d = deferred()
     console.log 'Making dbQuery'
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
     { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
@@ -202,20 +209,12 @@ getChart = (station, week, res) ->
         console.log "making Earshot Crawl for #{the_url}"
         deferredRequest(the_url).then(chartParse).done (chart_res) ->
           console.log 'Returned'
-          addToDb(chart_res).done (charts) ->
-            res.send charts
-          # res.send chart_res
-          # return
+          addToDb(chart_res)
         , (err) ->
           console.log err
           res.send err
           return
       else
-        # for result in results
-        #   do (result) ->
-        #     counter++
-        #     result.currentPos = result.appearances[0].position
-        #     result.save()
         res.send results
         console.log "found in db #{station}"
 
@@ -224,7 +223,6 @@ getChart = (station, week, res) ->
   chartParse = (body) ->
     $ = cheerio.load(body)
     chart_array = []
-
 
     # Find the relevant table, and parse it.
 
@@ -246,7 +244,6 @@ getChart = (station, week, res) ->
   # If the chart is new, add it to the database
 
   addToDb = (chart_array) ->
-    d = deferred()
     console.log "adding to DB"
     for record in chart_array
       do (record) ->
@@ -269,7 +266,7 @@ getChart = (station, week, res) ->
                   position: record.position
                 ]
             newAlbum.save (err, newAlbum) ->
-              console.log err if err
+              console.error err if err
               console.log "saved #{record.artist} - #{record.album} to the db for the first time"
           else
             console.log "Found #{record.artist} - #{record.album} in the db"
@@ -285,17 +282,12 @@ getChart = (station, week, res) ->
                 console.log "Appearance added to the db"
               else
                 console.log "Already added this appearance to the db"
-                # console.log results.appearances
-    d.resolve Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
-    { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}
-    # , (err, results) ->
-      # results
-    return d.promise()
-    # return chart_array
-
-    # dbQuery()
+    dbQuery()
 
   dbQuery()
+
+
+# Heroku ENV setup #################################################
 
 isHeroku = process.env.MONGOHQ_URL?
 if isHeroku

@@ -3,7 +3,6 @@ App = require('application')
 module.exports = App.module "Entities",
 (Entities, App, Backbone, Marionette, $, _) ->
 
-
   App.commands.setHandler "when:fetched", (entities, callback) ->
     xhrs = _.chain([entities]).flatten().pluck("_fetch").value()
 
@@ -24,7 +23,6 @@ module.exports = App.module "Entities",
       currentPos: Number
       appearances: []
 
-
   class Entities.ChartCollection extends Backbone.Collection
     model: Entities.ChartItem
     sortAttr: "points"
@@ -42,15 +40,27 @@ module.exports = App.module "Entities",
       return 0 if a is b
 
       if @sortDir is 1
-        return if a > b then 1 else -1
+        if a > b then 1 else -1
       else
-        return if a > b then -1 else 1
+        if a > b then -1 else 1
 
+  class Entities.ArtistItem extends Backbone.Model
+
+  class Entities.ArtistCollection extends Backbone.Collection
+    model: Entities.ArtistItem
 
   API =
+    getArtist: (artist) ->
+      artists = new Entities.ArtistCollection
+      artists.url = "/api/artists/#{artist}"
+      artists.fetch
+        reset: true
+      artists
+
     getHeaders: ->
       new Entities.HeaderCollection [
         { name: "Charts", url: '/' }
+        { name: "Artists", url: '/#artist'}
       ]
 
     getCharts: (station = null, date = null) ->
@@ -75,6 +85,9 @@ module.exports = App.module "Entities",
 
   App.reqres.setHandler "header:entities", ->
     API.getHeaders()
+
+  App.reqres.setHandler "artist:entities", (artist) ->
+    API.getArtist artist
 
   App.reqres.setHandler 'chart:entities', (station, date) ->
     API.getCharts station, date

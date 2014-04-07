@@ -35,8 +35,6 @@ class Application extends Backbone.Marionette.Application
 
 App = new Application()
 
-# I don't understand why I have to do this. ################################
-
 App.commands.setHandler "register:instance", (instance, id) ->
   App.register instance, id
 
@@ -53,3 +51,4 @@ require 'components/loading/loading'
 require 'modules/header/header_app'
 require 'modules/footer/footer_app'
 require 'modules/chart/chart_app'
+require 'modules/artists/artists_app'

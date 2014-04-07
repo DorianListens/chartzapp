@@ -2,7 +2,6 @@ App = require 'application'
 ChartApp = require 'modules/chart/chart_app'
 Controllers = require 'controllers/baseController'
 
-
 module.exports = App.module "ChartApp.List",
 (List, App, Backbone, Marionette, $, _) ->
 
@@ -53,7 +52,6 @@ module.exports = App.module "ChartApp.List",
     sortUpIcon: "fi-arrow-down"
     sortDnIcon: "fi-arrow-up"
 
-
     onRender: ->
       @$("th")
       .append($("<i>"))
@@ -90,7 +88,6 @@ module.exports = App.module "ChartApp.List",
       # Now sort the collection
       @collection.sortCharts ns
       return
-
 
 
   class List.Controller extends App.Controllers.Base
@@ -135,9 +132,6 @@ module.exports = App.module "ChartApp.List",
       panelView = @getPanelView charts
       @listenTo panelView, 'click:submitter', (station, date) =>
         @showCharts station, date
-
-      @listenTo panelView, 'click:sort', =>
-        @sortChart(charts)
 
       @show panelView,
         region: @layout.panelRegion

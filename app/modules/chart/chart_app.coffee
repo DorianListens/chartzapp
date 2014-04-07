@@ -1,6 +1,5 @@
 App = require 'application'
 
-
 module.exports = App.module 'ChartApp',
 (ChartApp, App, Backbone, Marionette, $, _) ->
 
