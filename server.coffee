@@ -320,8 +320,6 @@ getChart = (station, week, res) ->
                 if count is 30
                   dbQuery()
 
-
-
   dbQuery()
 
 
