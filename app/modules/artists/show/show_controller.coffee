@@ -29,6 +29,8 @@ module.exports = App.module 'ArtistsApp.Show',
       @show artistsView,
         region: @layout.tableRegion
         loading: true
+      App.execute "when:fetched", artists, ->
+        $(document).foundation()
 
     showEmpty: ->
       emptyView = @getEmptyView()

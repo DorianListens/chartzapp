@@ -27,6 +27,7 @@ module.exports = App.module "ChartApp.List",
       e.preventDefault()
       stationVal = $.trim @ui.stationInput.val()
       dateVal = $.trim @ui.dateInput.val()
+      console.log dateVal
       @trigger 'click:submitter', stationVal, dateVal
 
   class List.Aside extends Marionette.ItemView
@@ -131,6 +132,7 @@ module.exports = App.module "ChartApp.List",
     showPanel: (charts) ->
       panelView = @getPanelView charts
       @listenTo panelView, 'click:submitter', (station, date) =>
+        console.log date
         @showCharts station, date
 
       @show panelView,

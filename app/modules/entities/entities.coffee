@@ -1,4 +1,4 @@
-App = require('application')
+App = require 'application'
 
 module.exports = App.module "Entities",
 (Entities, App, Backbone, Marionette, $, _) ->
@@ -66,6 +66,7 @@ module.exports = App.module "Entities",
     getCharts: (station = null, date = null) ->
       console.log 'getCharts'
       console.log station
+      console.log date
       if station is null and date is null
         console.log 'first conditional'
         chartsUrl = '/api/db/wholething'

@@ -1,15 +1,20 @@
-<div class="row">
-  <div class="large-3 columns">{{artist}}</div>
-  <div class="large-3 columns">{{album}}</div>
-  <div class="large-3 columns">{{label}}</div>
-  <div class="large-3 columns">{{totalPoints}}</div>
-</div>
-
-{{#each appearances}}
-<div class="row">
-  <div class="large-4 columns">Week: {{this.week}}</div>
-  <div class="large-4 columns">Station: {{this.station}}</div>
-  <div class="large-4 columns">Position: {{this.position}}</div>
-</div>
-
-{{/each}}
+<dd>
+  <a href="#{{slug}}">
+    <div class="row">
+      <div class="large-3 columns">{{artist}}</div>
+      <div class="large-3 columns">{{album}}</div>
+      <div class="large-3 columns">{{label}}</div>
+      <div class="large-3 columns">{{totalPoints}}</div>
+    </div>
+<!--     {{artist}} -->
+  </a>
+  <div id="{{slug}}" class="content active">
+    {{#each appearances}}
+      <div class="appearance-row row">
+        <div class="large-4 columns">Week: {{this.week}}</div>
+        <div class="large-4 columns">Station: {{toUpperCase this.station}}</div>
+        <div class="large-4 columns">Position: {{this.position}}</div>
+      </div>
+    {{/each}}
+  </div>
+</dd>

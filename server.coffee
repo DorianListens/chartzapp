@@ -37,6 +37,7 @@ appearanceSchema = mongoose.Schema
   position: String
 
 albumSchema = mongoose.Schema
+  slug: String
   artist: String
   album: String
   label: String
@@ -47,6 +48,10 @@ albumSchema = mongoose.Schema
     appearanceSchema
     index: true
   ]
+
+
+sluggify = (Text) ->
+  Text.toLowerCase().replace(RegExp(" ", "g"), "-").replace /[^\w-]+/g, ""
 
 # Recalculate "total points" on every save
 
@@ -59,6 +64,14 @@ albumSchema.pre 'save', (next) ->
     do (appearance) ->
       pointSum += (31 - parseInt(appearance.position))
   self.totalPoints = pointSum
+  next()
+
+# Save Slug on Save
+
+albumSchema.pre 'save', (next) ->
+  self = @
+  slugText = "#{self.artist} #{self.album}"
+  self.slug = sluggify slugText
   next()
 
 # Set current position to whatever is on top of the "appearances" stack
@@ -78,6 +91,13 @@ albumSchema.post 'init', ->
     do (appearance) ->
       pointSum += (31 - parseInt(appearance.position))
   self.points = pointSum
+
+# Set the Slug
+
+albumSchema.post 'init', ->
+  self = @
+  slugText = "#{self.artist} #{self.album}"
+  self.slug = sluggify slugText
 
 # instantiate the schema
 
@@ -203,16 +223,20 @@ getChart = (station, week, res) ->
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
     { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
       console.log err if err
+
     # If nothing is in the DB, make the crawl.
 
       if results.length is 0
         console.log "making Earshot Crawl for #{the_url}"
         deferredRequest(the_url).then(chartParse).done (chart_res) ->
           console.log 'Returned'
-          addToDb(chart_res)
+          if chart_res.length is 0
+            res.send chart_res #"Sorry, there is no #{station} chart for #{week}"
+          else
+            addToDb(chart_res)
         , (err) ->
           console.log err
-          res.send err
+          res.send []
           return
       else
         res.send results
@@ -244,6 +268,7 @@ getChart = (station, week, res) ->
   # If the chart is new, add it to the database
 
   addToDb = (chart_array) ->
+    count = 0
     console.log "adding to DB"
     for record in chart_array
       do (record) ->
@@ -268,6 +293,10 @@ getChart = (station, week, res) ->
             newAlbum.save (err, newAlbum) ->
               console.error err if err
               console.log "saved #{record.artist} - #{record.album} to the db for the first time"
+              count++
+              console.log count
+              if count is 30
+                dbQuery()
           else
             console.log "Found #{record.artist} - #{record.album} in the db"
             if results.appearances.length > 0
@@ -280,9 +309,18 @@ getChart = (station, week, res) ->
                 results.appearances.push appearance
                 results.save()
                 console.log "Appearance added to the db"
+                count++
+                console.log count
+                if count is 30
+                  dbQuery()
               else
                 console.log "Already added this appearance to the db"
-    dbQuery()
+                count++
+                console.log count
+                if count is 30
+                  dbQuery()
+
+
 
   dbQuery()
 
