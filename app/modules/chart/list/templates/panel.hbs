@@ -6,6 +6,12 @@
         <label>Station:<input type="text" id="station_input" required data-abide-validator='isStation'></input></label>
         <small class="error">You must submit a valid station.</small>
       </div>
+      <div class="station-select">
+        <select data-placeholder="Choose a Station..." class="chosen-select" style="width:350px;">
+          <option value = ""></option>
+          <option value = "CKUT">CKUT</option>
+        </select>
+      </div>
       <div class="date-field">
         <label>Date:</label><input type="date" id="date_input"></input>
         <small class='error'>Please submit a valid date</small>

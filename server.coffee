@@ -39,6 +39,7 @@ appearanceSchema = mongoose.Schema
 albumSchema = mongoose.Schema
   slug: String
   artist: String
+  lartist: String
   album: String
   label: String
   points: Number
@@ -52,6 +53,11 @@ albumSchema = mongoose.Schema
 
 sluggify = (Text) ->
   Text.toLowerCase().replace(RegExp(" ", "g"), "-").replace /[^\w-]+/g, ""
+
+albumSchema.pre 'save', (next) ->
+  self = @
+  self.lartist = self.artist.toLowerCase()
+  next()
 
 # Recalculate "total points" on every save
 
@@ -79,6 +85,10 @@ albumSchema.pre 'save', (next) ->
 albumSchema.post 'init', ->
   self = @
   self.currentPos = @appearances[0].position
+
+albumSchema.post 'init', ->
+  self = @
+  self.lartist = self.artist.toLowerCase()
 
 # Set current points on every load ###
 
@@ -161,7 +171,8 @@ exports.startServer = (port, path, callback) ->
   # Get all enteries for a given artist
 
   app.get "/api/artists/:artist", (req, res) ->
-    Album.find {"artist" : "#{req.params.artist}"}, (err, results) ->
+    theArtist = req.params.artist.toLowerCase()
+    Album.find {"lartist" : theArtist}, (err, results) ->
       console.log err if err
       console.log req.params.artist
       res.send results
@@ -251,6 +262,15 @@ getChart = (station, week, res) ->
     # Find the relevant table, and parse it.
 
     $("th").parents("table").find("tr").each (index, item) ->
+      if index is 1
+        foundDate = $(item).find("td em strong").text().trim()
+        console.log "Found date is #{foundDate}"
+        newMoment = moment(foundDate, "dddd, MMMM D, YYYY")
+        console.log "week is #{week}"
+        theDate = newMoment.format('YYYY-MM-DD')
+        if week isnt theDate
+          week = theDate
+          console.log "week has been updated to #{theDate}" 
       if 3 < index < 34
         tds = $(item).find("td")
         chartPos = $(tds.eq(0)).text().trim()
