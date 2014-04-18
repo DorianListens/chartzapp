@@ -5,7 +5,7 @@ module.exports = App.module 'ChartApp',
 
   class ChartApp.Router extends Marionette.AppRouter
     appRoutes:
-      "listchart" : "listChart"
+      "chart" : "listChart"
 
   ChartApp.startWithParent = false
   ChartApp.List = require 'modules/chart/list/list_controller'

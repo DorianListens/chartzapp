@@ -32,6 +32,8 @@ exports.config =
           'vendor/scripts/backbone.js'
           'vendor/scripts/backbone.marionette.js'
           'vendor/scripts/spin.js'
+          'vendor/scripts/foundation.js'
+          'vendor/scripts/foundation/*'
         ]
         after: [
           'test/vendor/scripts/test-helper.js'

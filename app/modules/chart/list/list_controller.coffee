@@ -13,11 +13,11 @@ module.exports = App.module "ChartApp.List",
       asideRegion: "#aside-region"
       tableRegion: "#table-region"
 
+
   class List.Panel extends Marionette.ItemView
     template: "modules/chart/list/templates/panel"
-
     ui:
-      'stationInput' : '#station_input'
+      'stationInput' : '#station-select'
       'dateInput' : '#date_input'
 
     events:
@@ -113,10 +113,6 @@ module.exports = App.module "ChartApp.List",
       chartsView = @getChartsView charts
       asideView = @getAsideView charts
 
-      # @listenTo charts, 'sort', =>
-      #   # @show chartsView,
-      #   #   region: @layout.tableRegion
-
       @show chartsView,
         region: @layout.tableRegion
         loading: true
@@ -130,7 +126,8 @@ module.exports = App.module "ChartApp.List",
         collection: charts
 
     showPanel: (charts) ->
-      panelView = @getPanelView charts
+      stations = App.request 'stations:entities'
+      panelView = @getPanelView stations
       @listenTo panelView, 'click:submitter', (station, date) =>
         console.log date
         @showCharts station, date
@@ -138,10 +135,12 @@ module.exports = App.module "ChartApp.List",
       @show panelView,
         region: @layout.panelRegion
       $(document).foundation()
+      $(".chosen-select").chosen()
 
-    getPanelView: (charts) ->
+    getPanelView: (stations) ->
       new List.Panel
-        collection: charts
+        collection: stations
+        loading: true
 
     getLayoutView: ->
       new List.Layout

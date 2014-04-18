@@ -1,0 +1,23 @@
+{
+  "name": "chartzapp",
+  "version": "0.0.0",
+  "homepage": "https://github.com/DorianListens/chartzapp",
+  "authors": [
+    "Dorian <dorian.scheidt@gmail.com>"
+  ],
+  "main": "server.coffee",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "chosen_v1.1.0": "https://github.com/harvesthq/chosen/releases/download/v1.1.0/chosen_v1.1.0.zip",
+    "fastclick": ">=0.6.11",
+    "foundation": "~5.2.2"
+  }
+}

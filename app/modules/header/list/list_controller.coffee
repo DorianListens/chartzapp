@@ -8,6 +8,13 @@ module.exports = App.module 'HeaderApp.List',
   class List.Header extends Marionette.ItemView
     template: "modules/header/list/templates/header"
     tagName: "li"
+    events:
+      'click' : 'nav'
+    nav: (e) ->
+      e.preventDefault()
+      route = @model.get('path')
+      App.navigate(route, trigger: true)
+
 
   class List.Headers extends Marionette.CompositeView
     template: 'modules/header/list/templates/headers'

@@ -8,17 +8,19 @@
     </div>
   </a>
   <div id="{{slug}}" class="content">
-    <div class="appearance-row row">
-      <div class="large-4 columns">Position</div>
-      <div class="large-4 columns">Week</div>
-      <div class="large-4 columns">Station</div>
-    </div>
-    {{#each appearances}}
-      <div class="appearance-row row">
-        <div class="large-4 columns">{{this.position}}</div>
-        <div class="large-4 columns">{{this.week}}</div>
-        <div class="large-4 columns">{{toUpperCase this.station}}</div>
-      </div>
-    {{/each}}
+    <table width="100%">
+      <tr>
+        <th>Position</th>
+        <th>Station</th>
+        <th>Week</th>
+      </tr>
+    {{#each_with_sort appearances "week"}}
+      <tr>
+        <td>{{this.position}}</td>
+        <td>{{toUpper this.station}}</td>
+        <td>{{this.week}}</td>
+      </tr>
+    {{/each_with_sort}}
+    </table>
   </div>
 </dd>

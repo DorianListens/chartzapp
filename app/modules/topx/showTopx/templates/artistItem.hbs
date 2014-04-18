@@ -1,0 +1,22 @@
+<dd>
+  <a href="#{{_id.slug}}">
+    #{{index}} - {{countPoints appearances}} - {{_id.artist}} - {{_id.album}} - {{_id.label}} - {{appearances.length}} - {{_id.points}}
+  </a>
+  <div id="{{_id.slug}}" class="content">
+    <table width="100%">
+      <tr>
+
+        <th>Position</th>
+        <th>Station</th>
+        <th>Week</th>
+      </tr>
+    {{#each_sort_date appearances "week"}}
+      <tr>
+        <td>{{this.position}}</td>
+        <td>{{this.station}}</td>
+        <td>{{this.week}}</td>
+      </tr>
+    {{/each_sort_date}}
+    </table>
+  </div>
+</dd>

@@ -1,0 +1,26 @@
+<dd>
+  <a href="#{{slug}}">
+    <div class="row">
+      <div class="large-3 columns">{{artist}}</div>
+      <div class="large-3 columns">{{album}}</div>
+      <div class="large-3 columns">{{label}}</div>
+      <div class="large-3 columns">{{appearances.length}}</div>
+    </div>
+  </a>
+  <div id="{{slug}}" class="content">
+    <table width="100%">
+      <tr>
+        <th>Position</th>
+        <th>Station</th>
+        <th>Week</th>
+      </tr>
+    {{#each_with_sort appearances "week"}}
+      <tr>
+        <td>{{this.position}}</td>
+        <td>{{toUpper this.station}}</td>
+        <td>{{this.week}}</td>
+      </tr>
+    {{/each_with_sort}}
+    </table>
+  </div>
+</dd>

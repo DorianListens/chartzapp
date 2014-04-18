@@ -7,13 +7,13 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Controller extends App.Controllers.Base
 
-    initialize: ->
+    initialize: (opts) ->
 
       @layout = @getLayoutView()
 
       @listenTo @layout, 'show', =>
         @showPanel()
-        @mainView()
+        @mainView(opts.artist)
 
       @show @layout,
         loading: true

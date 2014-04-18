@@ -5,15 +5,16 @@ module.exports = App.module 'ArtistsApp',
 
   class ArtistsApp.Router extends Marionette.AppRouter
     appRoutes:
-      "artist" : "showArtists"
+      "artist(/)(:artist)" : "showArtists"
 
   ArtistsApp.startWithParent = false
   ArtistsApp.Show = require 'modules/artists/show/show_controller'
 
   API =
-    showArtists: ->
+    showArtists: (artist) ->
       new ArtistsApp.Show.Controller
         region: App.mainRegion
+        artist: artist if artist
       $(document).foundation()
 
   App.addInitializer ->

@@ -7,7 +7,6 @@
 
 # ###
 
-
 # Require necessary components
 
 express = require 'express'
@@ -18,6 +17,7 @@ cheerio = require 'cheerio'
 moment = require 'moment'
 mongo = require 'mongodb'
 mongoose = require 'mongoose'
+require('mongoose-middleware').initialize mongoose
 
 # Setup Database ##################################################
 
@@ -39,9 +39,15 @@ appearanceSchema = mongoose.Schema
 albumSchema = mongoose.Schema
   slug: String
   artist: String
-  lartist: String
+  artistLower:
+    type: String
+    index: true
   album: String
+  albumLower: String
   label: String
+  labelLower:
+    type: String
+    index: true
   points: Number
   totalPoints: Number
   currentPos: Number
@@ -50,14 +56,17 @@ albumSchema = mongoose.Schema
     index: true
   ]
 
-
-sluggify = (Text) ->
-  Text.toLowerCase().replace(RegExp(" ", "g"), "-").replace /[^\w-]+/g, ""
+# Setup slugs and lowercases on save
 
 albumSchema.pre 'save', (next) ->
   self = @
-  self.lartist = self.artist.toLowerCase()
+  self.artistLower = self.artist.toLowerCase()
+  self.albumLower = self.album.toLowerCase()
+  self.labelLower = self.label.toLowerCase()
+  slugText = "#{self.artist} #{self.album}"
+  self.slug = slugify slugText
   next()
+
 
 # Recalculate "total points" on every save
 
@@ -72,24 +81,19 @@ albumSchema.pre 'save', (next) ->
   self.totalPoints = pointSum
   next()
 
-# Save Slug on Save
-
-albumSchema.pre 'save', (next) ->
-  self = @
-  slugText = "#{self.artist} #{self.album}"
-  self.slug = sluggify slugText
-  next()
-
 # Set current position to whatever is on top of the "appearances" stack
 
 albumSchema.post 'init', ->
   self = @
   self.currentPos = @appearances[0].position
 
-albumSchema.post 'init', ->
-  self = @
-  self.lartist = self.artist.toLowerCase()
-
+# albumSchema.post 'init', ->
+#   self = @
+#   self.artistLower = self.artist.toLowerCase()
+#   self.albumLower = self.album.toLowerCase()
+#   self.labelLower = self.label.toLowerCase()
+#   self.save()
+#
 # Set current points on every load ###
 
 albumSchema.post 'init', ->
@@ -101,13 +105,6 @@ albumSchema.post 'init', ->
     do (appearance) ->
       pointSum += (31 - parseInt(appearance.position))
   self.points = pointSum
-
-# Set the Slug
-
-albumSchema.post 'init', ->
-  self = @
-  slugText = "#{self.artist} #{self.album}"
-  self.slug = sluggify slugText
 
 # instantiate the schema
 
@@ -140,10 +137,23 @@ exports.startServer = (port, path, callback) ->
       console.log err if err
       res.send albums
 
-  # Get every entry for a given station from the db
+  # Get every entry for a given station from the db, grouped by week
 
   app.get "/api/db/:station" , (req, res) ->
-    Album.find {"appearances.station" : "#{req.params.station.toLowerCase()}"} , (err, results) ->
+    station = req.params.station.toLowerCase()
+    Album.aggregate { $unwind: "$appearances" },
+    { $match: { "appearances.station" : station}},
+    { $group:
+      { _id:
+        {week: "$appearances.week"
+        station: "$appearances.station"}
+      albums:
+        { $addToSet :
+          {artist: "$artist"
+          album: "$album"
+          position: "$appearances.position"
+          label: "$label"}}}},
+    $sort: { "_id.week" : -1}, (err, results) ->
       console.log err if err
       if results is 0
         console.log 'no results'
@@ -154,11 +164,8 @@ exports.startServer = (port, path, callback) ->
   # Get a given station for a given week from the db
 
   app.get "/api/db/:station/:date" , (req, res) ->
-    newDate = moment(req.params.date)
-    if newDate.get('day') != 2
-      newDate.set('day', 2)
     station = req.params.station.toLowerCase()
-    week = newDate.format('YYYY-MM-DD')
+    week = tuesify(req.params.date)
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
     { artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
       console.log err if err
@@ -168,14 +175,111 @@ exports.startServer = (port, path, callback) ->
       else
         res.send results
 
-  # Get all enteries for a given artist
+  # Get all charts for a given station for a given date range
+
+  app.get "/api/station/:station/:startDate/:endDate", (req, res) ->
+    station = req.params.station.toLowerCase()
+    startDate = tuesify(req.params.startDate)
+    endDate = tuesify(req.params.endDate)
+    Album.aggregate { $unwind: "$appearances" },
+    { $match: { "appearances.week" : { $gte: startDate, $lte: endDate}, "appearances.station" : station }},
+    { $group:
+      { _id:
+        {station: "$appearances.station"
+        date: "$appearances.week"}
+      albums:
+        { $addToSet :
+          {artist: "$artist"
+          album: "$album"
+          position: "$appearances.position"
+          label: "$label"}}}},
+    { $sort: {"_id.date" : -1}},
+    (err, results) ->
+      res.send results
+
+  # Get top 50 for a given station for a given date range
+
+  app.get "/api/top/:num/:station/:startDate/:endDate", (req, res) ->
+    num = parseInt req.params.num
+    station = req.params.station.toLowerCase()
+    startDate = tuesify(req.params.startDate)
+    endDate = tuesify(req.params.endDate)
+    Album.aggregate { $unwind: "$appearances" },
+    { $match: { "appearances.week" : { $gte: startDate, $lte: endDate}, "appearances.station" : station }},
+    { $group:
+      { _id:
+        {artist: "$artist"
+        album: "$album"
+        slug: "$slug"
+        label: "$label"}
+      appearances:
+        { $addToSet :
+            {station: "$appearances.station"
+            week: "$appearances.week"
+            position: "$appearances.position"}}
+      positions :
+        { $push : "$appearances.position"}
+      }},
+    (err, results) ->
+      console.error err if err
+      res.send results
+
+  # Get all entries for a given artist
 
   app.get "/api/artists/:artist", (req, res) ->
     theArtist = req.params.artist.toLowerCase()
-    Album.find {"lartist" : theArtist}, (err, results) ->
+    Album.find { "artistLower" : theArtist }, (err, results) ->
+    # Album.find { artist_l: req.params.artist.toLowerCase() }, (err, results) ->
       console.log err if err
-      console.log req.params.artist
       res.send results
+
+  # Get all entries for a given label
+
+  app.get "/api/label/:label", (req, res) ->
+    theLabel = req.params.label.toLowerCase()
+    Album.find { "labelLower" : theLabel }, (err, results) ->
+      console.error err if err
+      res.send results
+
+  # Get all entries for a given week, grouped by station
+
+  app.get "/api/date/:date", (req, res) ->
+    week = tuesify(req.params.date)
+    Album.aggregate { $unwind: "$appearances" },
+    { $match: { "appearances.week" : week}},
+    { $group:
+      { _id:
+        {week: "$appearances.week"
+        station: "$appearances.station"}
+      albums:
+        { $addToSet :
+          {artist: "$artist"
+          album: "$album"
+          position: "$appearances.position"
+          label: "$label"}}}},
+    (err, results) ->
+      res.send results
+
+  # Get all entries for a given date range, grouped by station
+
+  app.get "/api/date/:startDate/:endDate", (req, res) ->
+    startDate = tuesify(req.params.startDate)
+    endDate = tuesify(req.params.endDate)
+    Album.aggregate { $unwind: "$appearances" },
+    { $match: { "appearances.week" : { $gte: startDate, $lte: endDate}}},
+    { $group:
+      { _id:
+        {week: "$appearances.week"
+        station: "$appearances.station"}
+      albums:
+        { $addToSet :
+          {artist: "$artist"
+          album: "$album"
+          position: "$appearances.position"
+          label: "$label"}}}},
+    (err, results) ->
+      res.send results
+
 
   # Get most recent chart from a given station
 
@@ -185,15 +289,12 @@ exports.startServer = (port, path, callback) ->
   # Get a chart from any date for a given station
 
   app.get "/api/chart/:station/:date", (req, res) ->
-    # Make sure the inputed date is a tuesday, and if not, fix it.
-    newDate = moment(req.params.date)
-    if newDate.get('day') != 2
-      newDate.set('day', 2)
-      theDate = newDate.format('YYYY-MM-DD')
-
+    theDate = tuesify(req.params.date)
     newChart = getChart(req.params.station.toLowerCase(), theDate, res)
 
-# Set up the deferred request.
+# Utility Functions #######################################################
+
+  # Set up the deferred request.
 
 deferredRequest = (url) ->
   d = deferred()
@@ -209,28 +310,46 @@ deferredRequest = (url) ->
 
   d.promise()
 
+  # Make tuesdays
+
+tuesify = (date) ->
+  theWeek = switch
+    when date then moment(date)
+    else moment()
+  theDay = theWeek.get('day')
+  theTues = switch
+    when theDay is 0 then theWeek.day(-5)
+    when theDay is 1 then theWeek.day(-5)
+    when theDay is 2 then theWeek
+    when theDay > 2 then theWeek.day(2)
+  theTues = moment(theTues)
+  theTues.format('YYYY-MM-DD')
+
+  # Make slugs
+
+slugify = (Text) ->
+  Text.toLowerCase().replace(RegExp(" ", "g"), "-").replace /[^\w-]+/g, ""
+
+# Crawler ###################################################################
+
 # Go get a chart!
 
 getChart = (station, week, res) ->
   console.log "getChart"
+
   # Check if we have a specific week. If not, grab the most recent chart
 
   if (week == '')
-    the_url = "http://www.earshot-online.com/charts/" + station + ".cfm"
-    currentDate = moment()
-    if currentDate.get('day') > 2
-      currentDate.set('day', 2)
-    else if currentDate.get('day') < 2
-      currentDate.set('day', -2)
-    week = currentDate.format('YYYY-MM-DD')
+    the_url = "http://www.earshot-online.com/charts/#{station}.cfm"
+    week = tuesify(week)
   else
-    the_url = "http://www.earshot-online.com/charts/" + station + ".cfm?dWeekOfID=" + week
+    the_url = "http://www.earshot-online.com/charts/#{station}.cfm?dWeekOfID=#{week}"
 
   # Check the database for the given station and week, and return false if nothing found.
 
   dbQuery = ->
     d = deferred()
-    console.log 'Making dbQuery'
+    console.log "Making dbQuery for #{station} and #{week}"
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
     { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
       console.log err if err
@@ -270,7 +389,7 @@ getChart = (station, week, res) ->
         theDate = newMoment.format('YYYY-MM-DD')
         if week isnt theDate
           week = theDate
-          console.log "week has been updated to #{theDate}" 
+          console.log "week has been updated to #{theDate}"
       if 3 < index < 34
         tds = $(item).find("td")
         chartPos = $(tds.eq(0)).text().trim()
@@ -302,8 +421,11 @@ getChart = (station, week, res) ->
           if results is null
             newAlbum = new Album
               artist: record.artist
+              artistLower: record.artist.toLowerCase()
               album: record.album
+              albumLower: record.album.toLowerCase()
               label: record.label
+              labelLower: record.label.toLowerCase()
               points: 0
               appearances: [
                   week: week
