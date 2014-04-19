@@ -1,0 +1,18 @@
+<!-- <div class="row"> -->
+<div class="panel">
+  <h3>Search</h3>
+  <p>What are you waiting for? Search Away!</p>
+  <form id="stationForm" data-abide>
+    <div class="station-select">
+      <select form="#stationForm" width="100%" data-placeholder="Choose a Station..." class="chosen-select" id="search_input">
+        <option value=""></option>
+        {{#each items}}
+          <option value="{{this.name}}">{{this.name}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <input type="text" id="search_input"></input>
+      <button type="submit">Search</button>
+  </form>
+</div>
+<!-- </div> -->

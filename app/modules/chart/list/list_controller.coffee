@@ -27,7 +27,6 @@ module.exports = App.module "ChartApp.List",
       e.preventDefault()
       stationVal = $.trim @ui.stationInput.val()
       dateVal = $.trim @ui.dateInput.val()
-      console.log dateVal
       @trigger 'click:submitter', stationVal, dateVal
 
   class List.Aside extends Marionette.ItemView

@@ -4,7 +4,7 @@ class Application extends Backbone.Marionette.Application
 
   initialize: =>
 
-    @rootRoute = "chart"
+    @rootRoute = "home"
 
     @on "initialize:after", (options) ->
 
@@ -21,7 +21,7 @@ class Application extends Backbone.Marionette.Application
     @mainRegion.open = (view) ->
       @$el.hide() # fadeOut("fast")
       if view.constructor.name isnt "LoadingView"
-        @$el.fadeOut("fast")
+        @$el.fadeOut("slow")
         @$el.html(view.el).css('opacity' : 0)
         @$el.show()
         @$el.fadeTo("slow", 1)
@@ -66,3 +66,4 @@ require 'modules/station/station_app'
 require 'modules/date/date_app'
 require 'modules/label/label_app'
 require 'modules/topx/topx_app'
+require 'modules/landing/landing_app'

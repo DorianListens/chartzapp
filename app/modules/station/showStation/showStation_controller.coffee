@@ -9,7 +9,7 @@ module.exports = App.module 'StationApp.Show',
 
     initialize: (opts) ->
       @layout = @getLayoutView()
-      
+
       @listenTo @layout, 'show', =>
         @showPanel()
         @mainView(opts.station)
@@ -77,7 +77,9 @@ module.exports = App.module 'StationApp.Show',
     template: "modules/station/showStation/templates/show_layout"
 
     regions:
+      titleRegion: "#title-region"
       panelRegion: "#panel-region"
+      topRegion: "#topthree-region"
       tableRegion: "#table-region"
 
   class Show.Panel extends Marionette.ItemView

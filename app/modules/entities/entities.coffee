@@ -92,21 +92,42 @@ module.exports = App.module "Entities",
 
   class Entities.Topx extends Backbone.Model
 
-    initialize: ->
-      theCount = 0
-      for obj in @get("appearances")
-        do (obj) ->
-          points = 0
-          points = 31-(parseInt obj.position)
-          theCount += points
-      @set "frontPoints", theCount
-
+    # initialize: (options) ->
+    #   theCount = 0
+    #   for obj in @get("appearances")
+    #     do (obj) ->
+    #       points = 0
+    #       points = 31-(parseInt obj.position)
+    #       theCount += points
+    #   @set "frontPoints", theCount
 
 
   class Entities.TopxCollection extends Backbone.Collection
     model: Entities.Topx
-    sortAttr: "frontPoints"
-    sortDir: -1
+    parse: (response) ->
+      for item in response
+        do (item) ->
+          theCount = 0
+          for obj in item.appearances
+            do (obj) ->
+              points = 0
+              points = 31-(parseInt obj.position)
+              theCount += points
+          item.frontPoints = theCount
+      response = response.sort (a, b) ->
+        a = parseInt a.frontPoints
+        b = parseInt b.frontPoints
+        return 0 if a is b
+        if a > b then -1 else 1
+
+      response = response.slice(0, 50)
+      for item in response
+        do (item) ->
+          item.rank = response.indexOf(item) + 1
+      response
+
+    sortAttr: "rank"
+    sortDir: 1
 
     sortCharts: (attr) ->
       @sortAttr = attr
@@ -135,11 +156,10 @@ module.exports = App.module "Entities",
         searchUrl = "/api/top/#{number}/#{station}/#{startDate}/#{endDate}"
       else
         d = new Date()
-        searchUrl = "/api/top/5/ckut/2014-01-07/#{d.yyyymmdd()}"
+        searchUrl = "/api/topall/2014-01-07/#{d.yyyymmdd()}"
       topxCollection.url = searchUrl
       topxCollection.fetch
         reset: true
-      console.log topxCollection
       topxCollection
 
     getLabel: (label) ->
@@ -172,6 +192,7 @@ module.exports = App.module "Entities",
 
     getHeaders: ->
       new Entities.HeaderCollection [
+        { name: "Home", path: 'home' }
         { name: "Charts", path: 'chart' }
         { name: "Top 50", path: 'topx'}
         { name: "Artists", path: 'artist' }

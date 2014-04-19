@@ -224,6 +224,31 @@ exports.startServer = (port, path, callback) ->
       console.error err if err
       res.send results
 
+  # Get top records for all stations
+
+  app.get "/api/topall/:startDate/:endDate", (req, res) ->
+    startDate = tuesify(req.params.startDate)
+    endDate = tuesify(req.params.endDate)
+    Album.aggregate { $unwind: "$appearances" },
+    { $match: { "appearances.week" : { $gte: startDate, $lte: endDate}}},
+    { $group:
+      { _id:
+        {artist: "$artist"
+        album: "$album"
+        slug: "$slug"
+        label: "$label"}
+      appearances:
+        { $addToSet :
+            {station: "$appearances.station"
+            week: "$appearances.week"
+            position: "$appearances.position"}}
+      positions :
+        { $push : "$appearances.position"}
+      }},
+    (err, results) ->
+      console.error err if err
+      res.send results
+
   # Get all entries for a given artist
 
   app.get "/api/artists/:artist", (req, res) ->
