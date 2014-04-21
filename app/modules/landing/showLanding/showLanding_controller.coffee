@@ -101,12 +101,25 @@ module.exports = App.module 'LandingApp.Show',
   class Show.StationList extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/stationList"
     className: "panel small-12 columns"
+    events:
+      'click a' : 'clickStation'
+    clickStation: (e) ->
+      e.preventDefault()
+      App.navigate "station/#{e.target.text}",
+        trigger:true
 
   class Show.ChartItem extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/chartItem"
     tagName: 'tr'
     initialize: ->
       @model = @model.set index: @options.index
+    events:
+      'click a' : 'clickItem'
+    clickItem: (e) ->
+      e.preventDefault()
+      console.log e.target.text
+      App.navigate "artist/#{e.target.text}",
+        trigger: true
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/topx/showTopx/templates/empty"

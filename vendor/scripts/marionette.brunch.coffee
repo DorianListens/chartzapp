@@ -24,7 +24,9 @@ do (Backbone) ->
 
     startHistory: ->
       if Backbone.history
-        Backbone.history.start()
+        Backbone.history.start(
+          pushState: true
+        )
 
     register: (instance, id) ->
       @_registry ?= {}

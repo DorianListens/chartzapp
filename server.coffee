@@ -38,6 +38,9 @@ appearanceSchema = mongoose.Schema
 
 albumSchema = mongoose.Schema
   slug: String
+  isNull:
+    type: Boolean
+    default: false
   artist: String
   artistLower:
     type: String
@@ -60,9 +63,9 @@ albumSchema = mongoose.Schema
 
 albumSchema.pre 'save', (next) ->
   self = @
-  self.artistLower = self.artist.toLowerCase()
-  self.albumLower = self.album.toLowerCase()
-  self.labelLower = self.label.toLowerCase()
+  self.artistLower = self.artist.toLowerCase() unless self.isNull
+  self.albumLower = self.album.toLowerCase() unless self.isNull
+  self.labelLower = self.label.toLowerCase() unless self.isNull
   slugText = "#{self.artist} #{self.album}"
   self.slug = slugify slugText
   next()
@@ -211,7 +214,8 @@ exports.startServer = (port, path, callback) ->
         {artist: "$artist"
         album: "$album"
         slug: "$slug"
-        label: "$label"}
+        label: "$label"
+        isNull: "$isNull"}
       appearances:
         { $addToSet :
             {station: "$appearances.station"
@@ -236,7 +240,8 @@ exports.startServer = (port, path, callback) ->
         {artist: "$artist"
         album: "$album"
         slug: "$slug"
-        label: "$label"}
+        label: "$label"
+        isNull: "$isNull"}
       appearances:
         { $addToSet :
             {station: "$appearances.station"
@@ -385,10 +390,11 @@ getChart = (station, week, res) ->
         console.log "making Earshot Crawl for #{the_url}"
         deferredRequest(the_url).then(chartParse).done (chart_res) ->
           console.log 'Returned'
-          if chart_res.length is 0
-            res.send chart_res #"Sorry, there is no #{station} chart for #{week}"
-          else
-            addToDb(chart_res)
+          console.log chart_res
+          # if chart_res.length is 0
+          #   res.send chart_res #"Sorry, there is no #{station} chart for #{week}"
+          # else
+          addToDb(chart_res)
         , (err) ->
           console.log err
           res.send []
@@ -434,6 +440,16 @@ getChart = (station, week, res) ->
   addToDb = (chart_array) ->
     count = 0
     console.log "adding to DB"
+    if chart_array.length is 0
+      newAlbum = new Album
+        isNull: true
+        appearances: [
+          week: week
+          station: station
+        ]
+      newAlbum.save (err, newAlbum) ->
+        console.error err if err
+        dbQuery()
     for record in chart_array
       do (record) ->
         appearance =

@@ -1,5 +1,20 @@
 App = require 'application'
 
+# Make tuesdays
+
+tuesify = (date) ->
+  theWeek = switch
+    when date then moment(date)
+    else moment()
+  theDay = theWeek.get('day')
+  theTues = switch
+    when theDay is 0 then theWeek.day(-5)
+    when theDay is 1 then theWeek.day(-5)
+    when theDay is 2 then theWeek
+    when theDay > 2 then theWeek.day(2)
+  theTues = moment(theTues)
+  theTues.format('YYYY-MM-DD')
+
 module.exports = App.module "Entities",
 (Entities, App, Backbone, Marionette, $, _) ->
 
@@ -18,17 +33,10 @@ module.exports = App.module "Entities",
     model: Entities.Header
 
   class Entities.ChartItem extends Backbone.Model
-    defaults:
-      artist: String
-      album: String
-      label: String
-      points: Number
-      frontPoints: Number
-      currentPos: Number
-      appearances: []
 
     initialize: ->
       theCount = 0
+      @set "rank", @get "currentPos"
       for obj in @get("appearances")
         do (obj) ->
           points = 0
@@ -92,21 +100,16 @@ module.exports = App.module "Entities",
 
   class Entities.Topx extends Backbone.Model
 
-    # initialize: (options) ->
-    #   theCount = 0
-    #   for obj in @get("appearances")
-    #     do (obj) ->
-    #       points = 0
-    #       points = 31-(parseInt obj.position)
-    #       theCount += points
-    #   @set "frontPoints", theCount
-
-
   class Entities.TopxCollection extends Backbone.Collection
     model: Entities.Topx
     parse: (response) ->
       for item in response
         do (item) ->
+          item.artist = item._id.artist
+          item.album = item._id.album
+          item.label = item._id.label
+          item.slug = item._id.slug
+          item.isNull = item._id.isNull
           theCount = 0
           for obj in item.appearances
             do (obj) ->
@@ -147,16 +150,27 @@ module.exports = App.module "Entities",
 
   API =
     getTopx: (search) ->
+      console.log search.startDate
+      d = new Date()
       topxCollection = new Entities.TopxCollection
-      number = search.number
+      number = 5 unless search.number
       station = search.station
-      startDate = search.startDate
-      endDate = search.endDate
+      console.log station
+      topxCollection.station = station
+      startDate = "2014-01-01"
+      if search.startDate then startDate = search.startDate
+      endDate = "#{d.yyyymmdd()}"
+      if search.endDate then endDate = search.endDate
+      startDate = tuesify startDate
+      endDate = tuesify endDate
       if station and startDate and endDate
         searchUrl = "/api/top/#{number}/#{station}/#{startDate}/#{endDate}"
+        desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
       else
-        d = new Date()
-        searchUrl = "/api/topall/2014-01-07/#{d.yyyymmdd()}"
+        searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
+        desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
+      console.log searchUrl
+      topxCollection.desc = desc
       topxCollection.url = searchUrl
       topxCollection.fetch
         reset: true
@@ -193,26 +207,31 @@ module.exports = App.module "Entities",
     getHeaders: ->
       new Entities.HeaderCollection [
         { name: "Home", path: 'home' }
-        { name: "Charts", path: 'chart' }
-        { name: "Top 50", path: 'topx'}
+        # { name: "Charts", path: 'chart' }
+        # { name: "Top 50", path: 'topx'}
         { name: "Artists", path: 'artist' }
         { name: "Stations", path: 'station' }
-        { name: "Date", path: 'date' }
-        { name: "Label", path: "label"}
+        # { name: "Date", path: 'date' }
+        # { name: "Label", path: "label"}
       ]
 
     getCharts: (station = null, date = null) ->
       console.log 'getCharts'
       console.log station
       console.log date
+      date = tuesify date if date
       if station is null and date is null
         chartsUrl = '/api/db/wholething'
+        desc = "Full Database"
       else if date is null and station isnt null
         chartsUrl = 'api/chart/'+station
+        desc = "Most recent #{station} chart"
       else
         chartsUrl = 'api/chart/'+station+'/'+date
+        desc = "#{station} Top 30 for the week of #{date}"
 
       charts = new Entities.ChartCollection
+      charts.desc = desc
       charts.url = chartsUrl
       charts.fetch
         reset: true

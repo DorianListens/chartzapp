@@ -1,6 +1,7 @@
 App = require "application"
 ArtistsApp = require "modules/artists/artists_app"
 Controllers = require "controllers/baseController"
+graph = require "modules/artists/show/graph"
 
 module.exports = App.module 'ArtistsApp.Show',
 (Show, App, Backbone, Marionette, $, _) ->
@@ -8,34 +9,66 @@ module.exports = App.module 'ArtistsApp.Show',
   class Show.Controller extends App.Controllers.Base
 
     initialize: (opts) ->
+      @opts = opts
+      # graph "/api/artists/#{opts.artist}"
+      artist = App.request "artist:entities", opts.artist
 
       @layout = @getLayoutView()
 
       @listenTo @layout, 'show', =>
-        @showPanel()
-        @mainView(opts.artist)
+        @mainView(artist)
 
       @show @layout,
         loading: true
 
-    mainView: (search = null) ->
-      if search then @showArtist(search) else @showEmpty()
+    mainView: (artist) =>
+      if @opts.artist
+        @showArtist(artist)
+      else
+        @showEmpty()
 
-    showArtist: (search) ->
-      artists = App.request 'artist:entities', search
+    showArtist: (artist) ->
+      # artists = App.request 'artist:entities', search
 
-      artistsView = @getArtistsView artists
+      artistsView = @getArtistsView artist
 
       @show artistsView,
         region: @layout.tableRegion
         loading: true
-      App.execute "when:fetched", artists, ->
+      @showPanel(artist)
+      @showTitle(artist)
+      @showGraph(artist)
+      App.execute "when:fetched", artist, ->
         $(document).foundation()
+
+    showTitle: (artist) ->
+      titleView = @getTitleView artist
+      @show titleView,
+        region: @layout.titleRegion
+        loading: true
+
+    showGraph: (artist) ->
+      graphView = @getGraphView artist
+      @show graphView,
+        region: @layout.graphRegion
+        loading: true
 
     showEmpty: ->
       emptyView = @getEmptyView()
+      @listenTo emptyView, 'click:search', (artistVal) ->
+        console.log artistVal
+        App.navigate "artist/#{artistVal}", trigger: true
+
       @show emptyView,
         region: @layout.tableRegion
+
+    getTitleView: (artist) ->
+      new Show.Title
+        collection: artist
+
+    getGraphView: (artist) ->
+      new Show.Graph
+        collection: artist
 
     getEmptyView: ->
       new Show.EmptyView
@@ -46,15 +79,15 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showPanel: (artist) ->
       panelView = @getPanelView artist
-      @listenTo panelView, 'click:search', (artist) =>
-        @showArtist artist
 
       @show panelView,
         region: @layout.panelRegion
-      $(document).foundation()
+        loading: true
+      # $(document).foundation()
 
-    getPanelView: ->
+    getPanelView: (artist) ->
       new Show.Panel
+        collection: artist
 
     getLayoutView: ->
       new Show.Layout
@@ -67,12 +100,29 @@ module.exports = App.module 'ArtistsApp.Show',
     template: "modules/artists/show/templates/show_layout"
 
     regions:
+      titleRegion: "#title-region"
       panelRegion: "#panel-region"
+      graphRegion: "#graph-region"
       tableRegion: "#table-region"
+
+  class Show.Title extends Marionette.ItemView
+    template: "modules/artists/show/templates/title"
+    className: "panel"
 
   class Show.Panel extends Marionette.ItemView
     template: "modules/artists/show/templates/panel"
 
+
+
+  class Show.Graph extends Marionette.ItemView
+    template: "modules/artists/show/templates/graph"
+    className: 'panel'
+
+  class Show.Empty extends Marionette.ItemView
+    template: "modules/artists/show/templates/empty"
+
+  class Show.EmptyView extends Marionette.ItemView
+    template: "modules/artists/show/templates/emptyview"
     ui:
       'artistInput' : '#artist_input'
 
@@ -87,13 +137,11 @@ module.exports = App.module 'ArtistsApp.Show',
   class Show.ArtistItem extends Marionette.ItemView
     template: "modules/artists/show/templates/artistItem"
     tagName: 'div'
-
-  class Show.Empty extends Marionette.ItemView
-    template: "modules/artists/show/templates/empty"
-    tagName: 'div'
-
-  class Show.EmptyView extends Marionette.ItemView
-    template: "modules/artists/show/templates/emptyview"
+    events:
+      "click a" : "clickStation"
+    clickStation: (e) ->
+      e.preventDefault()
+      App.navigate "station/#{e.target.text}", trigger: true
 
   class Show.Artist extends Marionette.CompositeView
     template: "modules/artists/show/templates/artists"

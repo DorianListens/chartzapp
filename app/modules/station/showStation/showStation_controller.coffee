@@ -8,60 +8,96 @@ module.exports = App.module 'StationApp.Show',
   class Show.Controller extends App.Controllers.Base
 
     initialize: (opts) ->
+      @opts = opts
       @layout = @getLayoutView()
+      station = App.request 'topx:entities', opts
+      @stations = App.request 'stations:entities'
 
       @listenTo @layout, 'show', =>
+        @showTitle(@opts)
+        @mainView(station)
         @showPanel()
-        @mainView(opts.station)
 
       @show @layout,
         loading: true
 
-    mainView: (search = null) ->
-      if search then @showStation(search) else @showEmpty()
+    mainView: (search = null) =>
+      if search.station
+        @showStation(search)
+        @showPanel()
+      else
+        @showEmpty @stations
 
-    showStation: (search) ->
-      station = App.request 'station:entities', search
+    showRecent: (search) =>
+      d = new Date
+      week = d.yyyymmdd()
+      station = App.request 'chart:entities', search, week
+      @showStation station,
+        loading: true
 
+    showStation: (station) ->
       stationView = @getStationView station
+      topThreeView = @getTopThreeView station
+      @show topThreeView,
+        region: @layout.topRegion
+        loading: true
 
       @show stationView,
         region: @layout.tableRegion
         loading: true
-      App.execute "when:fetched", station, ->
-        console.log station
-        $(document).foundation
-          accordion:
-            # active_class: 'active'
-            multi_expand: true
-            toggleable: true
+        $(document).foundation()
 
+    showTitle: (opts) ->
+      opts.station = "Pick a Station" unless opts.station
+      stationTitle = new App.Entities.Station opts
+      titleView = @getTitleView stationTitle
+      @show titleView,
+        region: @layout.titleRegion
+        loading: true
 
-    showEmpty: ->
-      emptyView = @getEmptyView()
-      @show emptyView,
-        region: @layout.tableRegion
-
-    getEmptyView: ->
-      new Show.EmptyView
-
-    getStationView: (station) ->
-      new Show.Station
-        collection: station
-
-    showPanel: (station) ->
-      panelView = @getPanelView station
-      @listenTo panelView, 'click:search', (station) =>
-        @showStation station
-
+    showPanel: ->
+      panelView = @getPanelView()
       @show panelView,
         region: @layout.panelRegion
-      $(document).foundation(
-        accordion:
-          # active_class: 'active'
-          multi_expand: true
-          toggleable: true
-      )
+      $(document).foundation()
+
+      @listenTo panelView, 'click:mostRecent', (station) =>
+        @showRecent @opts.station
+      @listenTo panelView, 'click:thisYear', (station) =>
+        station = App.request "topx:entities", @opts
+        @showStation station
+      @listenTo panelView, 'click:other', (search) =>
+        search.station = @opts.station
+        station = App.request 'topx:entities', search
+        @showStation station
+
+    showEmpty: (stations) ->
+      emptyView = @getEmptyView stations
+      @show emptyView,
+        region: @layout.tableRegion
+      $(".chosen-select").chosen()
+
+      @listenTo emptyView, 'pick:station', (search) ->
+        App.navigate "station/#{search.station}", trigger: true
+
+
+    getTopThreeView: (station) ->
+      new Show.TopThree
+        collection: station
+
+    getTitleView: (station) ->
+      new Show.Title
+        model: station
+
+    getEmptyView: (stations) ->
+      new Show.EmptyView
+        collection: stations
+
+    getStationView: (station) ->
+      console.log station
+      new Show.Chart
+        collection: station
+        model: new App.Entities.Station station
 
     getPanelView: ->
       new Show.Panel
@@ -86,32 +122,83 @@ module.exports = App.module 'StationApp.Show',
     template: "modules/station/showStation/templates/panel"
 
     ui:
-      'artistInput' : '#artist_input'
+      'mostRecent' : '#mostRecent'
+      'thisYear'   : '#thisYear'
+      'other'      : '#submitOther'
+      'startDate'  : '#startDate'
+      'endDate'    : '#endDate'
+    events:
+      'click @ui.mostRecent' : 'mostRecent'
+      'click @ui.thisYear'   : 'thisYear'
+      'click @ui.other'      : 'other'
+
+    mostRecent: (e) ->
+      e.preventDefault()
+      @trigger 'click:mostRecent'
+
+    thisYear: (e) ->
+      e.preventDefault()
+      @trigger 'click:thisYear'
+
+    other: (e) ->
+      e.preventDefault()
+      search = {}
+      search.startDate = $.trim @ui.startDate.val()
+      search.endDate = $.trim @ui.endDate.val()
+      @trigger 'click:other', search
+
+  class Show.Title extends Marionette.ItemView
+    template: "modules/station/showStation/templates/title"
+    className: "panel"
+
+  class Show.TopItem extends Marionette.ItemView
+    template: "modules/station/showStation/templates/topItem"
+    tagName: "li"
+    events:
+      'click a' : 'clickArtist'
+    clickArtist: (e) ->
+      App.navigate "artist/#{e.target.text}", trigger: true
+
+  class Show.TopThree extends Marionette.CompositeView
+    template: "modules/station/showStation/templates/topthree"
+    itemView: Show.TopItem
+    itemViewContainer: "#topthree"
+    onBeforeRender: ->
+      @collection = @collection.clone()
+      @collection.models = @collection.models.slice(0,3)
+
+  class Show.ChartItem extends Marionette.ItemView
+    template: "modules/station/showStation/templates/chartItem"
+    tagName: 'tr'
+    events:
+      'click a' : 'clickArtist'
+    clickArtist: (e) ->
+      App.navigate "artist/#{e.target.text}", trigger: true
+
+  class Show.Empty extends Marionette.ItemView
+    template: "modules/station/showStation/templates/empty"
+    tagName: 'tr'
+
+  class Show.EmptyView extends Marionette.ItemView
+    template: "modules/station/showStation/templates/emptyview"
+    ui:
+      'stationPicker' : '#station-select'
 
     events:
       'submit' : 'submit'
 
     submit: (e) ->
       e.preventDefault()
-      artistVal = $.trim @ui.artistInput.val()
-      @trigger 'click:search', artistVal
+      search = {}
+      search.station = $.trim @ui.stationPicker.val()
+      @trigger 'pick:station', search
 
-  class Show.ArtistItem extends Marionette.ItemView
-    template: "modules/station/showStation/templates/artistItem"
-    tagName: 'div'
-
-  class Show.Empty extends Marionette.ItemView
-    template: "modules/station/showStation/templates/empty"
-    tagName: 'div'
-
-  class Show.EmptyView extends Marionette.ItemView
-    template: "modules/station/showStation/templates/emptyview"
-
-  class Show.Station extends Marionette.CompositeView
-    template: "modules/station/showStation/templates/artists"
-    itemView: Show.ArtistItem
+  class Show.Chart extends Marionette.CompositeView
+    template: "modules/station/showStation/templates/chart"
+    itemView: Show.ChartItem
     emptyView: Show.Empty
-    itemViewContainer: "#theplace"
+    itemViewContainer: "#thechart"
+
     # initialize: ->
     #   @collection = @model.get "albums"
     # events:
