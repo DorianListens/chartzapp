@@ -25,21 +25,24 @@ module.exports = App.module 'ArtistsApp.Show',
       if @opts.artist
         @showArtist(artist)
       else
-        @showEmpty()
+        @showStart()
 
     showArtist: (artist) ->
       # artists = App.request 'artist:entities', search
-
-      artistsView = @getArtistsView artist
-
-      @show artistsView,
-        region: @layout.tableRegion
-        loading: true
-      @showPanel(artist)
-      @showTitle(artist)
-      @showGraph(artist)
-      App.execute "when:fetched", artist, ->
+      App.execute "when:fetched", artist, =>
         $(document).foundation()
+        if artist.length is 0
+          @showEmpty()
+        else
+          artistsView = @getArtistsView artist
+
+          @show artistsView,
+            region: @layout.tableRegion
+            loading: true
+          @showPanel(artist)
+          @showTitle(artist)
+          @showGraph(artist)
+
 
     showTitle: (artist) ->
       titleView = @getTitleView artist
@@ -60,6 +63,15 @@ module.exports = App.module 'ArtistsApp.Show',
         App.navigate "artist/#{artistVal}", trigger: true
 
       @show emptyView,
+        region: @layout.tableRegion
+
+    showStart: ->
+      startView = @getStartView()
+      @listenTo startView, 'click:search', (artistVal) ->
+        console.log artistVal
+        App.navigate "artist/#{artistVal}", trigger: true
+
+      @show startView,
         region: @layout.tableRegion
 
     getTitleView: (artist) ->
@@ -84,6 +96,9 @@ module.exports = App.module 'ArtistsApp.Show',
         region: @layout.panelRegion
         loading: true
       # $(document).foundation()
+
+    getStartView: ->
+      new Show.Start
 
     getPanelView: (artist) ->
       new Show.Panel
@@ -112,8 +127,6 @@ module.exports = App.module 'ArtistsApp.Show',
   class Show.Panel extends Marionette.ItemView
     template: "modules/artists/show/templates/panel"
 
-
-
   class Show.Graph extends Marionette.ItemView
     template: "modules/artists/show/templates/graph"
     className: 'panel'
@@ -123,6 +136,19 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.EmptyView extends Marionette.ItemView
     template: "modules/artists/show/templates/emptyview"
+    ui:
+      'artistInput' : '#artist_input'
+
+    events:
+      'submit' : 'submit'
+
+    submit: (e) ->
+      e.preventDefault()
+      artistVal = $.trim @ui.artistInput.val()
+      @trigger 'click:search', artistVal
+
+  class Show.Start extends Marionette.ItemView
+    template: "modules/artists/show/templates/start"
     ui:
       'artistInput' : '#artist_input'
 

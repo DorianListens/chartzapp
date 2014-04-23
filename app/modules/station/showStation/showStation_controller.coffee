@@ -14,19 +14,17 @@ module.exports = App.module 'StationApp.Show',
       @stations = App.request 'stations:entities'
 
       @listenTo @layout, 'show', =>
-        @showTitle(@opts)
-        @mainView(station)
-        @showPanel()
 
+        @mainView(station)
+        
       @show @layout,
         loading: true
 
     mainView: (search = null) =>
       if search.station
         @showStation(search)
-        @showPanel()
       else
-        @showEmpty @stations
+        @showStart @stations
 
     showRecent: (search) =>
       d = new Date
@@ -36,16 +34,22 @@ module.exports = App.module 'StationApp.Show',
         loading: true
 
     showStation: (station) ->
-      stationView = @getStationView station
-      topThreeView = @getTopThreeView station
-      @show topThreeView,
-        region: @layout.topRegion
-        loading: true
+      App.execute "when:fetched", station, =>
+        if station.length is 0
+          @showEmpty @stations
+        else
+          stationView = @getStationView station
+          topThreeView = @getTopThreeView station
+          @showPanel()
+          @showTitle(@opts)
+          @show topThreeView,
+            region: @layout.topRegion
+            loading: true
 
-      @show stationView,
-        region: @layout.tableRegion
-        loading: true
-        $(document).foundation()
+          @show stationView,
+            region: @layout.tableRegion
+            loading: true
+            $(document).foundation()
 
     showTitle: (opts) ->
       opts.station = "Pick a Station" unless opts.station
@@ -80,6 +84,15 @@ module.exports = App.module 'StationApp.Show',
       @listenTo emptyView, 'pick:station', (search) ->
         App.navigate "station/#{search.station}", trigger: true
 
+    showStart: (stations) ->
+      startView = @getStartView stations
+      @show startView,
+        region: @layout.tableRegion
+      $(".chosen-select").chosen()
+
+      @listenTo startView, 'pick:station', (search) ->
+        App.navigate "station/#{search.station}", trigger: true
+
 
     getTopThreeView: (station) ->
       new Show.TopThree
@@ -91,6 +104,10 @@ module.exports = App.module 'StationApp.Show',
 
     getEmptyView: (stations) ->
       new Show.EmptyView
+        collection: stations
+
+    getStartView: (stations) ->
+      new Show.StartView
         collection: stations
 
     getStationView: (station) ->
@@ -167,14 +184,6 @@ module.exports = App.module 'StationApp.Show',
       @collection = @collection.clone()
       @collection.models = @collection.models.slice(0,3)
 
-  class Show.ChartItem extends Marionette.ItemView
-    template: "modules/station/showStation/templates/chartItem"
-    tagName: 'tr'
-    events:
-      'click a' : 'clickArtist'
-    clickArtist: (e) ->
-      App.navigate "artist/#{e.target.text}", trigger: true
-
   class Show.Empty extends Marionette.ItemView
     template: "modules/station/showStation/templates/empty"
     tagName: 'tr'
@@ -193,53 +202,73 @@ module.exports = App.module 'StationApp.Show',
       search.station = $.trim @ui.stationPicker.val()
       @trigger 'pick:station', search
 
+  class Show.StartView extends Marionette.ItemView
+    template: "modules/station/showStation/templates/start"
+    ui:
+      'stationPicker' : '#station-select'
+
+    events:
+      'submit' : 'submit'
+
+    submit: (e) ->
+      e.preventDefault()
+      search = {}
+      search.station = $.trim @ui.stationPicker.val()
+      @trigger 'pick:station', search
+
+  class Show.ChartItem extends Marionette.ItemView
+    template: "modules/station/showStation/templates/chartItem"
+    tagName: 'tr'
+    events:
+      'click a' : 'clickArtist'
+    clickArtist: (e) ->
+      App.navigate "artist/#{e.target.text}", trigger: true
+
   class Show.Chart extends Marionette.CompositeView
     template: "modules/station/showStation/templates/chart"
     itemView: Show.ChartItem
     emptyView: Show.Empty
     itemViewContainer: "#thechart"
 
-    # initialize: ->
-    #   @collection = @model.get "albums"
-    # events:
-    #   'click th' : 'clickHeader'
-    #
-    # sortUpIcon: "fi-arrow-down"
-    # sortDnIcon: "fi-arrow-up"
-    #
-    # onRender: ->
-    #   @$("th")
-    #   .append($("<i>"))
-    #   .closest("th")
-    #   .find("i")
-    #   .addClass("fi-minus-circle size-18")
-    #   @$("[column='#{@collection.sortAttr}']")
-    #   .find("i")
-    #   .removeClass("fi-minus-circle")
-    #   .addClass @sortUpIcon
-    #
-    #   @
-    #
-    # clickHeader: (e) =>
-    #   $el = $(e.currentTarget)
-    #   ns = $el.attr("column")
-    #   cs = @collection.sortAttr
-    #
-    #   # Toggle sort if the current column is sorted
-    #   if ns is cs
-    #     @collection.sortDir *= -1
-    #   else
-    #     @collection.sortDir = 1
-    #
-    #   # Adjust the indicators.  Reset everything to hide the indicator
-    #   $("th").find("i").attr "class", "fi-minus-circle size-18"
-    #
-    #   # Now show the correct icon on the correct column
-    #   if @collection.sortDir is 1
-    #     $el.find("i").removeClass("fi-minus-circle").addClass @sortUpIcon
-    #   else
-    #     $el.find("i").removeClass("fi-minus-circle").addClass @sortDnIcon
-    #
-    #   # Now sort the collection
-    #   @collection.sortCharts ns
-    #   return
+    events:
+      'click th' : 'clickHeader'
+
+    sortUpIcon: "fi-arrow-down"
+    sortDnIcon: "fi-arrow-up"
+
+    onRender: ->
+      @$("th")
+      .append($("<i>"))
+      .closest("th")
+      .find("i")
+      .addClass("fi-minus-circle size-18")
+      @$("[column='#{@collection.sortAttr}']")
+      .find("i")
+      .removeClass("fi-minus-circle")
+      .addClass @sortUpIcon
+
+      @
+
+    clickHeader: (e) =>
+      $el = $(e.currentTarget)
+      ns = $el.attr("column")
+      cs = @collection.sortAttr
+
+      # Toggle sort if the current column is sorted
+      if ns is cs
+        @collection.sortDir *= -1
+      else
+        @collection.sortDir = 1
+
+      # Adjust the indicators.  Reset everything to hide the indicator
+      $("th").find("i").attr "class", "fi-minus-circle size-18"
+
+      # Now show the correct icon on the correct column
+      if @collection.sortDir is 1
+        $el.find("i").removeClass("fi-minus-circle").addClass @sortUpIcon
+      else
+        $el.find("i").removeClass("fi-minus-circle").addClass @sortDnIcon
+
+      # Now sort the collection
+      @collection.sortCharts ns
+      return

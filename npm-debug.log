@@ -1,0 +1,306 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install', '--save', 'sleep' ]
+2 info using npm@1.3.21
+3 info using node@v0.10.24
+4 verbose readDependencies using package.json deps
+5 verbose cache add [ 'sleep', null ]
+6 verbose cache add name=undefined spec="sleep" args=["sleep",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: 'sleep',
+7 verbose parsed url   path: 'sleep',
+7 verbose parsed url   href: 'sleep' }
+8 silly lockFile c3ca5f78-sleep sleep
+9 verbose lock sleep /Users/Dorian/.npm/c3ca5f78-sleep.lock
+10 silly lockFile c3ca5f78-sleep sleep
+11 silly lockFile c3ca5f78-sleep sleep
+12 verbose addNamed [ 'sleep', '' ]
+13 verbose addNamed [ null, '*' ]
+14 silly lockFile e2b4ed60-sleep sleep@
+15 verbose lock sleep@ /Users/Dorian/.npm/e2b4ed60-sleep.lock
+16 silly addNameRange { name: 'sleep', range: '*', hasData: false }
+17 verbose url raw sleep
+18 verbose url resolving [ 'https://registry.npmjs.org/', './sleep' ]
+19 verbose url resolved https://registry.npmjs.org/sleep
+20 info trying registry request attempt 1 at 18:26:34
+21 verbose etag "BD8X0GU5D3UUE56YABHCORDJU"
+22 http GET https://registry.npmjs.org/sleep
+23 http 304 https://registry.npmjs.org/sleep
+24 silly registry.get cb [ 304,
+24 silly registry.get   { date: 'Tue, 22 Apr 2014 22:26:34 GMT',
+24 silly registry.get     server: 'Apache',
+24 silly registry.get     via: '1.1 varnish',
+24 silly registry.get     'last-modified': 'Tue, 22 Apr 2014 22:26:34 GMT',
+24 silly registry.get     'cache-control': 'max-age=1',
+24 silly registry.get     etag: '"BD8X0GU5D3UUE56YABHCORDJU"',
+24 silly registry.get     'x-served-by': 'cache-d96-DAL',
+24 silly registry.get     'x-cache': 'MISS',
+24 silly registry.get     'x-cache-hits': '0',
+24 silly registry.get     'x-timer': 'S1398205594.826630116,VS0,VE89',
+24 silly registry.get     vary: 'Accept',
+24 silly registry.get     'content-length': '0',
+24 silly registry.get     'keep-alive': 'timeout=10, max=50',
+24 silly registry.get     connection: 'Keep-Alive' } ]
+25 verbose etag sleep from cache
+26 silly addNameRange number 2 { name: 'sleep', range: '*', hasData: true }
+27 silly addNameRange versions [ 'sleep',
+27 silly addNameRange   [ '1.0.0',
+27 silly addNameRange     '1.0.1',
+27 silly addNameRange     '1.0.2',
+27 silly addNameRange     '1.1.0',
+27 silly addNameRange     '1.1.1',
+27 silly addNameRange     '1.1.2',
+27 silly addNameRange     '1.1.3',
+27 silly addNameRange     '1.1.4' ] ]
+28 verbose addNamed [ 'sleep', '1.1.4' ]
+29 verbose addNamed [ '1.1.4', '1.1.4' ]
+30 silly lockFile 1d9add0e-sleep-1-1-4 sleep@1.1.4
+31 verbose lock sleep@1.1.4 /Users/Dorian/.npm/1d9add0e-sleep-1-1-4.lock
+32 silly lockFile 1d9add0e-sleep-1-1-4 sleep@1.1.4
+33 silly lockFile 1d9add0e-sleep-1-1-4 sleep@1.1.4
+34 silly lockFile e2b4ed60-sleep sleep@
+35 silly lockFile e2b4ed60-sleep sleep@
+36 silly resolved [ { name: 'sleep',
+36 silly resolved     version: '1.1.4',
+36 silly resolved     main: './lib/index.js',
+36 silly resolved     description: 'Add sleep() and usleep() to nodejs',
+36 silly resolved     homepage: 'http://github.com/ErikDubbelboer/node-sleep',
+36 silly resolved     author: { name: 'Erik Dubbelboer', email: 'erik@dubbelboer.com' },
+36 silly resolved     engines: { node: '>=0.4.0' },
+36 silly resolved     keywords: [ 'sleep', 'usleep' ],
+36 silly resolved     repository:
+36 silly resolved      { type: 'git',
+36 silly resolved        url: 'https://github.com/ErikDubbelboer/node-sleep.git' },
+36 silly resolved     repositories: [ [Object] ],
+36 silly resolved     dependencies: { mkdirp: '~0.3.5' },
+36 silly resolved     scripts: { install: 'node build.js || nodejs build.js' },
+36 silly resolved     gypfile: true,
+36 silly resolved     readme: 'sleep\n=====\n\nAdd `sleep()` and `usleep()` to nodejs.\n\nThis is mainly useful for debugging.\n\n**Sleep will block execution of all javascript!**\n===================================================\n\nOn windows the module will fall back to a while loop which will use 100% CPU!\n\nUsage\n-----\n\n`var sleep = require(\'sleep\');`\n\n* `sleep.sleep(n)`: sleep for n seconds\n* `sleep.usleep(n)`: sleep for n microseconds (1 second is 1000000 microseconds)\n\nUpdate\n------\n\nNow bulids properly using node-gyp :)\n\n',
+36 silly resolved     readmeFilename: 'README.md',
+36 silly resolved     bugs: { url: 'https://github.com/ErikDubbelboer/node-sleep/issues' },
+36 silly resolved     _id: 'sleep@1.1.4',
+36 silly resolved     _from: 'sleep@' } ]
+37 info install sleep@1.1.4 into /Users/Dorian/sites/chartzapp
+38 info installOne sleep@1.1.4
+39 info /Users/Dorian/sites/chartzapp/node_modules/sleep unbuild
+40 verbose tar unpack /Users/Dorian/.npm/sleep/1.1.4/package.tgz
+41 silly lockFile e076e1df-tes-chartzapp-node-modules-sleep tar:///Users/Dorian/sites/chartzapp/node_modules/sleep
+42 verbose lock tar:///Users/Dorian/sites/chartzapp/node_modules/sleep /Users/Dorian/.npm/e076e1df-tes-chartzapp-node-modules-sleep.lock
+43 silly lockFile b1e1fd40-rian-npm-sleep-1-1-4-package-tgz tar:///Users/Dorian/.npm/sleep/1.1.4/package.tgz
+44 verbose lock tar:///Users/Dorian/.npm/sleep/1.1.4/package.tgz /Users/Dorian/.npm/b1e1fd40-rian-npm-sleep-1-1-4-package-tgz.lock
+45 silly gunzTarPerm modes [ '755', '644' ]
+46 silly gunzTarPerm extractEntry package.json
+47 silly gunzTarPerm extractEntry .npmignore
+48 silly gunzTarPerm extractEntry README.md
+49 silly gunzTarPerm extractEntry test.js
+50 silly gunzTarPerm extractEntry build.js
+51 silly gunzTarPerm extractEntry .jshintrc
+52 silly gunzTarPerm extractEntry .jshintignore
+53 silly gunzTarPerm extractEntry lib/binary_name.js
+54 silly gunzTarPerm extractEntry lib/index.js
+55 silly gunzTarPerm extractEntry binding.gyp
+56 silly gunzTarPerm extractEntry sleep.cc
+57 silly gunzTarPerm extractEntry build-util/tools.js
+58 silly lockFile e076e1df-tes-chartzapp-node-modules-sleep tar:///Users/Dorian/sites/chartzapp/node_modules/sleep
+59 silly lockFile e076e1df-tes-chartzapp-node-modules-sleep tar:///Users/Dorian/sites/chartzapp/node_modules/sleep
+60 silly lockFile b1e1fd40-rian-npm-sleep-1-1-4-package-tgz tar:///Users/Dorian/.npm/sleep/1.1.4/package.tgz
+61 silly lockFile b1e1fd40-rian-npm-sleep-1-1-4-package-tgz tar:///Users/Dorian/.npm/sleep/1.1.4/package.tgz
+62 info preinstall sleep@1.1.4
+63 verbose readDependencies using package.json deps
+64 verbose readDependencies using package.json deps
+65 verbose cache add [ 'mkdirp@~0.3.5', null ]
+66 verbose cache add name=undefined spec="mkdirp@~0.3.5" args=["mkdirp@~0.3.5",null]
+67 verbose parsed url { protocol: null,
+67 verbose parsed url   slashes: null,
+67 verbose parsed url   auth: null,
+67 verbose parsed url   host: null,
+67 verbose parsed url   port: null,
+67 verbose parsed url   hostname: null,
+67 verbose parsed url   hash: null,
+67 verbose parsed url   search: null,
+67 verbose parsed url   query: null,
+67 verbose parsed url   pathname: 'mkdirp@~0.3.5',
+67 verbose parsed url   path: 'mkdirp@~0.3.5',
+67 verbose parsed url   href: 'mkdirp@~0.3.5' }
+68 verbose cache add name="mkdirp" spec="~0.3.5" args=["mkdirp","~0.3.5"]
+69 verbose parsed url { protocol: null,
+69 verbose parsed url   slashes: null,
+69 verbose parsed url   auth: null,
+69 verbose parsed url   host: null,
+69 verbose parsed url   port: null,
+69 verbose parsed url   hostname: null,
+69 verbose parsed url   hash: null,
+69 verbose parsed url   search: null,
+69 verbose parsed url   query: null,
+69 verbose parsed url   pathname: '~0.3.5',
+69 verbose parsed url   path: '~0.3.5',
+69 verbose parsed url   href: '~0.3.5' }
+70 verbose addNamed [ 'mkdirp', '~0.3.5' ]
+71 verbose addNamed [ null, '>=0.3.5-0 <0.4.0-0' ]
+72 silly lockFile c3f0fe9b-mkdirp-0-3-5 mkdirp@~0.3.5
+73 verbose lock mkdirp@~0.3.5 /Users/Dorian/.npm/c3f0fe9b-mkdirp-0-3-5.lock
+74 silly addNameRange { name: 'mkdirp', range: '>=0.3.5-0 <0.4.0-0', hasData: false }
+75 verbose url raw mkdirp
+76 verbose url resolving [ 'https://registry.npmjs.org/', './mkdirp' ]
+77 verbose url resolved https://registry.npmjs.org/mkdirp
+78 info trying registry request attempt 1 at 18:26:35
+79 verbose etag "6EDQ3TO0Q6I1JBUWBVRMBUI5S"
+80 http GET https://registry.npmjs.org/mkdirp
+81 http 304 https://registry.npmjs.org/mkdirp
+82 silly registry.get cb [ 304,
+82 silly registry.get   { date: 'Tue, 22 Apr 2014 22:26:35 GMT',
+82 silly registry.get     server: 'Apache',
+82 silly registry.get     via: '1.1 varnish',
+82 silly registry.get     'last-modified': 'Tue, 22 Apr 2014 22:26:35 GMT',
+82 silly registry.get     'cache-control': 'max-age=1',
+82 silly registry.get     etag: '"6EDQ3TO0Q6I1JBUWBVRMBUI5S"',
+82 silly registry.get     'x-served-by': 'cache-d98-DAL',
+82 silly registry.get     'x-cache': 'HIT',
+82 silly registry.get     'x-cache-hits': '1',
+82 silly registry.get     'x-timer': 'S1398205595.184062958,VS0,VE34',
+82 silly registry.get     vary: 'Accept',
+82 silly registry.get     'content-length': '0',
+82 silly registry.get     'keep-alive': 'timeout=10, max=50',
+82 silly registry.get     connection: 'Keep-Alive' } ]
+83 verbose etag mkdirp from cache
+84 silly addNameRange number 2 { name: 'mkdirp', range: '>=0.3.5-0 <0.4.0-0', hasData: true }
+85 silly addNameRange versions [ 'mkdirp',
+85 silly addNameRange   [ '0.0.1',
+85 silly addNameRange     '0.0.2',
+85 silly addNameRange     '0.0.3',
+85 silly addNameRange     '0.0.4',
+85 silly addNameRange     '0.0.5',
+85 silly addNameRange     '0.0.6',
+85 silly addNameRange     '0.0.7',
+85 silly addNameRange     '0.1.0',
+85 silly addNameRange     '0.2.0',
+85 silly addNameRange     '0.2.1',
+85 silly addNameRange     '0.2.2',
+85 silly addNameRange     '0.3.0',
+85 silly addNameRange     '0.3.1',
+85 silly addNameRange     '0.3.2',
+85 silly addNameRange     '0.3.3',
+85 silly addNameRange     '0.3.4',
+85 silly addNameRange     '0.3.5',
+85 silly addNameRange     '0.4.0' ] ]
+86 verbose addNamed [ 'mkdirp', '0.3.5' ]
+87 verbose addNamed [ '0.3.5', '0.3.5' ]
+88 silly lockFile 67d2df2a-mkdirp-0-3-5 mkdirp@0.3.5
+89 verbose lock mkdirp@0.3.5 /Users/Dorian/.npm/67d2df2a-mkdirp-0-3-5.lock
+90 silly lockFile 67d2df2a-mkdirp-0-3-5 mkdirp@0.3.5
+91 silly lockFile 67d2df2a-mkdirp-0-3-5 mkdirp@0.3.5
+92 silly lockFile c3f0fe9b-mkdirp-0-3-5 mkdirp@~0.3.5
+93 silly lockFile c3f0fe9b-mkdirp-0-3-5 mkdirp@~0.3.5
+94 silly resolved [ { name: 'mkdirp',
+94 silly resolved     description: 'Recursively mkdir, like `mkdir -p`',
+94 silly resolved     version: '0.3.5',
+94 silly resolved     author:
+94 silly resolved      { name: 'James Halliday',
+94 silly resolved        email: 'mail@substack.net',
+94 silly resolved        url: 'http://substack.net' },
+94 silly resolved     main: './index',
+94 silly resolved     keywords: [ 'mkdir', 'directory' ],
+94 silly resolved     repository:
+94 silly resolved      { type: 'git',
+94 silly resolved        url: 'http://github.com/substack/node-mkdirp.git' },
+94 silly resolved     scripts: { test: 'tap test/*.js' },
+94 silly resolved     devDependencies: { tap: '~0.4.0' },
+94 silly resolved     license: 'MIT',
+94 silly resolved     readme: '# mkdirp\n\nLike `mkdir -p`, but in node.js!\n\n[![build status](https://secure.travis-ci.org/substack/node-mkdirp.png)](http://travis-ci.org/substack/node-mkdirp)\n\n# example\n\n## pow.js\n\n```js\nvar mkdirp = require(\'mkdirp\');\n    \nmkdirp(\'/tmp/foo/bar/baz\', function (err) {\n    if (err) console.error(err)\n    else console.log(\'pow!\')\n});\n```\n\nOutput\n\n```\npow!\n```\n\nAnd now /tmp/foo/bar/baz exists, huzzah!\n\n# methods\n\n```js\nvar mkdirp = require(\'mkdirp\');\n```\n\n## mkdirp(dir, mode, cb)\n\nCreate a new directory and any necessary subdirectories at `dir` with octal\npermission string `mode`.\n\nIf `mode` isn\'t specified, it defaults to `0777 & (~process.umask())`.\n\n`cb(err, made)` fires with the error or the first directory `made`\nthat had to be created, if any.\n\n## mkdirp.sync(dir, mode)\n\nSynchronously create a new directory and any necessary subdirectories at `dir`\nwith octal permission string `mode`.\n\nIf `mode` isn\'t specified, it defaults to `0777 & (~process.umask())`.\n\nReturns the first directory that had to be created, if any.\n\n# install\n\nWith [npm](http://npmjs.org) do:\n\n```\nnpm install mkdirp\n```\n\n# license\n\nMIT\n',
+94 silly resolved     readmeFilename: 'readme.markdown',
+94 silly resolved     bugs: { url: 'https://github.com/substack/node-mkdirp/issues' },
+94 silly resolved     homepage: 'https://github.com/substack/node-mkdirp',
+94 silly resolved     _id: 'mkdirp@0.3.5',
+94 silly resolved     _from: 'mkdirp@~0.3.5' } ]
+95 info install mkdirp@0.3.5 into /Users/Dorian/sites/chartzapp/node_modules/sleep
+96 info installOne mkdirp@0.3.5
+97 info /Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp unbuild
+98 verbose tar unpack /Users/Dorian/.npm/mkdirp/0.3.5/package.tgz
+99 silly lockFile 4fddb286-odules-sleep-node-modules-mkdirp tar:///Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp
+100 verbose lock tar:///Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp /Users/Dorian/.npm/4fddb286-odules-sleep-node-modules-mkdirp.lock
+101 silly lockFile 9c4f80c6-ian-npm-mkdirp-0-3-5-package-tgz tar:///Users/Dorian/.npm/mkdirp/0.3.5/package.tgz
+102 verbose lock tar:///Users/Dorian/.npm/mkdirp/0.3.5/package.tgz /Users/Dorian/.npm/9c4f80c6-ian-npm-mkdirp-0-3-5-package-tgz.lock
+103 silly gunzTarPerm modes [ '755', '644' ]
+104 silly gunzTarPerm extractEntry package.json
+105 silly gunzTarPerm extractEntry .npmignore
+106 silly gunzTarPerm extractEntry LICENSE
+107 silly gunzTarPerm extractEntry index.js
+108 silly gunzTarPerm extractEntry .travis.yml
+109 silly gunzTarPerm extractEntry examples/pow.js
+110 silly gunzTarPerm extractEntry readme.markdown
+111 silly gunzTarPerm extractEntry test/chmod.js
+112 silly gunzTarPerm extractEntry test/perm.js
+113 silly gunzTarPerm extractEntry test/perm_sync.js
+114 silly gunzTarPerm extractEntry test/race.js
+115 silly gunzTarPerm extractEntry test/mkdirp.js
+116 silly gunzTarPerm extractEntry test/return.js
+117 silly gunzTarPerm extractEntry test/return_sync.js
+118 silly gunzTarPerm extractEntry test/root.js
+119 silly gunzTarPerm extractEntry test/sync.js
+120 silly gunzTarPerm extractEntry test/umask.js
+121 silly gunzTarPerm extractEntry test/clobber.js
+122 silly gunzTarPerm extractEntry test/umask_sync.js
+123 silly gunzTarPerm extractEntry test/rel.js
+124 silly lockFile 4fddb286-odules-sleep-node-modules-mkdirp tar:///Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp
+125 silly lockFile 4fddb286-odules-sleep-node-modules-mkdirp tar:///Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp
+126 silly lockFile 9c4f80c6-ian-npm-mkdirp-0-3-5-package-tgz tar:///Users/Dorian/.npm/mkdirp/0.3.5/package.tgz
+127 silly lockFile 9c4f80c6-ian-npm-mkdirp-0-3-5-package-tgz tar:///Users/Dorian/.npm/mkdirp/0.3.5/package.tgz
+128 info preinstall mkdirp@0.3.5
+129 verbose readDependencies using package.json deps
+130 verbose readDependencies using package.json deps
+131 silly resolved []
+132 verbose about to build /Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp
+133 info build /Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules/mkdirp
+134 verbose linkStuff [ false,
+134 verbose linkStuff   false,
+134 verbose linkStuff   false,
+134 verbose linkStuff   '/Users/Dorian/sites/chartzapp/node_modules/sleep/node_modules' ]
+135 info linkStuff mkdirp@0.3.5
+136 verbose linkBins mkdirp@0.3.5
+137 verbose linkMans mkdirp@0.3.5
+138 verbose rebuildBundles mkdirp@0.3.5
+139 info install mkdirp@0.3.5
+140 info postinstall mkdirp@0.3.5
+141 verbose about to build /Users/Dorian/sites/chartzapp/node_modules/sleep
+142 info build /Users/Dorian/sites/chartzapp/node_modules/sleep
+143 verbose linkStuff [ false,
+143 verbose linkStuff   false,
+143 verbose linkStuff   false,
+143 verbose linkStuff   '/Users/Dorian/sites/chartzapp/node_modules' ]
+144 info linkStuff sleep@1.1.4
+145 verbose linkBins sleep@1.1.4
+146 verbose linkMans sleep@1.1.4
+147 verbose rebuildBundles sleep@1.1.4
+148 verbose rebuildBundles [ 'mkdirp' ]
+149 info install sleep@1.1.4
+150 verbose unsafe-perm in lifecycle false
+151 info sleep@1.1.4 Failed to exec install script
+152 info /Users/Dorian/sites/chartzapp/node_modules/sleep unbuild
+153 info preuninstall sleep@1.1.4
+154 info uninstall sleep@1.1.4
+155 verbose true,/Users/Dorian/sites/chartzapp/node_modules,/Users/Dorian/sites/chartzapp/node_modules unbuild sleep@1.1.4
+156 info postuninstall sleep@1.1.4
+157 error sleep@1.1.4 install: `node build.js || nodejs build.js`
+157 error Exit status 127
+158 error Failed at the sleep@1.1.4 install script.
+158 error This is most likely a problem with the sleep package,
+158 error not with npm itself.
+158 error Tell the author that this fails on your system:
+158 error     node build.js || nodejs build.js
+158 error You can get their info via:
+158 error     npm owner ls sleep
+158 error There is likely additional logging output above.
+159 error System Darwin 13.1.0
+160 error command "node" "/usr/local/bin/npm" "install" "--save" "sleep"
+161 error cwd /Users/Dorian/sites/chartzapp
+162 error node -v v0.10.24
+163 error npm -v 1.3.21
+164 error code ELIFECYCLE
+165 verbose exit [ 1, true ]

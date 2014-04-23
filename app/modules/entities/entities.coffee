@@ -216,18 +216,18 @@ module.exports = App.module "Entities",
       ]
 
     getCharts: (station = null, date = null) ->
-      console.log 'getCharts'
-      console.log station
-      console.log date
+      # console.log 'getCharts'
+      # console.log station
+      # console.log date
       date = tuesify date if date
       if station is null and date is null
         chartsUrl = '/api/db/wholething'
         desc = "Full Database"
       else if date is null and station isnt null
-        chartsUrl = 'api/chart/'+station
+        chartsUrl = '/api/chart/'+station
         desc = "Most recent #{station} chart"
       else
-        chartsUrl = 'api/chart/'+station+'/'+date
+        chartsUrl = '/api/chart/'+station+'/'+date
         desc = "#{station} Top 30 for the week of #{date}"
 
       charts = new Entities.ChartCollection

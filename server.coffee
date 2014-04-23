@@ -17,7 +17,67 @@ cheerio = require 'cheerio'
 moment = require 'moment'
 mongo = require 'mongodb'
 mongoose = require 'mongoose'
-require('mongoose-middleware').initialize mongoose
+
+stationArray = [
+  'CAPR'
+  'CFBU'
+  'CFBX'
+  'CFCR'
+  'CFMH'
+  'CFMU'
+  'CFOU'
+  'CFRC'
+  'CFRE'
+  'CFRO'
+]
+stationArray2 = [
+  'CFRU'
+  'CFUR'
+  'CFUV'
+  'CFXU'
+  'CHLY'
+  'CHMA'
+  'CHMR'
+  'CHOQ'
+  'CHRW'
+]
+stationArray3 = [
+  'CHRY'
+  'CHSR'
+  'CHUO'
+  'CHYZ'
+  'CICK'
+  'CILU'
+  'CIOI'
+  'CISM'
+  'CITR'
+]
+stationArray4 = [
+  'CIUT'
+  'CIVL'
+  'CJAM'
+  'CJLO'
+  'CJLY'
+  'CJMQ'
+  'CJSF'
+  'CJSR'
+  'CJSW'
+  'CJUM'
+]
+stationArray5 = [
+  'CKCU'
+  'CKDU'
+  'CKLU'
+  'CKMS'
+  'CKUA'
+  'CKUT'
+  'CKUW'
+  'CKXU'
+  'CSCR'
+  'RADL'
+  'SCOP'
+]
+
 
 # Setup Database ##################################################
 
@@ -30,13 +90,14 @@ db.once "open", ->
   console.log 'connected to the db'
 
 # Define schema
+Schema = mongoose.Schema
 
-appearanceSchema = mongoose.Schema
+appearanceSchema = new Schema
   week: String
   station: String
   position: String
 
-albumSchema = mongoose.Schema
+albumSchema = new Schema
   slug: String
   isNull:
     type: Boolean
@@ -44,6 +105,7 @@ albumSchema = mongoose.Schema
   artist: String
   artistLower:
     type: String
+    lowercase: true
     index: true
   album: String
   albumLower: String
@@ -51,6 +113,7 @@ albumSchema = mongoose.Schema
   labelLower:
     type: String
     index: true
+    lowercase: true
   points: Number
   totalPoints: Number
   currentPos: Number
@@ -109,6 +172,16 @@ albumSchema.post 'init', ->
       pointSum += (31 - parseInt(appearance.position))
   self.points = pointSum
 
+# Add text search -- Not ready for production
+# textSearch = require 'mongoose-text-search'
+#
+# albumSchema.plugin textSearch
+# albumSchema.index {artist: "text", album: "text"},
+# {name: "basic_search_index",
+# weights:
+#   artist: 5
+#   album: 4}
+
 # instantiate the schema
 
 Album = mongoose.model 'Album', albumSchema
@@ -139,6 +212,93 @@ exports.startServer = (port, path, callback) ->
     Album.find (err, albums) ->
       console.log err if err
       res.send albums
+
+  # Basic search -- Not ready for production
+
+  # app.get "/api/search/:search", (req, res) ->
+  #   Album.textSearch req.params.search, (err, albums) ->
+  #     console.error err if err
+  #     res.send albums
+
+  app.get "/server/go-get/:station", (req, res) ->
+    newRes = res
+    station = req.params.station.toLowerCase()
+    now = moment()
+    week = now
+    start = moment("2014-01-01")
+    console.log "go get #{station}"
+    numDays = week.diff(start, 'days')
+    weeks = []
+    newNow = moment()
+    weeks.push newNow
+
+    while week.diff(start, 'days') > 0
+      weeks.push week
+      week = moment(week.day(-5))
+    theLength = weeks.length
+    theLength -= 1
+    lastWeek = weeks[theLength]
+    timeout = 0
+    getWeek = (day, station) ->
+      setTimeout ->
+        # getChart station, day.format("YYYY-MM-DD"), newRes
+        console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+        console.log "Finished #{station}" if day is lastWeek
+      , timeout
+
+    getStation = (station) ->
+      for day in weeks
+        do (day) ->
+          timeout += 5000
+          getWeek day, station
+
+    getStation station
+
+    # getAll = (stations) ->
+    #   for station in stations
+    #     do (station) ->
+    #       getStation station
+    #
+    # getAll(stationArray)
+
+  app.get "/server/go-get-all", (req, res) ->
+    newRes = res
+    res.send "here goes!"
+    now = moment()
+    week = now
+    start = moment("2014-01-01")
+    console.log "go get the whole array"
+    numDays = week.diff(start, 'days')
+    weeks = []
+    newNow = moment()
+    weeks.push newNow
+
+    while week.diff(start, 'days') > 0
+      weeks.push week
+      week = moment(week.day(-5))
+    theLength = weeks.length
+    theLength -= 1
+    lastWeek = weeks[theLength]
+    timeout = 0
+    getWeek = (day, station) ->
+      setTimeout ->
+        getChart station, day.format("YYYY-MM-DD"), newRes
+        console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+        console.log "Finished #{station}" if day is lastWeek
+      , timeout
+
+    getStation = (station) ->
+      for day in weeks
+        do (day) ->
+          timeout += 5000
+          getWeek day, station
+
+    getAll = (stations) ->
+      for station in stations
+        do (station) ->
+          getStation station.toLowerCase()
+
+    getAll(stationArray3)
 
   # Get every entry for a given station from the db, grouped by week
 
@@ -360,6 +520,10 @@ tuesify = (date) ->
 slugify = (Text) ->
   Text.toLowerCase().replace(RegExp(" ", "g"), "-").replace /[^\w-]+/g, ""
 
+
+Array::last = ->
+  @[@length -1]
+
 # Crawler ###################################################################
 
 # Go get a chart!
@@ -378,7 +542,6 @@ getChart = (station, week, res) ->
   # Check the database for the given station and week, and return false if nothing found.
 
   dbQuery = ->
-    d = deferred()
     console.log "Making dbQuery for #{station} and #{week}"
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
     { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
@@ -390,17 +553,16 @@ getChart = (station, week, res) ->
         console.log "making Earshot Crawl for #{the_url}"
         deferredRequest(the_url).then(chartParse).done (chart_res) ->
           console.log 'Returned'
-          console.log chart_res
           # if chart_res.length is 0
           #   res.send chart_res #"Sorry, there is no #{station} chart for #{week}"
           # else
           addToDb(chart_res)
         , (err) ->
-          console.log err
-          res.send []
+          console.error err
+          # res.send []
           return
       else
-        res.send results
+        # res.send results
         console.log "found in db #{station}"
 
   # Load the given url, and grab the chart table

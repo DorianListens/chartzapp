@@ -18,6 +18,7 @@ module.exports = App.module 'LandingApp.Show',
 
       @show @layout,
         loading: true
+      $(document).foundation()
 
     showChart: ->
       search = {}
@@ -40,7 +41,11 @@ module.exports = App.module 'LandingApp.Show',
       console.log stations
       searchView = @getSearchView stations
       @listenTo searchView, 'click:search', (newSearch) ->
-        App.vent.trigger "new:search", newSearch
+        switch newSearch.kind
+          when "artist"
+            App.navigate "/artist/#{newSearch.keyword}", trigger: true
+          when "station"
+            App.navigate "/station/#{newSearch.keyword}", trigger: true
 
       @show searchView,
         region: @layout.searchRegion
@@ -92,6 +97,7 @@ module.exports = App.module 'LandingApp.Show',
       'submit' : 'submit'
 
     submit: (e) ->
+      console.log "search submit"
       e.preventDefault()
       search = {}
       search.keyword = $.trim @ui.searchInput.val()
