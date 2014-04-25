@@ -25,3 +25,4 @@ Front-End:
 * [Marionette](http://marionettejs.com/)
 * [Handlebars](http://handlebarsjs.com/)
 * [Foundation](https://github.com/zurb/foundation)
+* [D3](d3js.org)
