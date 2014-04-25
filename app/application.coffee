@@ -17,15 +17,16 @@ class Application extends Backbone.Marionette.Application
       headerRegion: "#header-region"
       mainRegion: "#main-region"
       footerRegion: "#footer-region"
- 
-    # @mainRegion.open = (view) ->
-    #   @$el.hide() # fadeOut("fast")
-    #   if view.constructor.name isnt "LoadingView"
-    #     @$el.fadeOut("slow")
-    #     @$el.html(view.el).css('opacity' : 0)
-    #     @$el.show()
-    #     @$el.fadeTo("slow", 1)
-    #   else @$el.show()
+
+    @mainRegion.open = (view) ->
+      @$el.hide() # fadeOut("fast")
+      if view.constructor.name isnt "LoadingView"
+        console.log view
+        @$el.fadeOut("slow")
+        @$el.html(view.el).css('opacity' : 0)
+        @$el.show()
+        @$el.fadeTo("slow", 1)
+      else @$el.show()
 
     @reqres.setHandler "default:region", =>
       @mainRegion
