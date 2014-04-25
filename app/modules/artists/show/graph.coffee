@@ -3,11 +3,14 @@ module.exports = (el, url) ->
 
   margin =
     top: 20
-    right: 80
+    right: 120
     bottom: 30
     left: 50
 
-  width = 960 - margin.left - margin.right
+  # width = 960 - margin.left - margin.right
+
+  width = $("#graph-region").width() - margin.left - margin.right
+  # width = width
   height = 500 - margin.top - margin.bottom
   # width = "100%"
   # height= "100%"
@@ -52,6 +55,25 @@ module.exports = (el, url) ->
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+
+  resize = ->
+    width = $("#graph-region").width() - margin.left - margin.right
+    x.range([
+      0
+      width
+    ])
+    d3.select('svg').remove()
+    svg = d3.select(el)
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      # .attr("transform", "translate(0," + height + ")")
+    draw(url)
+
+  $(window).on("resize", resize)
 
   highlight = (d, i) ->
     d3.selectAll("g path, circle")
@@ -156,97 +178,98 @@ module.exports = (el, url) ->
   hideData = (dot) ->
     $(".tip").fadeOut(50)
 
+  draw = (url) ->
+    d3.json url, (error, data) ->
+      # ids = []
+      # data.forEach (d) ->
+      #   ids.push d._id
 
-  d3.json url, (error, data) ->
-    # ids = []
-    # data.forEach (d) ->
-    #   ids.push d._id
+      stations = data
 
-    stations = data
-
-    stations.forEach (d) ->
-      d.appearances.forEach (c) ->
-        c.date = parseDate c.week
-
-    x.domain [
-      d3.min(stations, (c) ->
-        d3.min c.appearances, (v) ->
-          v.date
-
-      )
-      d3.max(stations, (c) ->
-        d3.max c.appearances, (v) ->
-          v.date
-
-      )
-    ]
-    y.domain [ 1, 30]
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text "Position"
-    station = svg.selectAll(".station")
-      .data(stations)
-      .enter()
-      .append("g")
-      .attr("class", (d) ->
-        return "station #{d._id}")
-    station.append("path")
-      .attr("class", "line")
-      .attr "d", (d) ->
-        line d.appearances
-      .style "stroke", (d, i) ->
-          color d._id
-      .on("mouseover", highlight)
-      .on("mouseout", mouseout)
-    circle = station.selectAll('circle')
-      .data( (d, i) ->
+      stations.forEach (d) ->
         d.appearances.forEach (c) ->
-          c._id = d._id
-        return d.appearances)
-      .enter().append("circle")
-      .attr("class", (d) -> return "dot #{d._id} #{d.week}")
-      .style "fill", (d, i) ->
-        color d._id
-      .attr("r", 5)
-      .attr "cx", (d) ->
-        x d.date
-      .attr "cy", (d) ->
-        y d.position
-      .on("mouseover", highlightCircle)
-      .on "mouseout", mouseoutCircle
+          c.date = parseDate c.week
 
-    legend = svg.selectAll(".legend")
-      .data(color.domain().slice().reverse())
-      .enter().append("g")
-      .attr("class", (d) -> return "legend #{d}")
-      .attr "transform", (d, i) ->
-        "translate(0," + i * 20 + ")"
+      x.domain [
+        d3.min(stations, (c) ->
+          d3.min c.appearances, (v) ->
+            v.date
 
-    legend.append("rect")
-      .attr("x", width + margin.left)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style "fill", color
-    legend.append("text")
-      .attr("x", width + 40)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text (d) ->
-        d.toUpperCase()
-    legend.on("mouseover", highlightLegend)
-      .on("mouseout", mouseoutLegend)
-    return
+        )
+        d3.max(stations, (c) ->
+          d3.max c.appearances, (v) ->
+            v.date
+
+        )
+      ]
+      y.domain [ 1, 30]
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text "Position"
+      station = svg.selectAll(".station")
+        .data(stations)
+        .enter()
+        .append("g")
+        .attr("class", (d) ->
+          return "station #{d._id}")
+      station.append("path")
+        .attr("class", "line")
+        .attr "d", (d) ->
+          line d.appearances
+        .style "stroke", (d, i) ->
+            color d._id
+        .on("mouseover", highlight)
+        .on("mouseout", mouseout)
+      circle = station.selectAll('circle')
+        .data( (d, i) ->
+          d.appearances.forEach (c) ->
+            c._id = d._id
+          return d.appearances)
+        .enter().append("circle")
+        .attr("class", (d) -> return "dot #{d._id} #{d.week}")
+        .style "fill", (d, i) ->
+          color d._id
+        .attr("r", 5)
+        .attr "cx", (d) ->
+          x d.date
+        .attr "cy", (d) ->
+          y d.position
+        .on("mouseover", highlightCircle)
+        .on "mouseout", mouseoutCircle
+
+      legend = svg.selectAll(".legend")
+        .data(color.domain().slice().reverse())
+        .enter().append("g")
+        .attr("class", (d) -> return "legend #{d}")
+        .attr "transform", (d, i) ->
+          "translate(0," + i * 20 + ")"
+
+      legend.append("rect")
+        .attr("x", width + margin.left)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style "fill", color
+      legend.append("text")
+        .attr("x", width + 40)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text (d) ->
+          d.toUpperCase()
+      legend.on("mouseover", highlightLegend)
+        .on("mouseout", mouseoutLegend)
+      return
+  draw(url)
 
     # station.append("text").datum((d) ->
     #   name: d._id
