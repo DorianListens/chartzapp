@@ -1,0 +1,34 @@
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #ddd;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 1.5px;
+}
+#graph {
+  font-size: small;
+}
+
+.tick {
+  opacity: 0.5;
+}
+
+.tip {
+  display: none;
+  padding: 5px;
+  color: white;
+  border-radius: 4px;
+  position: absolute;
+  width: auto;
+  line-height: 2;
+  text-align: center;
+  background: rgba(255, 0, 0, 0.2);
+}

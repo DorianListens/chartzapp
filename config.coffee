@@ -5,7 +5,7 @@ exports.config =
       pattern: /^app\/.*\.coffee$/
       options:
         indentation:
-          level: "error"
+          level: "warn"
           value: 2
         no_tabs:
           level: "ignore"

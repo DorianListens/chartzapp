@@ -16,7 +16,7 @@ module.exports = App.module 'StationApp.Show',
       @listenTo @layout, 'show', =>
 
         @mainView(station)
-        
+
       @show @layout,
         loading: true
 
@@ -27,9 +27,13 @@ module.exports = App.module 'StationApp.Show',
         @showStart @stations
 
     showRecent: (search) =>
+      stationName = search
+      search = {}
+      search.station = stationName
       d = new Date
-      week = d.yyyymmdd()
-      station = App.request 'chart:entities', search, week
+      search.startDate = d.yyyymmdd()
+      search.endDate = search.startDate
+      station = App.request 'topx:entities', search
       @showStation station,
         loading: true
 
@@ -111,7 +115,6 @@ module.exports = App.module 'StationApp.Show',
         collection: stations
 
     getStationView: (station) ->
-      console.log station
       new Show.Chart
         collection: station
         model: new App.Entities.Station station

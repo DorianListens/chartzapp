@@ -1,7 +1,7 @@
 App = require "application"
 ArtistsApp = require "modules/artists/artists_app"
 Controllers = require "controllers/baseController"
-graph = require "modules/artists/show/graph"
+# graph = require "modules/artists/show/graph"
 
 module.exports = App.module 'ArtistsApp.Show',
 (Show, App, Backbone, Marionette, $, _) ->
@@ -52,6 +52,8 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showGraph: (artist) ->
       graphView = @getGraphView artist
+      App.vent.on "change:album:graph", (slug) ->
+        graphView.graph "/api/albumgraph/#{slug}"
       @show graphView,
         region: @layout.graphRegion
         loading: true
@@ -59,7 +61,6 @@ module.exports = App.module 'ArtistsApp.Show',
     showEmpty: ->
       emptyView = @getEmptyView()
       @listenTo emptyView, 'click:search', (artistVal) ->
-        console.log artistVal
         App.navigate "artist/#{artistVal}", trigger: true
 
       @show emptyView,
@@ -68,7 +69,6 @@ module.exports = App.module 'ArtistsApp.Show',
     showStart: ->
       startView = @getStartView()
       @listenTo startView, 'click:search', (artistVal) ->
-        console.log artistVal
         App.navigate "artist/#{artistVal}", trigger: true
 
       @show startView,
@@ -91,6 +91,8 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showPanel: (artist) ->
       panelView = @getPanelView artist
+      @listenTo panelView, "click:albumButton", (slug) ->
+        App.vent.trigger "change:album:graph", slug
 
       @show panelView,
         region: @layout.panelRegion
@@ -126,10 +128,28 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Panel extends Marionette.ItemView
     template: "modules/artists/show/templates/panel"
+    events:
+      "click a" : "showGraph"
+
+    showGraph: (e) ->
+      e.preventDefault()
+      console.log e.target.id
+      @trigger 'click:albumButton', e.target.id
 
   class Show.Graph extends Marionette.ItemView
     template: "modules/artists/show/templates/graph"
     className: 'panel'
+    buildGraph: require "modules/artists/show/graph"
+
+    graph: (url) ->
+      d3.select("svg").remove()
+      @buildGraph(@el, url)
+
+    id: "graph"
+    onRender: ->
+      nameString = @collection.url.split('/')
+      nameString = nameString[3]
+      @graph("/api/artistgraph/#{nameString}")
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/artists/show/templates/empty"

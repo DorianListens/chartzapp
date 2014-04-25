@@ -62,9 +62,9 @@ stationArray4 = [
   'CJSF'
   'CJSR'
   'CJSW'
-  'CJUM'
 ]
 stationArray5 = [
+  'CJUM'
   'CKCU'
   'CKDU'
   'CKLU'
@@ -220,85 +220,82 @@ exports.startServer = (port, path, callback) ->
   #     console.error err if err
   #     res.send albums
 
-  app.get "/server/go-get/:station", (req, res) ->
-    newRes = res
-    station = req.params.station.toLowerCase()
-    now = moment()
-    week = now
-    start = moment("2014-01-01")
-    console.log "go get #{station}"
-    numDays = week.diff(start, 'days')
-    weeks = []
-    newNow = moment()
-    weeks.push newNow
+  # Autocrawler - Disabled for production release
 
-    while week.diff(start, 'days') > 0
-      weeks.push week
-      week = moment(week.day(-5))
-    theLength = weeks.length
-    theLength -= 1
-    lastWeek = weeks[theLength]
-    timeout = 0
-    getWeek = (day, station) ->
-      setTimeout ->
-        # getChart station, day.format("YYYY-MM-DD"), newRes
-        console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
-        console.log "Finished #{station}" if day is lastWeek
-      , timeout
-
-    getStation = (station) ->
-      for day in weeks
-        do (day) ->
-          timeout += 5000
-          getWeek day, station
-
-    getStation station
-
-    # getAll = (stations) ->
-    #   for station in stations
-    #     do (station) ->
-    #       getStation station
-    #
-    # getAll(stationArray)
-
-  app.get "/server/go-get-all", (req, res) ->
-    newRes = res
-    res.send "here goes!"
-    now = moment()
-    week = now
-    start = moment("2014-01-01")
-    console.log "go get the whole array"
-    numDays = week.diff(start, 'days')
-    weeks = []
-    newNow = moment()
-    weeks.push newNow
-
-    while week.diff(start, 'days') > 0
-      weeks.push week
-      week = moment(week.day(-5))
-    theLength = weeks.length
-    theLength -= 1
-    lastWeek = weeks[theLength]
-    timeout = 0
-    getWeek = (day, station) ->
-      setTimeout ->
-        getChart station, day.format("YYYY-MM-DD"), newRes
-        console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
-        console.log "Finished #{station}" if day is lastWeek
-      , timeout
-
-    getStation = (station) ->
-      for day in weeks
-        do (day) ->
-          timeout += 5000
-          getWeek day, station
-
-    getAll = (stations) ->
-      for station in stations
-        do (station) ->
-          getStation station.toLowerCase()
-
-    getAll(stationArray3)
+  # app.get "/server/go-get/:station", (req, res) ->
+  #   newRes = res
+  #   station = req.params.station.toLowerCase()
+  #   now = moment()
+  #   week = now
+  #   start = moment("2014-01-01")
+  #   console.log "go get #{station}"
+  #   numDays = week.diff(start, 'days')
+  #   weeks = []
+  #   newNow = moment()
+  #   weeks.push newNow
+  #
+  #   while week.diff(start, 'days') > 0
+  #     weeks.push week
+  #     week = moment(week.day(-5))
+  #   theLength = weeks.length
+  #   theLength -= 1
+  #   lastWeek = weeks[theLength]
+  #   timeout = 0
+  #   getWeek = (day, station) ->
+  #     setTimeout ->
+  #       # getChart station, day.format("YYYY-MM-DD"), newRes
+  #       console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+  #       console.log "Finished #{station}" if day is lastWeek
+  #     , timeout
+  #
+  #   getStation = (station) ->
+  #     for day in weeks
+  #       do (day) ->
+  #         timeout += 5000
+  #         getWeek day, station
+  #
+  #   getStation station
+  #
+  # app.get "/server/go-get-all", (req, res) ->
+  #   newRes = res
+  #   res.send "here goes!"
+  #   now = moment()
+  #   week = now
+  #   start = moment("2014-01-01")
+  #   console.log "go get the whole array"
+  #   numDays = week.diff(start, 'days')
+  #   weeks = []
+  #   newNow = moment()
+  #   newNow = tuesify newNow
+  #   newNow = moment(newNow)
+  #   weeks.push newNow
+  #
+  #   while week.diff(start, 'days') > 0
+  #     weeks.push week
+  #     week = moment(week.day(-5))
+  #   theLength = weeks.length
+  #   theLength -= 1
+  #   lastWeek = weeks[theLength]
+  #   timeout = 0
+  #   getWeek = (day, station) ->
+  #     setTimeout ->
+  #       getChart station, day.format("YYYY-MM-DD"), newRes
+  #       console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+  #       console.log "Finished #{station}" if day is lastWeek
+  #     , timeout
+  #
+  #   getStation = (station) ->
+  #     for day in weeks
+  #       do (day) ->
+  #         timeout += 5000
+  #         getWeek day, station
+  #
+  #   getAll = (stations) ->
+  #     for station in stations
+  #       do (station) ->
+  #         getStation station.toLowerCase()
+  #
+  #   getAll(stationArray5)
 
   # Get every entry for a given station from the db, grouped by week
 
@@ -360,10 +357,9 @@ exports.startServer = (port, path, callback) ->
     (err, results) ->
       res.send results
 
-  # Get top 50 for a given station for a given date range
+  # Get top albums for a given station for a given date range
 
-  app.get "/api/top/:num/:station/:startDate/:endDate", (req, res) ->
-    num = parseInt req.params.num
+  app.get "/api/top/:station/:startDate/:endDate", (req, res) ->
     station = req.params.station.toLowerCase()
     startDate = tuesify(req.params.startDate)
     endDate = tuesify(req.params.endDate)
@@ -421,6 +417,37 @@ exports.startServer = (port, path, callback) ->
     Album.find { "artistLower" : theArtist }, (err, results) ->
     # Album.find { artist_l: req.params.artist.toLowerCase() }, (err, results) ->
       console.log err if err
+      res.send results
+
+  # Specially formatted JSON for d3 Graphs
+
+  app.get "/api/artistgraph/:artist", (req, res) ->
+    theArtist = req.params.artist.toLowerCase()
+    Album.aggregate {$match: {"artistLower" : theArtist}},
+    { $unwind: "$appearances"},
+    { $group:
+      {_id: "$appearances.station"
+        # {station: "$appearances.station"}
+      appearances:
+        {$push :
+          {position: "$appearances.position"
+          week: "$appearances.week"}}}},
+    (err, results) ->
+      console.error if err
+      res.send results
+
+  app.get "/api/albumgraph/:slug", (req, res) ->
+    Album.aggregate {$match: {"slug" : req.params.slug}},
+    { $unwind: "$appearances"},
+    { $group:
+      {_id: "$appearances.station"
+        # {station: "$appearances.station"}
+      appearances:
+        {$push :
+          {position: "$appearances.position"
+          week: "$appearances.week"}}}},
+    (err, results) ->
+      console.error if err
       res.send results
 
   # Get all entries for a given label

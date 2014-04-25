@@ -13,5 +13,4 @@ module.exports = App.module 'HeaderApp',
         region: App.headerRegion
 
   HeaderApp.on 'start', ->
-    console.log 'HeaderApp start'
     API.listHeader()

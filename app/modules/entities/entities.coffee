@@ -150,12 +150,9 @@ module.exports = App.module "Entities",
 
   API =
     getTopx: (search) ->
-      console.log search.startDate
       d = new Date()
       topxCollection = new Entities.TopxCollection
-      number = 5 unless search.number
       station = search.station
-      console.log station
       topxCollection.station = station
       startDate = "2014-01-01"
       if search.startDate then startDate = search.startDate
@@ -164,8 +161,11 @@ module.exports = App.module "Entities",
       startDate = tuesify startDate
       endDate = tuesify endDate
       if station and startDate and endDate
-        searchUrl = "/api/top/#{number}/#{station}/#{startDate}/#{endDate}"
-        desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
+        searchUrl = "/api/top/#{station}/#{startDate}/#{endDate}"
+        if startDate is endDate
+          desc = "#{station} Top 30 for the week of #{startDate}"
+        else
+          desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
       else
         searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
         desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
