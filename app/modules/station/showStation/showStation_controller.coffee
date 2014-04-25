@@ -229,6 +229,7 @@ module.exports = App.module 'StationApp.Show',
 
   class Show.Chart extends Marionette.CompositeView
     template: "modules/station/showStation/templates/chart"
+    className: "small-12 columns"
     itemView: Show.ChartItem
     emptyView: Show.Empty
     itemViewContainer: "#thechart"

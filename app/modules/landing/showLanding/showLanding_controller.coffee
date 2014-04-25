@@ -78,6 +78,7 @@ module.exports = App.module 'LandingApp.Show',
 
   class Show.Layout extends Marionette.Layout
     template: "modules/landing/showLanding/templates/show_layout"
+    id: "landing-page"
 
     regions:
       titleRegion: "#title_region"
@@ -135,6 +136,7 @@ module.exports = App.module 'LandingApp.Show',
     template: "modules/landing/showLanding/templates/chart"
     itemView: Show.ChartItem
     emptyView: Show.Empty
+    className: "small-12 columns"
     itemViewContainer: "#thecharts"
     itemViewOptions: (model) ->
       index: @collection.indexOf(model) + 1

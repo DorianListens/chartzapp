@@ -36,13 +36,13 @@ module.exports = (el, url) ->
   color.range(fullRange)
   xAxis = d3.svg.axis()
     .scale(x)
-    .tickPadding(10)
-    .tickSize(-height, -height)
+    # .tickPadding(10)
+    # .tickSize(-height, -height)
     .orient("bottom")
   yAxis = d3.svg.axis()
     .scale(y)
-    .tickPadding(10)
-    .tickSize(-width, -width)
+    # .tickPadding(10)
+    # .tickSize(-width, -width)
     .orient("left")
   line = d3.svg.line().x((d) ->
     x d.date
