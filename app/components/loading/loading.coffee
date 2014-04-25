@@ -55,6 +55,7 @@ module.exports = App.module "Components.Loading",
   class Loading.LoadingView extends Marionette.ItemView
     template: false
     className: "loading-container small-1 small-centered columns"
+    id: "loadingView"
 
     onShow: ->
       opts = @_getOptions()

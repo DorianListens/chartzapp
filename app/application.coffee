@@ -20,8 +20,9 @@ class Application extends Backbone.Marionette.Application
 
     @mainRegion.open = (view) ->
       @$el.hide() # fadeOut("fast")
-      if view.constructor.name isnt "LoadingView"
-        console.log view
+      # console.log view.el.id
+      if view.el.id isnt "loadingView"
+        # console.log view
         @$el.fadeOut("slow")
         @$el.html(view.el).css('opacity' : 0)
         @$el.show()
