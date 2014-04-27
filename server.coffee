@@ -203,8 +203,7 @@ exports.startServer = (port, path, callback) ->
 
 # Routes #####################################################################
 
-  app.get '/', (req, res) ->
-    res.sendfile './public/index.html'
+
 
   # Get the whole DB
 
@@ -508,6 +507,9 @@ exports.startServer = (port, path, callback) ->
   app.get "/api/chart/:station/:date", (req, res) ->
     theDate = tuesify(req.params.date)
     newChart = getChart(req.params.station.toLowerCase(), theDate, res)
+
+  app.get '/', (req, res) ->
+    res.sendfile './public/index.html'
 
 # Utility Functions #######################################################
 

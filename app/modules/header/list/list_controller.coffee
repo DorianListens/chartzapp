@@ -20,6 +20,12 @@ module.exports = App.module 'HeaderApp.List',
     template: 'modules/header/list/templates/headers'
     itemView: List.Header
     itemViewContainer: "ul.links"
+    events:
+      "click a#home" : "home"
+    home: (e) ->
+      e.preventDefault()
+      route = "home"
+      App.navigate route, trigger: true
 
   class List.Controller extends App.Controllers.Base
 
