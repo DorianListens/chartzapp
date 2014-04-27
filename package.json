@@ -39,7 +39,7 @@
     "mongodb": "~1.4.0",
     "mongoose": "~3.8.8",
     "mongoose-middleware": "~0.2.3",
-    "mongoose-text-search": "0.0.2",
+    "mongoose-text-search": "0.0.2"
   },
   "main": "server.coffee",
   "directories": {
