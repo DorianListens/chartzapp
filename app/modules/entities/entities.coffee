@@ -206,11 +206,11 @@ module.exports = App.module "Entities",
 
     getHeaders: ->
       new Entities.HeaderCollection [
-        { name: "Home", path: 'home' }
+        { name: "Home", path: 'home', icon: 'fi-home' }
         # { name: "Charts", path: 'chart' }
         # { name: "Top 50", path: 'topx'}
-        { name: "Artists", path: 'artist' }
-        { name: "Stations", path: 'station' }
+        { name: "Artists", path: 'artist', icon: "fi-music"}
+        { name: "Stations", path: 'station', icon: 'fi-calendar' }
         # { name: "Date", path: 'date' }
         # { name: "Label", path: "label"}
       ]

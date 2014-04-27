@@ -53,7 +53,7 @@ module.exports = App.module 'StationApp.Show',
           @show stationView,
             region: @layout.tableRegion
             loading: true
-            $(document).foundation()
+
 
     showTitle: (opts) ->
       opts.station = "Pick a Station" unless opts.station
@@ -67,7 +67,6 @@ module.exports = App.module 'StationApp.Show',
       panelView = @getPanelView()
       @show panelView,
         region: @layout.panelRegion
-      $(document).foundation()
 
       @listenTo panelView, 'click:mostRecent', (station) =>
         @showRecent @opts.station
@@ -173,9 +172,12 @@ module.exports = App.module 'StationApp.Show',
 
   class Show.TopItem extends Marionette.ItemView
     template: "modules/station/showStation/templates/topItem"
-    tagName: "li"
+    className: "large-4 columns top-three-item radius"
+    attributes:
+      "data-equalizer-watch" : ''
     events:
       'click a' : 'clickArtist'
+
     clickArtist: (e) ->
       App.navigate "artist/#{e.target.text}", trigger: true
 
@@ -183,6 +185,7 @@ module.exports = App.module 'StationApp.Show',
     template: "modules/station/showStation/templates/topthree"
     itemView: Show.TopItem
     itemViewContainer: "#topthree"
+    className: "small-12 columns"
     onBeforeRender: ->
       @collection = @collection.clone()
       @collection.models = @collection.models.slice(0,3)

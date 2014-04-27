@@ -46,8 +46,12 @@ exports.config =
         'stylesheets/vendor.css': /^vendor(\/|\\)styles/
         'test/stylesheets/vendor.css': /^test(\/|\\)vendor(\/|\\)styles(\/|\\)/
       order:
-        before: []
-        after: []
+        before: [
+          'app/views/styles/foundation.scss'
+        ]
+        after: [
+          # "app/views/styles/station.scss"
+        ]
 
     templates:
       defaultExtension: 'hbs'

@@ -64,6 +64,7 @@ module.exports = App.module "Components.Loading",
       @$el.append(@spinner.el)
 
     onClose: ->
+      $(document).foundation()
       @spinner.stop()
 
     _getOptions: ->

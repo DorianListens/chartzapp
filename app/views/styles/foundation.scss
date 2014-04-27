@@ -4,9 +4,13 @@
 
 // Make sure the charset is set appropriately
 @charset "UTF-8";
+@import url(http://fonts.googleapis.com/css?family=Josefin+Sans);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
 
 // Behold, here are all the Foundation components.
 @import
+  "foundation/settings",
   "foundation/components/grid",
   "foundation/components/accordion",
   "foundation/components/alert-boxes",
@@ -42,4 +46,7 @@
   "foundation/components/top-bar",
   "foundation/components/type",
   "foundation/components/offcanvas",
-  "foundation/components/visibility";
+  "foundation/components/visibility",
+  "custom";
+
+  //
