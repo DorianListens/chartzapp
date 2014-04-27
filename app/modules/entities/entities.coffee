@@ -169,7 +169,7 @@ module.exports = App.module "Entities",
       else
         searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
         desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
-      console.log searchUrl
+      # console.log searchUrl
       topxCollection.desc = desc
       topxCollection.url = searchUrl
       topxCollection.fetch
