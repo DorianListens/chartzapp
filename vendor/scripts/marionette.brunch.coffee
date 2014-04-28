@@ -17,11 +17,11 @@ do (Backbone) ->
       # route = "#" + route if route.charAt(0) is "/"
       # console.log "Doing navigate for #{route}"
       ga('send', 'pageview', "/#{route}")
-      # console.log route
       Backbone.history.navigate route, options
 
     getCurrentRoute: ->
       frag = Backbone.history.fragment
+      ga('send', 'pageview', "/#{frag}") if frag
       if _.isEmpty(frag) then null else frag
 
     startHistory: ->
