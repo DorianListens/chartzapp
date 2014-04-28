@@ -168,7 +168,7 @@ module.exports = (el, url) ->
       chartTip.css("top", (coord[1] + 50) + "px" )
     else
       chartTip.css("top", (coord[1] - 50) + "px")
-    chartTip.css("left", (coord[0] + 25) + "px" )
+    chartTip.css("left", (coord[0] + 50) + "px" )
       # .css("top", (coord[1] - 50) + "px")
       .css("background", color d[i].__data__._id)
     $("##{d[i].__data__._id}-#{i}")
