@@ -164,8 +164,12 @@ module.exports = (el, url) ->
     $("#graph")
       .append("<div class='tip' id='#{d[i].__data__._id}-#{i}'></div>")
     chartTip = $("##{d[i].__data__._id}-#{i}")
-    chartTip.css("left", (coord[0] + 15) + "px" )
-      .css("top", (coord[1] - 50) + "px")
+    if i % 2
+      chartTip.css("top", (coord[1] + 50) + "px" )
+    else
+      chartTip.css("top", (coord[1] - 50) + "px")
+    chartTip.css("left", (coord[0] + 25) + "px" )
+      # .css("top", (coord[1] - 50) + "px")
       .css("background", color d[i].__data__._id)
     $("##{d[i].__data__._id}-#{i}")
       .html("""
