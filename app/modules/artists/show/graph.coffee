@@ -235,7 +235,7 @@ module.exports = (el, url) ->
 
         )
       ]
-      y.domain [ 1, 30]
+      y.domain [1, 30]
       svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
@@ -258,6 +258,7 @@ module.exports = (el, url) ->
       station.append("path")
         .attr("class", "line")
         .attr "d", (d) ->
+          d.appearances.sort((a,b) -> return a.date-b.date)
           line d.appearances
         .style "stroke", (d, i) ->
             color d._id
