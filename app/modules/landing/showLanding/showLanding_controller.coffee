@@ -38,7 +38,6 @@ module.exports = App.module 'LandingApp.Show',
         collection: topCharts
 
     showSearch: (stations) ->
-      console.log stations
       searchView = @getSearchView stations
       @listenTo searchView, 'click:search', (newSearch) ->
         switch newSearch.kind
@@ -124,7 +123,6 @@ module.exports = App.module 'LandingApp.Show',
       'click a' : 'clickItem'
     clickItem: (e) ->
       e.preventDefault()
-      console.log e.target.text
       App.navigate "artist/#{e.target.text}",
         trigger: true
 

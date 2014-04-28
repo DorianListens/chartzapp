@@ -10,10 +10,7 @@ module.exports = (el, url) ->
   # width = 960 - margin.left - margin.right
 
   width = $("#graph-region").width() - margin.left - margin.right
-  # width = width
   height = 500 - margin.top - margin.bottom
-  # width = "100%"
-  # height= "100%"
   parseDate = d3.time.format("%Y-%m-%d").parse
   x = d3.time.scale().range([
     0
@@ -90,8 +87,9 @@ module.exports = (el, url) ->
       .duration(100)
       .attr("r", "10")
       .style("opacity", 1)
-      .forEach ->
-        d.appearances.forEach (c) ->
+      .forEach (d) ->
+        d.forEach (c, i) ->
+          showTips(d, c, i)
 
     d3.select(".#{d._id} text")
       .transition()
@@ -112,6 +110,7 @@ module.exports = (el, url) ->
       .transition()
       .duration(100)
       .style("font-weight", "normal")
+    hideData()
 
   highlightCircle = (d) ->
     showData(@, d)
@@ -152,6 +151,32 @@ module.exports = (el, url) ->
       .duration(100)
       .attr("r", "10")
       .style("opacity", 1)
+    d3.selectAll(".#{d} circle")
+      .forEach (d) ->
+        d.forEach (c, i) ->
+          showTips(d, c, i)
+
+
+  showTips = (d, c, i) ->
+    coord1 = parseInt c.cx.animVal.value
+    coord2 = parseInt c.cy.animVal.value
+    coord = [coord1, coord2]
+    $("#graph")
+      .append("<div class='tip' id='#{d[i].__data__._id}-#{i}'></div>")
+    chartTip = $("##{d[i].__data__._id}-#{i}")
+    chartTip.css("left", (coord[0] + 15) + "px" )
+      .css("top", (coord[1] - 50) + "px")
+      .css("background", color d[i].__data__._id)
+    $("##{d[i].__data__._id}-#{i}")
+      .html("""
+      #{d[i].__data__._id.toUpperCase()}<br />
+      # #{d[i].__data__.position} <br />
+      #{d[i].__data__.week}
+      """
+      )
+    $("##{d[i].__data__._id}-#{i}").fadeIn(100)
+
+
   mouseoutLegend = (d, i) ->
     d3.select(@)
       .transition()
@@ -167,16 +192,24 @@ module.exports = (el, url) ->
       .transition()
       .duration(100)
       .attr("r", 5)
+    hideData()
   showData = (dot, d) ->
     coord = d3.mouse(dot)
+    $("#graph").append("<div class='tip'></div>")
     chartTip = d3.select(".tip")
     chartTip.style("left", (coord[0] + 15) + "px" )
       .style("top", (coord[1] - 50) + "px")
       .style("background", color d._id)
-    $(".tip").html("Station: #{d._id.toUpperCase()}<br /> Position: #{d.position} <br />Week: #{d.week} ")
+    $(".tip")
+      .html("""
+      Station: #{d._id.toUpperCase()}<br />
+      Position: #{d.position} <br />
+      Week: #{d.week}
+      """
+      )
     $(".tip").fadeIn(100)
-  hideData = (dot) ->
-    $(".tip").fadeOut(50)
+  hideData = ->
+    $(".tip").fadeOut(50).remove()
 
   draw = (url) ->
     d3.json url, (error, data) ->

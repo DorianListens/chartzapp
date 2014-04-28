@@ -210,7 +210,7 @@ module.exports = App.module "Entities",
         # { name: "Charts", path: 'chart' }
         # { name: "Top 50", path: 'topx'}
         { name: "Artists", path: 'artist', icon: "fi-music"}
-        { name: "Stations", path: 'station', icon: 'fi-calendar' }
+        { name: "Stations", path: 'station', icon: 'fi-align-left' }
         # { name: "Date", path: 'date' }
         # { name: "Label", path: "label"}
       ]
