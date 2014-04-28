@@ -16,6 +16,8 @@ do (Backbone) ->
     navigate: (route, options = {}) ->
       # route = "#" + route if route.charAt(0) is "/"
       # console.log "Doing navigate for #{route}"
+      ga('send', 'pageview', "/#{route}")
+      # console.log route
       Backbone.history.navigate route, options
 
     getCurrentRoute: ->
