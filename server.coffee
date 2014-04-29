@@ -17,8 +17,10 @@ cheerio = require 'cheerio'
 moment = require 'moment'
 mongo = require 'mongodb'
 mongoose = require 'mongoose'
+schedule = require 'node-schedule'
 
-stationArray = [
+stationArray = require './stationList'
+stationArray1 = [
   'CAPR'
   'CFBU'
   'CFBX'
@@ -77,6 +79,8 @@ stationArray5 = [
   'RADL'
   'SCOP'
 ]
+
+
 
 
 # Setup Database ##################################################
@@ -295,6 +299,43 @@ exports.startServer = (port, path, callback) ->
   #         getStation station.toLowerCase()
   #
   #   getAll(stationArray5)
+
+  # Get this weeks charts - Disabled for production
+
+  # app.get "/server/go-get-week", (req, res) ->
+  #   newNow = moment()
+  #   newNow = tuesify newNow
+  #   res.send "Geting all charts for the week of #{newNow}. \n Here goes!"
+  #   newNow = moment(newNow)
+  #   theArray = stationArray
+  #   numStations = theArray.length
+  #   numStations -= 1
+  #   lastStation = theArray[numStations]
+  #   console.log "Last one is", lastStation
+  #   timeout = 0
+  #   weeks = []
+  #   weeks.push newNow
+  #   opts = {}
+  #   opts.noNull = true
+  #   getWeek = (day, station) ->
+  #     setTimeout ->
+  #       getChart station, day.format("YYYY-MM-DD"), res, opts
+  #       console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+  #       console.log "Finished" if station is lastStation.toLowerCase()
+  #     , timeout
+  #
+  #   getStation = (station) ->
+  #     for day in weeks
+  #       do (day) ->
+  #         timeout += 8000
+  #         getWeek day, station
+  #
+  #   getAll = (stations) ->
+  #     for station in stations
+  #       do (station) ->
+  #         getStation station.toLowerCase()
+  #
+  #   getAll(theArray)
 
   # Get every entry for a given station from the db, grouped by week
 
@@ -557,7 +598,7 @@ Array::last = ->
 
 # Go get a chart!
 
-getChart = (station, week, res) ->
+getChart = (station, week, res, opts) ->
   console.log "getChart"
 
   # Check if we have a specific week. If not, grab the most recent chart
@@ -631,16 +672,17 @@ getChart = (station, week, res) ->
   addToDb = (chart_array) ->
     count = 0
     console.log "adding to DB"
-    if chart_array.length is 0
-      newAlbum = new Album
-        isNull: true
-        appearances: [
-          week: week
-          station: station
-        ]
-      newAlbum.save (err, newAlbum) ->
-        console.error err if err
-        dbQuery()
+    unless opts.noNull
+      if chart_array.length is 0
+        newAlbum = new Album
+          isNull: true
+          appearances: [
+            week: week
+            station: station
+          ]
+        newAlbum.save (err, newAlbum) ->
+          console.error err if err
+          dbQuery()
     for record in chart_array
       do (record) ->
         appearance =
@@ -648,7 +690,7 @@ getChart = (station, week, res) ->
           station: station
           position: record.position
 
-        Album.findOne {'artist' : "#{record.artist}", 'album' : "#{record.album}" }, (err, results) ->
+        Album.findOne {'artist' : "#{record.artist}", 'album' : "#{record.album}", 'label' : "#{record.label}" }, (err, results) ->
           console.log err if err
           if results is null
             newAlbum = new Album
@@ -696,6 +738,46 @@ getChart = (station, week, res) ->
 
   dbQuery()
 
+# Set up automatic crawling on tuesdays and fridays
+
+autoCrawl = (options = false) ->
+  console.log "Autocrawling"
+  res = {}
+  newNow = moment()
+  newNow = tuesify newNow
+  newNow = moment(newNow)
+  theArray = stationArray
+  numStations = theArray.length
+  numStations -= 1
+  lastStation = theArray[numStations]
+  console.log "Last one is", lastStation
+  timeout = 0
+  weeks = []
+  weeks.push newNow
+  opts = {}
+  opts.noNull = true unless options
+  getWeek = (day, station) ->
+    setTimeout ->
+      getChart station, day.format("YYYY-MM-DD"), res, opts
+      console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+      console.log "Finished" if station is lastStation.toLowerCase()
+    , timeout
+
+  getStation = (station) ->
+    for day in weeks
+      do (day) ->
+        timeout += 8000
+        getWeek day, station
+
+  getAll = (stations) ->
+    for station in stations
+      do (station) ->
+        getStation station.toLowerCase()
+
+  getAll(theArray)
+
+j = schedule.scheduleJob({hour: 14, minute: 0, dayOfWeek: 2}, autoCrawl())
+j2 = schedule.scheduleJob({hour: 14, minute: 0, dayOfWeek: 5}, autoCrawl(true))
 
 # Heroku ENV setup #################################################
 
