@@ -14,7 +14,7 @@ module.exports = (el, url) ->
   parseDate = d3.time.format("%Y-%m-%d").parse
   x = d3.time.scale().range([
     0
-    width
+    width - 75
   ])
   y = d3.scale.linear().range([
     0
@@ -290,15 +290,18 @@ module.exports = (el, url) ->
         .enter().append("g")
         .attr("class", (d) -> return "legend #{d}")
         .attr "transform", (d, i) ->
-          "translate(0," + i * 20 + ")"
+          if i < 20
+            "translate(0," + i * 20 + ")"
+          else if i >= 20
+            "translate(75," + (i - 20) * 20 + ")"
 
       legend.append("rect")
-        .attr("x", width + margin.left)
+        .attr("x", width - 10)
         .attr("width", 18)
         .attr("height", 18)
         .style "fill", color
       legend.append("text")
-        .attr("x", width + 40)
+        .attr("x", width - 15)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")

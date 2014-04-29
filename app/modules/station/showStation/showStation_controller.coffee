@@ -34,8 +34,7 @@ module.exports = App.module 'StationApp.Show',
       search.startDate = d.yyyymmdd()
       search.endDate = search.startDate
       station = App.request 'topx:entities', search
-      @showStation station,
-        loading: true
+      @showStation station
 
     showStation: (station) ->
       App.execute "when:fetched", station, =>

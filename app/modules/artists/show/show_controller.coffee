@@ -61,6 +61,7 @@ module.exports = App.module 'ArtistsApp.Show',
     showEmpty: ->
       emptyView = @getEmptyView()
       @listenTo emptyView, 'click:search', (artistVal) ->
+        artistVal = encodeURIComponent(artistVal)
         App.navigate "artist/#{artistVal}", trigger: true
 
       @show emptyView,
@@ -69,6 +70,7 @@ module.exports = App.module 'ArtistsApp.Show',
     showStart: ->
       startView = @getStartView()
       @listenTo startView, 'click:search', (artistVal) ->
+        artistVal = encodeURIComponent(artistVal)
         App.navigate "artist/#{artistVal}", trigger: true
 
       @show startView,

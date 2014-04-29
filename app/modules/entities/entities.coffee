@@ -166,7 +166,13 @@ module.exports = App.module "Entities",
           desc = "#{station} Top 30 for the week of #{startDate}"
         else
           desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
-      else
+      else if search.request is "This Month"
+        searchUrl = "/api/topall/2014-04-04/#{d.yyyymmdd()}"
+        desc = "Top Albums this Month"
+      else if search.request is "This Week"
+        searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
+        console.log "default"
+      else #if search.request is "This Year"
         searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
         desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
       # console.log searchUrl
@@ -178,6 +184,7 @@ module.exports = App.module "Entities",
 
     getLabel: (label) ->
       labelCollection = new Entities.LabelCollection
+      label = encodeURIComponent(label)
       labelCollection.url = "/api/label/#{label}"
       labelCollection.fetch
         reset: true
@@ -199,6 +206,7 @@ module.exports = App.module "Entities",
 
     getArtist: (artist) ->
       artists = new Entities.ArtistCollection
+      artist = encodeURIComponent(artist)
       artists.url = "/api/artists/#{artist}"
       artists.fetch
         reset: true

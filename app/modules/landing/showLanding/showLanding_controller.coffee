@@ -16,19 +16,31 @@ module.exports = App.module 'LandingApp.Show',
         @showList(stations)
         @showSearch(stations)
 
+      @listenTo @layout, 'change:time', (time) =>
+        search = {}
+        search.request = time
+        console.log search.request
+        @showChart(search)
+
       @show @layout,
         loading: true
       $(document).foundation()
 
-    showChart: ->
-      search = {}
+    showChart: (search = {}) ->
+
       topCharts = App.request 'topx:entities', search
 
       chartView = @getChartView topCharts
+      if search.request
+        @show chartView,
+          region: @layout.tableRegion
+          loading:
+            loadingType: "opacity"
+      else
+        @show chartView,
+          region: @layout.tableRegion
+          loading: true
 
-      @show chartView,
-        region: @layout.tableRegion
-        loading: true
       App.execute "when:fetched", topCharts, ->
         topCharts.sort()
         $(document).foundation()
@@ -78,6 +90,12 @@ module.exports = App.module 'LandingApp.Show',
   class Show.Layout extends Marionette.Layout
     template: "modules/landing/showLanding/templates/show_layout"
     id: "landing-page"
+    ui:
+      "timeSelect" : "#time-select"
+    events:
+      "change @ui.timeSelect" : "select"
+    select: (e) ->
+      @trigger 'change:time', @ui.timeSelect.val()
 
     regions:
       titleRegion: "#title_region"
@@ -123,11 +141,12 @@ module.exports = App.module 'LandingApp.Show',
       'click a' : 'clickItem'
     clickItem: (e) ->
       e.preventDefault()
-      App.navigate "artist/#{e.target.text}",
+      artist = encodeURIComponent(e.target.text)
+      App.navigate "artist/#{artist}",
         trigger: true
 
   class Show.Empty extends Marionette.ItemView
-    template: "modules/topx/showTopx/templates/empty"
+    template: "modules/landing/showLanding/templates/empty"
     tagName: 'tr'
 
   class Show.Chart extends Marionette.CompositeView

@@ -8,7 +8,7 @@ module.exports = App.module "Components.Loading",
 
     initialize: (options) ->
       { view, config } = options
-
+      
       config = if _.isBoolean(config) then {} else config
 
       _.defaults config,
@@ -18,7 +18,7 @@ module.exports = App.module "Components.Loading",
 
       switch config.loadingType
         when "opacity"
-          @region.currentView.$el.css "opacity", 0.5
+          @region.currentView.$el.css "opacity", 0.2
         when "spinner"
           loadingView = @getLoadingView()
           @show loadingView
