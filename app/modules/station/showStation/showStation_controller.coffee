@@ -22,7 +22,7 @@ module.exports = App.module 'StationApp.Show',
 
     mainView: (search = null) =>
       if search.station
-        @showStation(search)
+        @showStation search
       else
         @showStart @stations
 
@@ -40,18 +40,18 @@ module.exports = App.module 'StationApp.Show',
       App.execute "when:fetched", station, =>
         if station.length is 0
           @showEmpty @stations
-        else
-          stationView = @getStationView station
-          topThreeView = @getTopThreeView station
-          @showPanel()
-          @showTitle(@opts)
-          @show topThreeView,
-            region: @layout.topRegion
-            loading: true
 
-          @show stationView,
-            region: @layout.tableRegion
-            loading: true
+      stationView = @getStationView station
+      topThreeView = @getTopThreeView station
+      @showPanel()
+      @showTitle(@opts)
+      @show topThreeView,
+        region: @layout.topRegion
+        loading: true
+
+      @show stationView,
+        region: @layout.tableRegion
+        loading: true
 
 
     showTitle: (opts) ->
@@ -60,7 +60,7 @@ module.exports = App.module 'StationApp.Show',
       titleView = @getTitleView stationTitle
       @show titleView,
         region: @layout.titleRegion
-        loading: true
+        # loading: true
 
     showPanel: ->
       panelView = @getPanelView()
@@ -195,6 +195,7 @@ module.exports = App.module 'StationApp.Show',
 
   class Show.EmptyView extends Marionette.ItemView
     template: "modules/station/showStation/templates/emptyview"
+    className: "small-12 columns"
     ui:
       'stationPicker' : '#station-select'
 
@@ -227,7 +228,8 @@ module.exports = App.module 'StationApp.Show',
     events:
       'click a' : 'clickArtist'
     clickArtist: (e) ->
-      App.navigate "artist/#{e.target.text}", trigger: true
+      artist = encodeURIComponent(e.target.text)
+      App.navigate "artist/#{artist}", trigger: true
 
   class Show.Chart extends Marionette.CompositeView
     template: "modules/station/showStation/templates/chart"
