@@ -8,7 +8,7 @@
 # ###
 
 # Require necessary components
-
+require 'newrelic'
 express = require 'express'
 request = require 'request'
 deferred = require 'deferred'
