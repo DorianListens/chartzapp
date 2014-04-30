@@ -1,5 +1,12 @@
 {{#unless models.0.attributes.isNull}}
-<div class="panel"><p>{{desc}}</p></div>
+<div class="panel"><span>{{desc}}</span>
+  {{#if week}}
+  <ul class="inline-list right">
+    <li><a class="next" data-week="{{week}}" id="prev"><i class="fi-arrow-left"></i> Prev</a></li>
+    <li><a class="next" data-week="{{week}}" id="next">Next <i class="fi-arrow-right"></i></a></li>
+  </ul>
+  {{/if}}
+</div>
 <div class="chart">
   <table width="100%">
     <thead>

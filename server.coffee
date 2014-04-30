@@ -17,7 +17,7 @@ cheerio = require 'cheerio'
 moment = require 'moment'
 mongo = require 'mongodb'
 mongoose = require 'mongoose'
-schedule = require 'node-schedule'
+later = require 'later'
 
 stationArray = require './stationList'
 stationArray1 = [
@@ -548,11 +548,30 @@ exports.startServer = (port, path, callback) ->
   app.get "/api/chart/:station/:date", (req, res) ->
     theDate = tuesify(req.params.date)
     newChart = getChart(req.params.station.toLowerCase(), theDate, res)
+  #
+  # app.get "/api/fixOught", (req, res) ->
+  #   Album.find {artist : "Ought"}, (err, resp) ->
+  #     doc = resp[0].appearances.id("535ff9383adac38549626140")
+  #     doc.remove()
+  #     resp[0].save()
+  #     # resp[0].label = "Constellation"
+  #     # resp[0].save()
+  #     res.send resp
+
+  app.get "/api/nulls", (req, res) ->
+    Album.find {isNull: true}, (err, resp) ->
+      console.error err if err
+      res.send resp
 
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
 
 # Utility Functions #######################################################
+
+Array::unique = ->
+  output = {}
+  output[@[key]] = @[key] for key in [0...@length]
+  value for key, value of output
 
   # Set up the deferred request.
 
@@ -598,7 +617,7 @@ Array::last = ->
 
 # Go get a chart!
 
-getChart = (station, week, res, opts) ->
+getChart = (station, week, res, opts = {}) ->
   console.log "getChart"
 
   # Check if we have a specific week. If not, grab the most recent chart
@@ -758,7 +777,7 @@ autoCrawl = (options = false) ->
   opts.noNull = true unless options
   getWeek = (day, station) ->
     setTimeout ->
-      getChart station, day.format("YYYY-MM-DD"), res, opts
+      getChart station, '', res, opts
       console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
       console.log "Finished" if station is lastStation.toLowerCase()
     , timeout
@@ -776,8 +795,22 @@ autoCrawl = (options = false) ->
 
   getAll(theArray)
 
-j = schedule.scheduleJob({hour: 14, minute: 0, dayOfWeek: 2}, autoCrawl())
-j2 = schedule.scheduleJob({hour: 14, minute: 0, dayOfWeek: 5}, autoCrawl(true))
+autoCrawlTrue = ->
+  return autoCrawl(true)
+
+sched = later.parse.recur()
+  .on(14).hour().on(3).dayOfWeek()
+
+sched2 = later.parse.recur()
+  .on(14).hour().on(6).dayOfWeek()
+
+later.date.localTime()
+
+timer = later.setInterval(autoCrawl, sched)
+timer2 = later.setInterval(autoCrawlTrue, sched2)
+
+# theNext = later.schedule(sched2).next(5)
+# console.log theNext
 
 # Heroku ENV setup #################################################
 

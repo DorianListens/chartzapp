@@ -41,7 +41,8 @@
     "mongoose-middleware": "~0.2.3",
     "mongoose-text-search": "0.0.2",
     "newrelic": "~1.5.2",
-    "node-schedule": "~0.1.13"
+    "node-schedule": "~0.1.13",
+    "later": "~1.1.6"
   },
   "main": "server.coffee",
   "directories": {

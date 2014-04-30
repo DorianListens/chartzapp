@@ -123,6 +123,9 @@ module.exports = App.module "Entities",
         return 0 if a is b
         if a > b then -1 else 1
 
+      response = response.filter (v, i, a) ->
+        return v if v.isNull is false
+
       response = response.slice(0, 50)
       for item in response
         do (item) ->
@@ -164,6 +167,7 @@ module.exports = App.module "Entities",
         searchUrl = "/api/top/#{station}/#{startDate}/#{endDate}"
         if startDate is endDate
           desc = "#{station} Top 30 for the week of #{startDate}"
+          week = startDate
         else
           desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
       else if search.request is "This Month"
@@ -171,12 +175,14 @@ module.exports = App.module "Entities",
         desc = "Top Albums this Month"
       else if search.request is "This Week"
         searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
-        console.log "default"
+        week = d.yyyymmdd()
+        console.log week
       else #if search.request is "This Year"
         searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
         desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
       # console.log searchUrl
       topxCollection.desc = desc
+      topxCollection.week = week if week
       topxCollection.url = searchUrl
       topxCollection.fetch
         reset: true

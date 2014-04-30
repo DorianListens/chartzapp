@@ -53,6 +53,28 @@ module.exports = App.module 'StationApp.Show',
         region: @layout.tableRegion
         loading: true
 
+      @listenTo stationView, 'click:week', (req) =>
+        currentWeek = moment(req.week)
+        now = moment()
+        switch req.dir
+          when "next"
+            reqWeek = currentWeek.day(9)
+            if reqWeek > now
+              reqWeek = now
+          when "prev"
+            reqWeek = currentWeek.day(-5)
+          else
+            reqWeek = currentWeek
+        search =
+          station : @opts.station
+          startDate : reqWeek.format("YYYY-MM-DD")
+          endDate : reqWeek.format('YYYY-MM-DD')
+        newWeek = App.request 'topx:entities', search
+        @showStation newWeek
+
+        # newWeek = App.request 'topx:entities', opts
+        # @showStation newWeek
+
 
     showTitle: (opts) ->
       opts.station = "Pick a Station" unless opts.station
@@ -60,7 +82,6 @@ module.exports = App.module 'StationApp.Show',
       titleView = @getTitleView stationTitle
       @show titleView,
         region: @layout.titleRegion
-        # loading: true
 
     showPanel: ->
       panelView = @getPanelView()
@@ -240,6 +261,14 @@ module.exports = App.module 'StationApp.Show',
 
     events:
       'click th' : 'clickHeader'
+      'click .next' : 'clickNext'
+
+    clickNext: (e) ->
+      e.preventDefault()
+      request =
+        week : $(e.target).data("week")
+        dir : e.target.id
+      @trigger 'click:week', request
 
     sortUpIcon: "fi-arrow-down"
     sortDnIcon: "fi-arrow-up"
