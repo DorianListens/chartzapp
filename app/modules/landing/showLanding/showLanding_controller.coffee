@@ -31,6 +31,7 @@ module.exports = App.module 'LandingApp.Show',
       topCharts = App.request 'topx:entities', search
 
       chartView = @getChartView topCharts
+      @showGraph topCharts
       if search.request
         @show chartView,
           region: @layout.tableRegion
@@ -64,6 +65,14 @@ module.exports = App.module 'LandingApp.Show',
       $(document).foundation()
       # $(".chosen-select").chosen()
 
+    showGraph: (topCharts) ->
+      graphView = @getGraphView topCharts
+      @listenTo graphView, 'click:album:circle', (d) ->
+        App.navigate "/artist/#{encodeURIComponent d}", trigger: true
+      @show graphView,
+        region: @layout.graphRegion
+        loading: true
+
     showList: (stations) ->
       listView = @getListView stations
 
@@ -78,6 +87,10 @@ module.exports = App.module 'LandingApp.Show',
 
     getLayoutView: ->
       new Show.Layout
+
+    getGraphView: (topCharts) ->
+      new Show.Graph
+        collection: topCharts
 
     getListView: (stations) ->
       new Show.StationList
@@ -101,6 +114,7 @@ module.exports = App.module 'LandingApp.Show',
       titleRegion: "#title_region"
       blurbRegion: "#blurb_region"
       searchRegion: "#search_region"
+      graphRegion: "#graph-region"
       tableRegion: "#table_region"
       listRegion: "#list_region"
 
@@ -121,6 +135,19 @@ module.exports = App.module 'LandingApp.Show',
       search.keyword = $.trim @ui.searchInput.val()
       search.kind = $.trim @ui.kind.val()
       @trigger 'click:search', search
+
+  class Show.Graph extends Marionette.ItemView
+    template: "modules/landing/showLanding/templates/graph"
+    className: 'panel'
+    buildGraph: require "modules/landing/showLanding/landingGraph"
+
+    graph: ->
+      d3.select("svg").remove()
+      @buildGraph(@el, @collection, @)
+
+    id: "graph"
+    onRender: ->
+      @graph()
 
   class Show.StationList extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/stationList"
