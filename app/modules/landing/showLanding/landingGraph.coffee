@@ -41,6 +41,16 @@ module.exports = (el, collection, view) ->
   albums = collection.models
   albums = albums.slice(0,10)
 
+  rScale = d3.scale.linear()
+  rScale.domain(
+    d3.extent(albums, (c) ->
+      c.attributes.frontPoints
+      )
+    )
+
+  rScale.range [5, 130]
+
+
   y.domain [
     d3.max(albums, (c) ->
       c.attributes.appearances.length
@@ -120,11 +130,8 @@ module.exports = (el, collection, view) ->
     .attr("cx", (d, i) ->
       x i+2)
     .attr("r", (d) ->
-      points = d.attributes.frontPoints
-      if points > 500
-        return points / 50
-      else
-        return points
+
+      rScale d.attributes.frontPoints
       )
   # albumCircles.append("svg:div")
   #   .attr("color", "#000")

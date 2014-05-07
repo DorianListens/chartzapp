@@ -300,42 +300,45 @@ exports.startServer = (port, path, callback) ->
   #
   #   getAll(stationArray5)
 
-  # Get this weeks charts - Disabled for production
+  # Get this weeks charts
 
-  # app.get "/server/go-get-week", (req, res) ->
-  #   newNow = moment()
-  #   newNow = tuesify newNow
-  #   res.send "Geting all charts for the week of #{newNow}. \n Here goes!"
-  #   newNow = moment(newNow)
-  #   theArray = stationArray
-  #   numStations = theArray.length
-  #   numStations -= 1
-  #   lastStation = theArray[numStations]
-  #   console.log "Last one is", lastStation
-  #   timeout = 0
-  #   weeks = []
-  #   weeks.push newNow
-  #   opts = {}
-  #   opts.noNull = true
-  #   getWeek = (day, station) ->
-  #     setTimeout ->
-  #       getChart station, day.format("YYYY-MM-DD"), res, opts
-  #       console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
-  #       console.log "Finished" if station is lastStation.toLowerCase()
-  #     , timeout
-  #
-  #   getStation = (station) ->
-  #     for day in weeks
-  #       do (day) ->
-  #         timeout += 8000
-  #         getWeek day, station
-  #
-  #   getAll = (stations) ->
-  #     for station in stations
-  #       do (station) ->
-  #         getStation station.toLowerCase()
-  #
-  #   getAll(theArray)
+  app.get "/server/go-get/:week/:noNull", (req, res) ->
+    reqWeek = moment req.params.week
+    reqWeek = tuesify reqWeek
+    newNow = moment()
+    newNow = tuesify newNow
+    res.send "Geting all charts for the week of #{reqWeek}. \n Here goes!"
+    newNow = moment(reqWeek)
+    theArray = stationArray
+    numStations = theArray.length
+    numStations -= 1
+    lastStation = theArray[numStations]
+    console.log "Last one is", lastStation
+    timeout = 0
+    weeks = []
+    weeks.push newNow
+    opts = {}
+    opts.noNull = req.params.noNull
+    console.log opts
+    getWeek = (day, station) ->
+      setTimeout ->
+        getChart station, day.format("YYYY-MM-DD"), res, opts
+        console.log "get #{station} for #{day.format('YYYY-MM-DD')}"
+        console.log "Finished" if station is lastStation.toLowerCase()
+      , timeout
+
+    getStation = (station) ->
+      for day in weeks
+        do (day) ->
+          timeout += 8000
+          getWeek day, station
+
+    getAll = (stations) ->
+      for station in stations
+        do (station) ->
+          getStation station.toLowerCase()
+
+    getAll(theArray)
 
   # Get every entry for a given station from the db, grouped by week
 
