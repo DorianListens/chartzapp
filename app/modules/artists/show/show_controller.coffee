@@ -52,8 +52,15 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showGraph: (artist) ->
       graphView = @getGraphView artist
+      @listenTo graphView, "change:graph:type", (type, url) ->
+        switch type
+          when "bar"
+            graphView.barGraph url
+          when "multiline"
+            graphView.lineGraph url
+
       App.vent.on "change:album:graph", (slug) ->
-        graphView.graph "/api/albumgraph/#{slug}"
+        graphView.lineGraph "/api/albumgraph/#{slug}"
       @show graphView,
         region: @layout.graphRegion
         loading: true
@@ -141,17 +148,35 @@ module.exports = App.module 'ArtistsApp.Show',
   class Show.Graph extends Marionette.ItemView
     template: "modules/artists/show/templates/graph"
     className: 'panel'
-    buildGraph: require "modules/artists/show/graph"
+    ui:
+      "typeSelect" : "#type-select"
+    events:
+      "change @ui.typeSelect" : "select"
+    selectOptions:
+      "Appearances By Station" : "bar"
+      "Appearances By Station Over Time" : "multiline"
+    select: (e) ->
+      nameString = @collection.url.split('/')
+      nameString = nameString[3]
+      # @graph("/api/artistgraph/#{nameString}")
+      @trigger 'change:graph:type', @selectOptions[@ui.typeSelect.val()], "/api/artistgraph/#{nameString}"
 
-    graph: (url) ->
+    buildBarGraph: require "modules/artists/show/barGraph"
+    buildLineGraph: require "modules/artists/show/graph"
+
+    barGraph: (url) ->
       d3.select("svg").remove()
-      @buildGraph(@el, url)
+      @buildBarGraph(@el, url)
+
+    lineGraph: (url) ->
+      d3.select("svg").remove()
+      @buildLineGraph(@el, url)
 
     id: "graph"
     onRender: ->
       nameString = @collection.url.split('/')
       nameString = nameString[3]
-      @graph("/api/artistgraph/#{nameString}")
+      @barGraph("/api/artistgraph/#{nameString}")
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/artists/show/templates/empty"

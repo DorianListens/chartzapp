@@ -20,6 +20,8 @@ module.exports = (el, url) ->
     0
     height
   ])
+
+  # Colour setup
   color = d3.scale.category20()
   color2 = d3.scale.category20b()
   color3 = d3.scale.category20c()
@@ -31,6 +33,8 @@ module.exports = (el, url) ->
   c3Range.forEach (c) ->
     fullRange.push c
   color.range(fullRange)
+
+  # Axis
   xAxis = d3.svg.axis()
     .scale(x)
     # .tickPadding(10)
@@ -222,6 +226,7 @@ module.exports = (el, url) ->
       #   ids.push d._id
 
       stations = data
+
 
       stations.forEach (d) ->
         d.appearances.forEach (c) ->
