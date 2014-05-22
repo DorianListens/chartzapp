@@ -29,6 +29,10 @@ module.exports = App.module 'LabelApp.Show',
         region: @layout.tableRegion
         loading: true
       App.execute "when:fetched", label, ->
+        label.initializeFilters()
+        console.log label
+        info = label.getFilterLists()
+        console.log label.getFilterLists()
         $(document).foundation()
 
     showEmpty: ->

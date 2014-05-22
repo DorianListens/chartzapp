@@ -19,7 +19,13 @@ module.exports = App.module 'LandingApp.Show',
       @listenTo @layout, 'change:time', (time) =>
         search = {}
         search.request = time
-        console.log search.request
+        @showChart(search)
+
+      @listenTo @layout, 'change:range', (time) =>
+        search = {}
+        search.request = 1
+        search.startDate = time.date1
+        search.endDate = time.date2
         @showChart(search)
 
       @show @layout,
@@ -105,6 +111,7 @@ module.exports = App.module 'LandingApp.Show',
     id: "landing-page"
     ui:
       "timeSelect" : "#time-select"
+      "range" : "#custom-range"
     events:
       "change @ui.timeSelect" : "select"
     select: (e) ->
@@ -117,6 +124,19 @@ module.exports = App.module 'LandingApp.Show',
       graphRegion: "#graph-region"
       tableRegion: "#table_region"
       listRegion: "#list_region"
+
+    onRender: ->
+      @ui.range.dateRangePicker(
+        startDate: "2014-01-01"
+        endDate: moment()
+        shortcuts:
+          'prev' : ['week','month','year']
+          'prev-days': [7, 14]
+          'next-days': false
+          'next' : false
+        ).bind 'datepicker-change', (event,obj) =>
+          @trigger 'change:range', obj
+
 
   class Show.Search extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/search"

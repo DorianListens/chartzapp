@@ -21,6 +21,7 @@ module.exports = App.module 'ArtistsApp.Show',
       @show @layout,
         loading: true
 
+
     mainView: (artist) =>
       if @opts.artist
         @showArtist(artist)
@@ -30,11 +31,36 @@ module.exports = App.module 'ArtistsApp.Show',
     showArtist: (artist) ->
       # artists = App.request 'artist:entities', search
       App.execute "when:fetched", artist, =>
+        # console.log artist
+        artist.countPoints()
         $(document).foundation()
+        artist.initializeFilters()
         if artist.length is 0
           @showEmpty()
         else
           artistsView = @getArtistsView artist
+          @listenTo artistsView, "itemview:collection:init", (item, filters) ->
+            _.each filters, (values, facet) ->
+              _.each values, (value) ->
+                artistsView.$el.find("##{facet}")
+                  .append("<option value='#{value}'>#{value.toUpperCase()}</option>")
+            artistsView.$el.find(".chosen-select").chosen().trigger("chosen:updated")
+          @listenTo artistsView, "submit:filter", (facet, value, collection) ->
+            filter = {}
+            filter[facet] = value
+            collections = []
+            collections.push model.get "appearancesCollection" for model in collection.models
+            _.each collections, (element, i, list) ->
+              element.addFilter filter
+
+          @listenTo artistsView, "remove:filter", (facet, value, collection) ->
+            filter = {}
+            filter[facet] = value
+            collections = []
+            collections.push model.get "appearancesCollection" for model in collection.models
+            _.each collections, (element, i, list) ->
+              element.removeFilter filter
+
 
           @show artistsView,
             region: @layout.tableRegion
@@ -46,21 +72,25 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showTitle: (artist) ->
       titleView = @getTitleView artist
+      @listenTo titleView, "click:pop:station", (e) ->
+        # console.log e.text
+        App.navigate "station/#{e.text}", trigger: true
       @show titleView,
         region: @layout.titleRegion
         loading: true
 
     showGraph: (artist) ->
       graphView = @getGraphView artist
-      @listenTo graphView, "change:graph:type", (type, url) ->
+      @listenTo graphView, "change:graph:type", (type, slug) ->
+        slug = @slug if @slug
         switch type
           when "bar"
-            graphView.barGraph url
+            graphView.barGraph slug
           when "multiline"
-            graphView.lineGraph url
+            graphView.lineGraph slug
 
-      App.vent.on "change:album:graph", (slug) ->
-        graphView.lineGraph "/api/albumgraph/#{slug}"
+      App.vent.on "change:album:graph", (slug) =>
+        graphView.barGraph @slug
       @show graphView,
         region: @layout.graphRegion
         loading: true
@@ -83,6 +113,25 @@ module.exports = App.module 'ArtistsApp.Show',
       @show startView,
         region: @layout.tableRegion
 
+    showPanel: (artist) ->
+      panelView = @getPanelView artist
+      @slug = ""
+      @listenTo panelView, "click:albumButton", (slug) ->
+        if slug is "cz_all"
+          @slug = ''
+          App.vent.trigger "change:album:graph"
+          artist.resetFilters()
+        else
+          @slug = slug
+          App.vent.trigger "change:album:graph", slug
+          artist.resetAndAddFilter
+            slug: slug
+
+      @show panelView,
+        region: @layout.panelRegion
+        loading: true
+      # $(document).foundation()
+
     getTitleView: (artist) ->
       new Show.Title
         collection: artist
@@ -97,16 +146,6 @@ module.exports = App.module 'ArtistsApp.Show',
     getArtistsView: (artists) ->
       new Show.Artist
         collection: artists
-
-    showPanel: (artist) ->
-      panelView = @getPanelView artist
-      @listenTo panelView, "click:albumButton", (slug) ->
-        App.vent.trigger "change:album:graph", slug
-
-      @show panelView,
-        region: @layout.panelRegion
-        loading: true
-      # $(document).foundation()
 
     getStartView: ->
       new Show.Start
@@ -134,6 +173,10 @@ module.exports = App.module 'ArtistsApp.Show',
   class Show.Title extends Marionette.ItemView
     template: "modules/artists/show/templates/title"
     className: "panel"
+    events:
+      "click #popStation" : "popStation"
+    popStation: (e) ->
+      @trigger "click:pop:station", e.target
 
   class Show.Panel extends Marionette.ItemView
     template: "modules/artists/show/templates/panel"
@@ -142,7 +185,8 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showGraph: (e) ->
       e.preventDefault()
-      console.log e.target.id
+      $(e.target).parent().parent().find('.active').removeClass("active")
+      $(e.target).parent("dd").toggleClass("active")
       @trigger 'click:albumButton', e.target.id
 
   class Show.Graph extends Marionette.ItemView
@@ -159,24 +203,24 @@ module.exports = App.module 'ArtistsApp.Show',
       nameString = @collection.url.split('/')
       nameString = nameString[3]
       # @graph("/api/artistgraph/#{nameString}")
-      @trigger 'change:graph:type', @selectOptions[@ui.typeSelect.val()], "/api/artistgraph/#{nameString}"
+      @trigger 'change:graph:type', @selectOptions[@ui.typeSelect.val()]
 
     buildBarGraph: require "modules/artists/show/barGraph"
     buildLineGraph: require "modules/artists/show/graph"
 
-    barGraph: (url) ->
+    barGraph: (slug) ->
       d3.select("svg").remove()
-      @buildBarGraph(@el, url)
+      @buildBarGraph(@el, @collection, slug)
 
-    lineGraph: (url) ->
+    lineGraph: (slug) ->
       d3.select("svg").remove()
-      @buildLineGraph(@el, url)
+      @buildLineGraph(@el, @collection, slug)
 
     id: "graph"
     onRender: ->
       nameString = @collection.url.split('/')
       nameString = nameString[3]
-      @barGraph("/api/artistgraph/#{nameString}")
+      @barGraph()
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/artists/show/templates/empty"
@@ -207,59 +251,86 @@ module.exports = App.module 'ArtistsApp.Show',
       artistVal = $.trim @ui.artistInput.val()
       @trigger 'click:search', artistVal
 
-  class Show.ArtistItem extends Marionette.ItemView
+  class Show.Appearance extends Marionette.ItemView
+    template: "modules/artists/show/templates/appearance"
+    tagName: "tr"
+
+  class Show.ArtistItem extends Marionette.CompositeView
     template: "modules/artists/show/templates/artistItem"
+    initialize: ->
+      @collection = @model.get "appearancesCollection"
+
+
+    itemView: Show.Appearance
+    itemViewContainer: "tbody"
     tagName: 'div'
     events:
       "click a" : "clickStation"
+      'click th' : 'clickHeader'
     clickStation: (e) ->
       e.preventDefault()
       App.navigate "station/#{e.target.text}", trigger: true
+
+    sortUpIcon: "fi-arrow-down"
+    sortDnIcon: "fi-arrow-up"
+
+    onRender: ->
+      @$el.find(".chosen-select").chosen()
+      @collection.initializeFilters()
+      @trigger "collection:init", @collection.getFilterLists()
+      @$("th")
+      .append($("<i>"))
+      .closest("th")
+      .find("i")
+      .addClass("fi-minus-circle size-18")
+      @$("[column='#{@collection.sortAttr}']")
+      .find("i")
+      .removeClass("fi-minus-circle")
+      .addClass @sortUpIcon
+
+      @
+
+    clickHeader: (e) =>
+      $el = $(e.currentTarget)
+      ns = $el.attr("column")
+      cs = @collection.sortAttr
+
+      # Toggle sort if the current column is sorted
+      if ns is cs
+        @collection.sortDir *= -1
+      else
+        @collection.sortDir = 1
+
+      # Adjust the indicators.  Reset everything to hide the indicator
+      $("th").find("i").attr "class", "fi-minus-circle size-18"
+
+      # Now show the correct icon on the correct column
+      if @collection.sortDir is 1
+        $el.find("i").removeClass("fi-minus-circle").addClass @sortUpIcon
+      else
+        $el.find("i").removeClass("fi-minus-circle").addClass @sortDnIcon
+
+      # Now sort the collection
+      @collection.sortCharts ns
+      return
 
   class Show.Artist extends Marionette.CompositeView
     template: "modules/artists/show/templates/artists"
     itemView: Show.ArtistItem
     emptyView: Show.Empty
     itemViewContainer: "#theplace"
-    # events:
-    #   'click th' : 'clickHeader'
-    #
-    # sortUpIcon: "fi-arrow-down"
-    # sortDnIcon: "fi-arrow-up"
-    #
-    # onRender: ->
-    #   @$("th")
-    #   .append($("<i>"))
-    #   .closest("th")
-    #   .find("i")
-    #   .addClass("fi-minus-circle size-18")
-    #   @$("[column='#{@collection.sortAttr}']")
-    #   .find("i")
-    #   .removeClass("fi-minus-circle")
-    #   .addClass @sortUpIcon
-    #
-    #   @
-    #
-    # clickHeader: (e) =>
-    #   $el = $(e.currentTarget)
-    #   ns = $el.attr("column")
-    #   cs = @collection.sortAttr
-    #
-    #   # Toggle sort if the current column is sorted
-    #   if ns is cs
-    #     @collection.sortDir *= -1
-    #   else
-    #     @collection.sortDir = 1
-    #
-    #   # Adjust the indicators.  Reset everything to hide the indicator
-    #   $("th").find("i").attr "class", "fi-minus-circle size-18"
-    #
-    #   # Now show the correct icon on the correct column
-    #   if @collection.sortDir is 1
-    #     $el.find("i").removeClass("fi-minus-circle").addClass @sortUpIcon
-    #   else
-    #     $el.find("i").removeClass("fi-minus-circle").addClass @sortDnIcon
-    #
-    #   # Now sort the collection
-    #   @collection.sortCharts ns
-    #   return
+    ui:
+      "position" : "#position"
+      "station" : "#station"
+      "week" : "#week"
+    events:
+      'change input' : "submit"
+      'change .chosen-select' : "submit"
+    submit: (e, params) ->
+      if params
+        if params.selected
+          @trigger "submit:filter", e.target.id, params.selected, @collection
+        else if params.deselected
+          @trigger "remove:filter", e.target.id, params.deselected, @collection
+      else
+        @trigger "submit:filter", e.target.id, @ui[e.target.id].val(), @collection

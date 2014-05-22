@@ -3,16 +3,17 @@
   <table width="100%">
     <thead>
       <tr><th colspan="3">{{album}} - {{label}} - {{appearances.length}} appearances</th></tr>
-      <th>Position</th>
-      <th>Station</th>
-      <th>Week</th>
+      <th column="position">Position</th>
+      <th column="station">Station</th>
+      <th column="week">Week</th>
     </thead>
-  {{#each_sort_date appearances "week"}}
+    <tbody></tbody>
+  <!-- {{#each_sort_date appearances "week"}}
     <tr>
       <td>{{this.position}}</td>
       <td><a>{{toUpper this.station}}</a></td>
       <td>{{this.week}}</td>
     </tr>
-  {{/each_sort_date}}
+  {{/each_sort_date}} -->
   </table>
 </div>

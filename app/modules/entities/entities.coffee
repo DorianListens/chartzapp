@@ -1,6 +1,6 @@
 App = require 'application'
 
-# Make tuesdays
+# Utilities
 
 tuesify = (date) ->
   theWeek = switch
@@ -14,6 +14,28 @@ tuesify = (date) ->
     when theDay > 2 then theWeek.day(2)
   theTues = moment(theTues)
   theTues.format('YYYY-MM-DD')
+
+mode = (array) ->
+  return null  if array.length is 0
+  modeMap = {}
+  maxCount = 1
+  modes = [array[0]]
+  i = 0
+
+  while i < array.length
+    el = array[i]
+    unless modeMap[el]?
+      modeMap[el] = 1
+    else
+      modeMap[el]++
+    if modeMap[el] > maxCount
+      modes = [el]
+      maxCount = modeMap[el]
+    else if modeMap[el] is maxCount
+      modes.push el
+      maxCount = modeMap[el]
+    i++
+  modes
 
 module.exports = App.module "Entities",
 (Entities, App, Backbone, Marionette, $, _) ->
@@ -66,19 +88,66 @@ module.exports = App.module "Entities",
         if a > b then -1 else 1
 
   class Entities.ArtistItem extends Backbone.Model
+    initialize: ->
+      @getAppearances()
+    getAppearances: ->
+      appearances = @get "appearances"
+      @set "appearancesCollection", new Entities.Appearances appearances
 
-  class Entities.ArtistCollection extends Backbone.Collection
+  class Entities.ArtistCollection extends Backbone.FacetedSearchCollection
     model: Entities.ArtistItem
+    filterFacets: ["album", "label", "slug"]
+    countPoints: ->
+      @popAlbum = ''
+      @popAlbumNumber = 0
+      @totalChartScore = 0
+      @totalAppearances = 0
+      @stations = []
+      @popStation = ''
+      # console.log @models
+      for model in @models
+        do (model) ->
+        @totalChartScore += model.get "totalPoints"
+        @totalAppearances += model.attributes.appearances.length
+        if model.attributes.appearances.length > @popAlbumNumber
+          @popAlbum = model.get "album"
+          @popAlbumNumber = model.attributes.appearances.length
+        for appearance in model.attributes.appearances
+          do (appearance) =>
+            @stations.push appearance.station.toUpperCase()
+        @popStation = mode(@stations)
+      for model in @models
+        do (model) =>
+          model.set "totalChartScore", @totalChartScore
+          model.set "totalAppearances", @totalAppearances
+          model.set "popAlbum", @popAlbum
+          model.set "popStation", @popStation
 
-  # class Entities.Album extends Backbone.Model
-  #
-  # class Entities.Albums extends Backbone.Collection
-  #   model: Entities.Album
+
+  class Entities.Album extends Backbone.Model
+
+  class Entities.Appearances extends Backbone.FacetedSearchCollection
+    model: Entities.Album
+    filterFacets: ["station", 'position', 'week']
+    sortAttr: "week"
+    sortDir: -1
+    sortCharts: (attr) ->
+      @sortAttr = attr
+      @sort()
+      @trigger "reset"
+
+    comparator: (a, b) ->
+      a = a.get(@sortAttr)
+      b = b.get(@sortAttr)
+
+      return 0 if a is b
+
+      if @sortDir is 1
+        if a > b then 1 else -1
+      else
+        if a > b then -1 else 1
 
   class Entities.StationItem extends Backbone.Model
-    # initialize: ->
-    #   @albums = new Entities.Albums [ @albums ]
-
 
   class Entities.SingleStation extends Backbone.Collection
     model: Entities.StationItem
@@ -95,8 +164,9 @@ module.exports = App.module "Entities",
 
   class Entities.Label extends Backbone.Model
 
-  class Entities.LabelCollection extends Backbone.Collection
+  class Entities.LabelCollection extends Backbone.FacetedSearchCollection
     model: Entities.Label
+    filterFacets: ["album", "artist", "appearances"]
 
   class Entities.Topx extends Backbone.Model
 
@@ -177,9 +247,12 @@ module.exports = App.module "Entities",
         searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
         week = d.yyyymmdd()
         console.log week
-      else #if search.request is "This Year"
+      else if search.request is "This Year"
         searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
         desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
+      else
+        searchUrl = "/api/topall/#{startDate}/#{endDate}"
+        desc = "Top Albums between #{startDate} and #{endDate}"
       # console.log searchUrl
       topxCollection.desc = desc
       topxCollection.week = week if week

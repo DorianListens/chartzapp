@@ -1,6 +1,7 @@
-<ul class="inline-list">
-<li><strong>Albums:</strong></li>
+<dl class="sub-nav">
+<dt>Albums:</dt>
+<dd class="active"><a href="#" id="cz_all">All</a></dd>
 {{#each items}}
-<li><a href="#" id="{{this.slug}}"class="button tiny">{{this.album}}</a></li>
+<dd><a href="#" id="{{this.slug}}">{{this.album}}</a></dd>
 {{/each}}
 </ul>

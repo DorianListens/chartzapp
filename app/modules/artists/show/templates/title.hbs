@@ -1,1 +1,12 @@
-<h1>{{items.0.artist}}</h1>
+<div class="row">
+  <span class="small-8 columns">
+    <h1>{{items.0.artist}}</h1>
+    <h4>Most Charted: <span class="label radius">{{items.0.popAlbum}}</span></h4>
+    <h4>Most Charted on:{{#each items.0.popStation}} <a class="label radius" id="popStation">{{this}}</a>{{/each}}</h4>
+  </span>
+  <span class="small-4 columns">
+    <h4>ChartScore: <span class="label radius">{{items.0.totalChartScore}}</span></h4>
+    <h4>Appearances: <span class="label radius">{{items.0.totalAppearances}}</span></h4>
+    <h4>Albums: <span class="label radius">{{items.length}}</span></h4>
+  </span>
+</div>

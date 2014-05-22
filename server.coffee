@@ -801,16 +801,16 @@ autoCrawl = (options = false) ->
 autoCrawlTrue = ->
   return autoCrawl(true)
 
-sched = later.parse.recur()
-  .on(15).hour().on(9).minute().on(3).dayOfWeek()
-
-sched2 = later.parse.recur()
-  .on(14).hour().on(6).dayOfWeek()
-
-later.date.localTime()
-
-timer = later.setInterval(autoCrawl, sched)
-timer2 = later.setInterval(autoCrawlTrue, sched2)
+# sched = later.parse.recur()
+#   .on(15).hour().on(9).minute().on(3).dayOfWeek()
+#
+# sched2 = later.parse.recur()
+#   .on(14).hour().on(6).dayOfWeek()
+#
+# later.date.localTime()
+#
+# timer = later.setInterval(autoCrawl, sched)
+# timer2 = later.setInterval(autoCrawlTrue, sched2)
 
 # theNext = later.schedule(sched2).next(5)
 # console.log theNext

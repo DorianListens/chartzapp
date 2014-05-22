@@ -1,4 +1,13 @@
-module.exports = (el, url) ->
+App = require "application"
+module.exports = (el, collection, slug = "") ->
+  nameString = collection.url.split('/')
+  nameString = nameString[3]
+  # console.log "/api/artistgraph/#{nameString}"
+  # console.log slug if slug
+  if slug
+    url = "/api/albumgraph/#{slug}"
+  else
+    url = "/api/artistgraph/#{nameString}"
 
   margin =
     top: 20
@@ -148,9 +157,12 @@ module.exports = (el, url) ->
           .html("""
           #{d._id.toUpperCase()} <br />
           Total Appearances: #{d.appearances.length}<br />
-          Heighest Position: #{d3.min(d.appearances, (c) -> return c.position )}<br />
-          First Appearance: #{d3.min(d.appearances, (c) -> return c.week )}<br />
-          Most Recent Appearance: #{d3.max(d.appearances, (c) -> return c.week )}
+          Heighest Position: #{d3.min(d.appearances, (c) ->
+            return c.position )}<br />
+          First: #{d3.min(d.appearances, (c) ->
+            return c.week )}<br />
+          Most Recent: #{d3.max(d.appearances, (c) ->
+            return c.week )}
           """
           )
         $(".tip").fadeIn(100)
@@ -161,7 +173,7 @@ module.exports = (el, url) ->
         .enter()
         .append("g")
         .attr("transform", (d, i) ->
-           return "translate(" + i * barWidth + ",0 )")
+          return "translate(" + i * barWidth + ",0 )")
         .attr("class", (d) ->
           return "station #{d._id}")
       station.append("rect")
@@ -171,7 +183,7 @@ module.exports = (el, url) ->
           return height - y d.appearances.length)
         .attr("y", (d) -> return 3 + y d.appearances.length)
         .style "fill", (d, i) ->
-            color d._id
+          color d._id
         .on("mouseover", mouseover)
         .on("mouseout", mouseout)
       station.append("text")

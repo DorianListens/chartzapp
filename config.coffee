@@ -34,6 +34,7 @@ exports.config =
           'vendor/scripts/spin.js'
           'vendor/scripts/foundation.js'
           'vendor/scripts/foundation/*'
+          'vendor/scripts/moment.js'
         ]
         after: [
           'test/vendor/scripts/test-helper.js'
