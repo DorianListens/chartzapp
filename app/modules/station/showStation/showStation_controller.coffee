@@ -163,13 +163,28 @@ module.exports = App.module 'StationApp.Show',
     ui:
       'mostRecent' : '#mostRecent'
       'thisYear'   : '#thisYear'
-      'other'      : '#submitOther'
       'startDate'  : '#startDate'
       'endDate'    : '#endDate'
+      'range'      : '#dateRange'
+
     events:
       'click @ui.mostRecent' : 'mostRecent'
       'click @ui.thisYear'   : 'thisYear'
-      'click @ui.other'      : 'other'
+
+    onRender: ->
+      @ui.range.dateRangePicker(
+        startDate: "2014-01-01"
+        endDate: moment()
+        shortcuts:
+          'prev' : ['week','month','year']
+          'prev-days': [7, 14]
+          'next-days': false
+          'next' : false
+        ).bind 'datepicker-change', (event, obj) =>
+          search = {}
+          search.startDate = obj.date1
+          search.endDate = obj.date2
+          @trigger 'click:other', search
 
     mostRecent: (e) ->
       e.preventDefault()
@@ -179,12 +194,12 @@ module.exports = App.module 'StationApp.Show',
       e.preventDefault()
       @trigger 'click:thisYear'
 
-    other: (e) ->
-      e.preventDefault()
-      search = {}
-      search.startDate = $.trim @ui.startDate.val()
-      search.endDate = $.trim @ui.endDate.val()
-      @trigger 'click:other', search
+    # other: (e) ->
+    #   e.preventDefault()
+    #   search = {}
+    #   search.startDate = $.trim @ui.startDate.val()
+    #   search.endDate = $.trim @ui.endDate.val()
+    #   @trigger 'click:other', search
 
   class Show.Title extends Marionette.ItemView
     template: "modules/station/showStation/templates/title"

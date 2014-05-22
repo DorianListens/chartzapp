@@ -135,6 +135,7 @@ module.exports = App.module 'LandingApp.Show',
           'next-days': false
           'next' : false
         ).bind 'datepicker-change', (event,obj) =>
+          console.log "datepicker-change"
           @trigger 'change:range', obj
 
 
@@ -149,7 +150,6 @@ module.exports = App.module 'LandingApp.Show',
       'submit' : 'submit'
 
     submit: (e) ->
-      console.log "search submit"
       e.preventDefault()
       search = {}
       search.keyword = $.trim @ui.searchInput.val()
