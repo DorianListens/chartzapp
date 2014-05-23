@@ -149,8 +149,14 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 	initializeFilterLists: function() {
 		var self = this;
 
+
 		_.each(this.filterFacets, function(facet) {
-			self.filterLists[facet] = self.makeFilterList(facet, self);
+			// Fixes nested collections having filter lists overwritten
+			if (self.filterLists[facet]) {
+				self.filterLists[facet].push(self.makeFilterList(facet, self));
+			} else {
+				self.filterLists[facet] = self.makeFilterList(facet, self);
+			}
 		});
 
 		return this.filterLists;
