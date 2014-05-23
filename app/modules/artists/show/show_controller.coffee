@@ -39,29 +39,6 @@ module.exports = App.module 'ArtistsApp.Show',
           @showEmpty()
         else
           artistsView = @getArtistsView artist
-          @listenTo artistsView, "itemview:collection:init", (item, filters) ->
-            _.each filters, (values, facet) ->
-              _.each values, (value) ->
-                artistsView.$el.find("##{facet}")
-                  .append("<option value='#{value}'>#{value.toUpperCase()}</option>")
-            artistsView.$el.find(".chosen-select").chosen().trigger("chosen:updated")
-          @listenTo artistsView, "submit:filter", (facet, value, collection) ->
-            filter = {}
-            filter[facet] = value
-            collections = []
-            collections.push model.get "appearancesCollection" for model in collection.models
-            _.each collections, (element, i, list) ->
-              element.addFilter filter
-
-          @listenTo artistsView, "remove:filter", (facet, value, collection) ->
-            filter = {}
-            filter[facet] = value
-            collections = []
-            collections.push model.get "appearancesCollection" for model in collection.models
-            _.each collections, (element, i, list) ->
-              element.removeFilter filter
-
-
           @show artistsView,
             region: @layout.tableRegion
             loading: true
@@ -269,7 +246,7 @@ module.exports = App.module 'ArtistsApp.Show',
       'click th' : 'clickHeader'
     clickStation: (e) ->
       e.preventDefault()
-      App.navigate "station/#{e.target.text}", trigger: true
+      App.navigate "station/#{encodeURIComponent e.target.text}", trigger: true
 
     sortUpIcon: "fi-arrow-down"
     sortDnIcon: "fi-arrow-up"
@@ -277,7 +254,6 @@ module.exports = App.module 'ArtistsApp.Show',
     onRender: ->
       @$el.find(".chosen-select").chosen()
       @collection.initializeFilters()
-      @trigger "collection:init", @collection.getFilterLists()
       @$("th")
       .append($("<i>"))
       .closest("th")
@@ -323,14 +299,71 @@ module.exports = App.module 'ArtistsApp.Show',
       "position" : "#position"
       "station" : "#station"
       "week" : "#week"
+      "clear" : "#clearFilters"
+
     events:
       'change input' : "submit"
       'change .chosen-select' : "submit"
+      "click @ui.clear" : "clearFilters"
+
+    collections: []
+
+    onRender: ->
+      subCollection = "appearancesCollection"
+      filters = []
+      bigList = {}
+      @collections.push model.get subCollection for model in @collection.models
+
+      _.each @collections, (collection, i) ->
+        filters[i] = collection.getFilterLists()
+      filterFacets = Object.keys(filters[0])
+      _.each filterFacets, (facet) ->
+        bigList[facet] = []
+      _.each filters, (filterSet) ->
+        _.each filterFacets, (facet, i) ->
+          bigList[facet].push filterSet[facet]
+          bigList[facet] = _.flatten bigList[facet]
+          bigList[facet] = _.uniq bigList[facet]
+      _.each bigList, (bigSet, facet) =>
+        _.each bigSet, (value) =>
+          @$el.find("##{facet}")
+            .append("""
+            <option value='#{value}'>#{value.toUpperCase()}</option>
+            """).attr("disabled", false)
+
+      @$el.find(".chosen-select").chosen().trigger("chosen:updated")
+
     submit: (e, params) ->
-      if params
-        if params.selected
-          @trigger "submit:filter", e.target.id, params.selected, @collection
-        else if params.deselected
-          @trigger "remove:filter", e.target.id, params.deselected, @collection
-      else
-        @trigger "submit:filter", e.target.id, @ui[e.target.id].val(), @collection
+      e.preventDefault()
+      filter = {}
+      facet = e.target.id
+      value = if params.selected then params.selected else params.deselected
+      filter[facet] = value
+      if params.selected then @addFilter filter else @removeFilter filter
+
+    clearFilters: (e) ->
+      e.preventDefault()
+      _.each @collections, (collection) ->
+        collection.resetFilters()
+      @$el.find("option").attr("disabled", false)
+      @$el.find(".chosen-select").val('[]').trigger('chosen:updated')
+
+    addFilter: (filter) ->
+      _.each @collections, (collection) ->
+        collection.addFilter filter
+      @updateFilters filter
+
+    removeFilter: (filter) ->
+      _.each @collections, (collection) ->
+        collection.removeFilter filter
+      @updateFilters filter
+
+    updateFilters: (filter) ->
+      filterFacet = Object.keys filter
+      @$el.find("option").attr("disabled", true)
+      _.each @collections, (collection, i, list) =>
+          facets = collection.getUpdatedFilterLists(filterFacet)
+          _.each facets, (values, facet) =>
+            _.each values, (value) =>
+              @$el.find("option[value='#{value}']").attr("disabled", false)
+      @$el.find(".chosen-select").chosen().trigger("chosen:updated")
