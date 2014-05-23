@@ -331,7 +331,7 @@ module.exports = App.module 'ArtistsApp.Show',
             .append("""
             <option value='#{value}'>#{value.toUpperCase()}</option>
             """).attr("disabled", false)
-
+      console.log bigList
       @$el.find(".chosen-select").chosen().trigger("chosen:updated")
 
     submit: (e, params) ->
