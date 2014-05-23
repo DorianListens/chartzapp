@@ -322,6 +322,7 @@ module.exports = App.module 'ArtistsApp.Show',
       _.each filters, (filterSet) ->
         _.each filterFacets, (facet, i) ->
           bigList[facet].push filterSet[facet]
+          bigList[facet] = _.union bigList[facet]
           bigList[facet] = _.flatten bigList[facet]
           bigList[facet] = _.uniq bigList[facet]
       _.each bigList, (bigSet, facet) =>
