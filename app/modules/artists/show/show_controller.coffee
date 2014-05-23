@@ -313,9 +313,11 @@ module.exports = App.module 'ArtistsApp.Show',
       filters = []
       bigList = {}
       @collections.push model.get subCollection for model in @collection.models
+      console.log @collections
 
       _.each @collections, (collection, i) ->
         filters[i] = collection.getFilterLists()
+      console.log filters
       filterFacets = Object.keys(filters[0])
       _.each filterFacets, (facet) ->
         bigList[facet] = []
