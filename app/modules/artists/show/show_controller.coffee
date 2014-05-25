@@ -348,10 +348,7 @@ module.exports = App.module 'ArtistsApp.Show',
     clearFilters: (e) ->
       e.preventDefault()
       _.each @collections, (collection) ->
-        console.log "before", collection
         collection.resetFilters()
-        # collection.models = collection.wholeCollection.models
-        console.log "after", collection
       @$el.find("option").attr("disabled", false)
       @$el.find(".chosen-select").val('[]').trigger('chosen:updated')
 
