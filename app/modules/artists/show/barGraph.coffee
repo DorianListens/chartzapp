@@ -157,7 +157,7 @@ module.exports = (el, collection, slug = "") ->
           .html("""
           #{d._id.toUpperCase()} <br />
           Total Appearances: #{d.appearances.length}<br />
-          Heighest Position: #{d3.min(d.appearances, (c) ->
+          Highest Position: #{d3.min(d.appearances, (c) ->
             return c.position )}<br />
           First: #{d3.min(d.appearances, (c) ->
             return c.week )}<br />
@@ -193,46 +193,6 @@ module.exports = (el, collection, slug = "") ->
         .text( (d) -> return d._id.toUpperCase() )
         .attr("transform", "rotate(90)")
 
-      # circle = station.selectAll('circle')
-      #   .data( (d, i) ->
-      #     d.appearances.forEach (c) ->
-      #       c._id = d._id
-      #     return d.appearances)
-      #   .enter().append("circle")
-      #   .attr("class", (d) -> return "dot #{d._id} #{d.week}")
-      #   .style "fill", (d, i) ->
-      #     color d._id
-      #   .attr("r", 5)
-      #   .attr "cx", (d) ->
-      #     x d.date
-      #   .attr "cy", (d) ->
-      #     y d.position
-      #   .on("mouseover", highlightCircle)
-      #   .on "mouseout", mouseoutCircle
-      #
-      # legend = svg.selectAll(".legend")
-      #   .data(color.domain().slice().reverse())
-      #   .enter().append("g")
-      #   .attr("class", (d) -> return "legend #{d}")
-      #   .attr "transform", (d, i) ->
-      #     if i < 20
-      #       "translate(0," + i * 20 + ")"
-      #     else if i >= 20
-      #       "translate(75," + (i - 20) * 20 + ")"
-      #
-      # legend.append("rect")
-      #   .attr("x", width - 10)
-      #   .attr("width", 18)
-      #   .attr("height", 18)
-      #   .style "fill", color
-      # legend.append("text")
-      #   .attr("x", width - 15)
-      #   .attr("y", 9)
-      #   .attr("dy", ".35em")
-      #   .style("text-anchor", "end")
-      #   .text (d) ->
-      #     d.toUpperCase()
-      # legend.on("mouseover", highlightLegend)
-      #   .on("mouseout", mouseoutLegend)
+
       return
   draw(url)

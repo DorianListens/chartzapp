@@ -254,7 +254,7 @@ module.exports = App.module 'ArtistsApp.Show',
 
     onRender: ->
       @$el.find(".chosen-select").chosen()
-      @collection.initializeFilters()
+      # @collection.initializeFilters()
       @$("th")
       .append($("<i>"))
       .closest("th")
@@ -314,12 +314,13 @@ module.exports = App.module 'ArtistsApp.Show',
       filters = []
       bigList = {}
       @collections.push model.get subCollection for model in @collection.models
+
       # console.log @collections
 
       _.each @collections, (collection, i) ->
-        # collection.initializeFilters()
+        collection.initializeFilters()
         filters[i] = collection.getFilterLists()
-      console.log filters
+      # console.log filters
       filterFacets = Object.keys(filters[0])
       _.each filterFacets, (facet) ->
         bigList[facet] = []
@@ -327,16 +328,13 @@ module.exports = App.module 'ArtistsApp.Show',
         _.each filterFacets, (facet, i) ->
           bigList[facet].push filterSet[facet]
       _.each filterFacets, (facet) ->
-        bigList[facet] = _.union bigList[facet]
-        bigList[facet] = _.flatten bigList[facet]
-        bigList[facet] = _.uniq bigList[facet]
+        bigList[facet] = _.uniq( _.flatten _.union bigList[facet])
       _.each bigList, (bigSet, facet) =>
         _.each bigSet, (value) =>
-          @$el.find("##{facet}")
-            .append("""
+          @$el.find("##{facet}").append("""
             <option value='#{value}'>#{value.toUpperCase()}</option>
             """).attr("disabled", false)
-      console.log bigList
+      # console.log bigList
       @$el.find(".chosen-select").chosen().trigger("chosen:updated")
 
     submit: (e, params) ->
@@ -350,7 +348,10 @@ module.exports = App.module 'ArtistsApp.Show',
     clearFilters: (e) ->
       e.preventDefault()
       _.each @collections, (collection) ->
+        console.log "before", collection
         collection.resetFilters()
+        # collection.models = collection.wholeCollection.models
+        console.log "after", collection
       @$el.find("option").attr("disabled", false)
       @$el.find(".chosen-select").val('[]').trigger('chosen:updated')
 
