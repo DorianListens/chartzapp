@@ -58,16 +58,16 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showGraph: (artist) ->
       graphView = @getGraphView artist
-      @listenTo graphView, "change:graph:type", (type, slug) ->
-        slug = @slug if @slug
-        switch type
-          when "bar"
-            graphView.barGraph slug
-          when "multiline"
-            graphView.lineGraph slug
+      # @listenTo graphView, "change:graph:type", (type, slug) ->
+      #   slug = @slug if @slug
+      #   switch type
+      #     when "bar"
+      #       graphView.barGraph slug
+      #     when "multiline"
+      #       graphView.lineGraph slug
 
-      App.vent.on "change:album:graph", (slug) =>
-        graphView.barGraph @slug
+      App.vent.on "change:album:graph", (slug) ->
+        graphView.render()
       @show graphView,
         region: @layout.graphRegion
         loading: true
@@ -175,29 +175,47 @@ module.exports = App.module 'ArtistsApp.Show',
       "change @ui.typeSelect" : "select"
     selectOptions:
       "Appearances By Station" : "bar"
-      "Appearances By Station Over Time" : "multiline"
+      "Appearances By Station Over Time" : "line"
     select: (e) ->
       nameString = @collection.url.split('/')
       nameString = nameString[3]
       # @graph("/api/artistgraph/#{nameString}")
-      @trigger 'change:graph:type', @selectOptions[@ui.typeSelect.val()]
+      # console.log @ui.typeSelect.val()
+      @graphType = @ui.typeSelect.val()
+      # console.log @graphType
+      @[@graphType]()
+      # @trigger 'change:graph:type', @selectOptions[@ui.typeSelect.val()]
 
     buildBarGraph: require "modules/artists/show/barGraph"
     buildLineGraph: require "modules/artists/show/graph"
 
-    barGraph: (slug) ->
+    graphType: "bar"
+
+    bar: (slug) ->
       d3.select("svg").remove()
       @buildBarGraph(@el, @collection, slug)
 
-    lineGraph: (slug) ->
+    line: (slug) ->
       d3.select("svg").remove()
       @buildLineGraph(@el, @collection, slug)
 
     id: "graph"
+
+    collections: []
+
+    initialize: ->
+      _.each @collection.models, (model) =>
+        @collections.push model.get "appearancesCollection"
+      _.each @collections, (appearances) =>
+        @listenTo appearances, "filter", =>
+          @render()
+
     onRender: ->
       nameString = @collection.url.split('/')
       nameString = nameString[3]
-      @barGraph()
+      @ui.typeSelect
+        .find("option[value='#{@graphType}']").attr("selected", true)
+      @[@graphType]()
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/artists/show/templates/empty"
@@ -232,7 +250,7 @@ module.exports = App.module 'ArtistsApp.Show',
     template: "modules/artists/show/templates/appearance"
     tagName: "tr"
 
-  class Show.ArtistItem extends Marionette.CompositeView
+  class Show.Album extends Marionette.CompositeView
     template: "modules/artists/show/templates/artistItem"
     initialize: ->
       @collection = @model.get "appearancesCollection"
@@ -293,7 +311,7 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Artist extends Marionette.CompositeView
     template: "modules/artists/show/templates/artists"
-    itemView: Show.ArtistItem
+    itemView: Show.Album
     emptyView: Show.Empty
     itemViewContainer: "#theplace"
     ui:

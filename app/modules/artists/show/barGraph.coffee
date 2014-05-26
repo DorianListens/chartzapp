@@ -81,11 +81,36 @@ module.exports = (el, collection, slug = "") ->
     draw(url)
 
   $(window).on("resize", resize)
+  parse = (collection) ->
+    output = []
+    stations = {}
+    _.each collection.models, (model) ->
+      appearances = model.get "appearancesCollection"
+      _.each appearances.models, (ap, i) ->
+        if stations[ap.attributes.station]
+          stations[ap.attributes.station].appearances.push
+            position: ap.attributes.position
+            week: ap.attributes.week
+        else stations[ap.attributes.station] =
+          appearances: [
+            position: ap.attributes.position
+            week: ap.attributes.week
+          ]
+    # console.log stations
+    names = Object.keys stations
+    _.each names, (name) ->
+      output.push
+        _id: name
+        appearances: stations[name].appearances
+    # console.log output
+    output
 
+  # parse(collection)
   draw = (url) ->
     d3.json url, (error, data) ->
 
-      stations = data
+      # stations = data
+      stations = parse(collection)
       color.domain stations
       barWidth = width / stations.length
 

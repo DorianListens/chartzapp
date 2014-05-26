@@ -87,7 +87,7 @@ module.exports = App.module "Entities",
       else
         if a > b then -1 else 1
 
-  class Entities.ArtistItem extends Backbone.Model
+  class Entities.Album extends Backbone.Model
     initialize: ->
       @getAppearances()
     getAppearances: ->
@@ -95,7 +95,7 @@ module.exports = App.module "Entities",
       @set "appearancesCollection", new Entities.Appearances appearances
 
   class Entities.ArtistCollection extends Backbone.FacetedSearchCollection
-    model: Entities.ArtistItem
+    model: Entities.Album
     filterFacets: ["album", "label", "slug"]
     countPoints: ->
       @popAlbum = ''
@@ -250,7 +250,7 @@ module.exports = App.module "Entities",
       else if search.request is "This Week"
         searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
         week = d.yyyymmdd()
-        console.log week
+        # console.log week
       else if search.request is "This Year"
         searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
         desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
