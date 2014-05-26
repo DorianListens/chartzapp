@@ -464,34 +464,34 @@ exports.startServer = (port, path, callback) ->
 
   # Specially formatted JSON for d3 Graphs
 
-  app.get "/api/artistgraph/:artist", (req, res) ->
-    theArtist = req.params.artist.toLowerCase()
-    Album.aggregate {$match: {"artistLower" : theArtist}},
-    { $unwind: "$appearances"},
-    { $group:
-      {_id: "$appearances.station"
-        # {station: "$appearances.station"}
-      appearances:
-        {$push :
-          {position: "$appearances.position"
-          week: "$appearances.week"}}}},
-    (err, results) ->
-      console.error if err
-      res.send results
-
-  app.get "/api/albumgraph/:slug", (req, res) ->
-    Album.aggregate {$match: {"slug" : req.params.slug}},
-    { $unwind: "$appearances"},
-    { $group:
-      {_id: "$appearances.station"
-        # {station: "$appearances.station"}
-      appearances:
-        {$push :
-          {position: "$appearances.position"
-          week: "$appearances.week"}}}},
-    (err, results) ->
-      console.error if err
-      res.send results
+  # app.get "/api/artistgraph/:artist", (req, res) ->
+  #   theArtist = req.params.artist.toLowerCase()
+  #   Album.aggregate {$match: {"artistLower" : theArtist}},
+  #   { $unwind: "$appearances"},
+  #   { $group:
+  #     {_id: "$appearances.station"
+  #       # {station: "$appearances.station"}
+  #     appearances:
+  #       {$push :
+  #         {position: "$appearances.position"
+  #         week: "$appearances.week"}}}},
+  #   (err, results) ->
+  #     console.error if err
+  #     res.send results
+  #
+  # app.get "/api/albumgraph/:slug", (req, res) ->
+  #   Album.aggregate {$match: {"slug" : req.params.slug}},
+  #   { $unwind: "$appearances"},
+  #   { $group:
+  #     {_id: "$appearances.station"
+  #       # {station: "$appearances.station"}
+  #     appearances:
+  #       {$push :
+  #         {position: "$appearances.position"
+  #         week: "$appearances.week"}}}},
+  #   (err, results) ->
+  #     console.error if err
+  #     res.send results
 
   # Get all entries for a given label
 
