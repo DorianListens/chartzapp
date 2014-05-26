@@ -1,18 +1,10 @@
 App = require "application"
-module.exports = (el, collection, slug = "") ->
-  nameString = collection.url.split('/')
-  nameString = nameString[3]
-  # console.log "/api/artistgraph/#{nameString}"
-  # console.log slug if slug
-  if slug
-    url = "/api/albumgraph/#{slug}"
-  else
-    url = "/api/artistgraph/#{nameString}"
+module.exports = (el, collection, graph) ->
 
   margin =
     top: 20
     right: 120
-    bottom: 30
+    bottom: 50
     left: 50
 
   # width = 960 - margin.left - margin.right
@@ -80,7 +72,7 @@ module.exports = (el, collection, slug = "") ->
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
       # .attr("transform", "translate(0," + height + ")")
-    draw(url)
+    draw(graph)
 
   $(window).on("resize", resize)
 
@@ -209,6 +201,7 @@ module.exports = (el, collection, slug = "") ->
       .duration(100)
       .attr("r", 5)
     hideData()
+
   showData = (dot, d) ->
     coord = d3.mouse(dot)
     $("#graph").append("<div class='tip'></div>")
@@ -251,13 +244,8 @@ module.exports = (el, collection, slug = "") ->
     # console.log output
     output
 
-  draw = (url) ->
-    # d3.json url, (error, data) ->
-    # ids = []
-    # data.forEach (d) ->
-    #   ids.push d._id
+  draw = (graph) ->
 
-    # stations = data
     stations = parse(collection)
 
 
@@ -265,90 +253,209 @@ module.exports = (el, collection, slug = "") ->
       d.appearances.forEach (c) ->
         c.date = parseDate c.week
 
-    x.domain [
-      d3.min(stations, (c) ->
-        d3.min c.appearances, (v) ->
-          v.date
+    if graph is "line"
 
-      )
-      d3.max(stations, (c) ->
-        d3.max c.appearances, (v) ->
-          v.date
+      x.domain [
+        d3.min(stations, (c) ->
+          d3.min c.appearances, (v) ->
+            v.date
 
-      )
-    ]
-    y.domain [1, 30]
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text "Position"
-    station = svg.selectAll(".station")
-      .data(stations)
-      .enter()
-      .append("g")
-      .attr("class", (d) ->
-        return "station #{d._id}")
-    station.append("path")
-      .attr("class", "line")
-      .attr "d", (d) ->
-        d.appearances.sort((a,b) -> return a.date-b.date)
-        line d.appearances
-      .style "stroke", (d, i) ->
+        )
+        d3.max(stations, (c) ->
+          d3.max c.appearances, (v) ->
+            v.date
+
+        )
+      ]
+      y.domain [1, 30]
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text "Position"
+      station = svg.selectAll(".station")
+        .data(stations)
+        .enter()
+        .append("g")
+        .attr("class", (d) ->
+          return "station #{d._id}")
+      station.append("path")
+        .attr("class", "line")
+        .attr "d", (d) ->
+          d.appearances.sort((a,b) -> return a.date-b.date)
+          line d.appearances
+        .style "stroke", (d, i) ->
+            color d._id
+        .on("mouseover", highlight)
+        .on("mouseout", mouseout)
+      circle = station.selectAll('circle')
+        .data( (d, i) ->
+          d.appearances.forEach (c) ->
+            c._id = d._id
+          return d.appearances)
+        .enter().append("circle")
+        .attr("class", (d) -> return "dot #{d._id} #{d.week}")
+        .style "fill", (d, i) ->
           color d._id
-      .on("mouseover", highlight)
-      .on("mouseout", mouseout)
-    circle = station.selectAll('circle')
-      .data( (d, i) ->
-        d.appearances.forEach (c) ->
-          c._id = d._id
-        return d.appearances)
-      .enter().append("circle")
-      .attr("class", (d) -> return "dot #{d._id} #{d.week}")
-      .style "fill", (d, i) ->
-        color d._id
-      .attr("r", 5)
-      .attr "cx", (d) ->
-        x d.date
-      .attr "cy", (d) ->
-        y d.position
-      .on("mouseover", highlightCircle)
-      .on "mouseout", mouseoutCircle
+        .attr("r", 5)
+        .attr "cx", (d) ->
+          x d.date
+        .attr "cy", (d) ->
+          y d.position
+        .on("mouseover", highlightCircle)
+        .on "mouseout", mouseoutCircle
 
-    legend = svg.selectAll(".legend")
-      .data(color.domain().slice().reverse())
-      .enter().append("g")
-      .attr("class", (d) -> return "legend #{d}")
-      .attr "transform", (d, i) ->
-        if i < 20
-          "translate(0," + i * 20 + ")"
-        else if i >= 20
-          "translate(75," + (i - 20) * 20 + ")"
+      legend = svg.selectAll(".legend")
+        .data(color.domain().slice().reverse())
+        .enter().append("g")
+        .attr("class", (d) -> return "legend #{d}")
+        .attr "transform", (d, i) ->
+          if i < 20
+            "translate(0," + i * 20 + ")"
+          else if i >= 20
+            "translate(75," + (i - 20) * 20 + ")"
 
-    legend.append("rect")
-      .attr("x", width - 10)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style "fill", color
-    legend.append("text")
-      .attr("x", width - 15)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text (d) ->
-        d.toUpperCase()
-    legend.on("mouseover", highlightLegend)
-      .on("mouseout", mouseoutLegend)
-    return
-  draw(url)
+      legend.append("rect")
+        .attr("x", width - 10)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style "fill", color
+      legend.append("text")
+        .attr("x", width - 15)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text (d) ->
+          d.toUpperCase()
+      legend.on("mouseover", highlightLegend)
+        .on("mouseout", mouseoutLegend)
+      return
+    else if graph is "bar"
+      color.domain stations
+      barWidth = width / stations.length
+      x = d3.scale.linear().range([
+        0
+        width - 75
+      ])
+      y = d3.scale.linear().range([
+        height
+        0
+      ])
+      yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+
+      x.domain [
+        0
+        stations.length
+      ]
+      y.domain [
+        0
+        d3.max(stations, (c) ->
+          c.appearances.length
+        )
+      ]
+      # svg.append("g")
+      #   .attr("class", "x axis")
+      #   .attr("transform", "translate(0," + height + ")")
+      #   .call(xAxis)
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text "# of Appearances"
+
+      mouseover = (d, i) ->
+        d3.selectAll("g rect")
+          .transition()
+          .duration(100)
+          .style("opacity", 0.2)
+        d3.select("g .#{d._id} > rect")
+          .transition()
+          .duration(100)
+          .style("opacity", 1)
+        d3.select("g .#{d._id} > text")
+          .transition()
+          .duration(100)
+          .style("font-weight", "bold")
+        showData(d)
+
+      mouseout = ->
+        d3.selectAll("g rect")
+          .transition()
+          .duration(100)
+          .style("opacity", 1)
+        d3.selectAll("g text")
+          .transition()
+          .duration(100)
+          .style("font-weight", "normal")
+        $(".tip").fadeOut(50).remove()
+
+      # click = (d) ->
+      #   artist = d.attributes.artist
+      #   view.trigger("click:album:circle", artist)
+
+      showData = (d) ->
+        $("#graph").append("<div class='tip'></div>")
+        chartTip = d3.select(".tip")
+        chartTip.style("left", width - 100 + "px" )
+          .style("top", 50 + "px")
+          .style("background", color d._id)
+        $(".tip")
+          .html("""
+          #{d._id.toUpperCase()} <br />
+          Total Appearances: #{d.appearances.length}<br />
+          Highest Position: #{d3.min(d.appearances, (c) ->
+            return c.position )}<br />
+          First: #{d3.min(d.appearances, (c) ->
+            return c.week )}<br />
+          Most Recent: #{d3.max(d.appearances, (c) ->
+            return c.week )}
+          """
+          )
+        $(".tip").fadeIn(100)
+
+
+      station = svg.selectAll(".station")
+        .data(stations)
+        .enter()
+        .append("g")
+        .attr("transform", (d, i) ->
+          return "translate(" + i * barWidth + ",0 )")
+        .attr("class", (d) ->
+          return "station #{d._id}")
+      station.append("rect")
+        .attr("class", "bar")
+        .attr("width", barWidth - 1)
+        .attr("height", (d) ->
+          return height - y d.appearances.length)
+        .attr("y", (d) -> return 3 + y d.appearances.length)
+        .style "fill", (d, i) ->
+          color d._id
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+      station.append("text")
+        .attr("y", barWidth / 2 - barWidth)
+        .attr("x", (d) -> return height)
+        .attr("dx", ".75em")
+        .text( (d) -> return d._id.toUpperCase() )
+        .attr("transform", "rotate(90)")
+
+
+      return
+  draw(graph)
 
     # station.append("text").datum((d) ->
     #   name: d._id

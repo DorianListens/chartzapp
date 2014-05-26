@@ -85,7 +85,7 @@ module.exports = App.module 'ArtistsApp.Show',
       @listenTo panelView, "click:albumButton", (slug) ->
         if slug is "cz_all"
           @slug = ''
-          App.vent.trigger "change:album:graph"
+          # App.vent.trigger "change:album:graph"
           artist.resetFilters()
         else
           @slug = slug
@@ -167,20 +167,15 @@ module.exports = App.module 'ArtistsApp.Show',
     select: (e) ->
       e.preventDefault()
       @graphType = @ui.typeSelect.val()
-      @[@graphType]()
+      @graph(@graphType)
 
-    buildBarGraph: require "modules/artists/show/barGraph"
-    buildLineGraph: require "modules/artists/show/graph"
+    buildGraph: require "modules/artists/show/graph"
 
     graphType: "bar"
 
-    bar:  ->
+    graph: (type) ->
       d3.select("svg").remove()
-      @buildBarGraph(@el, @collection)
-
-    line: ->
-      d3.select("svg").remove()
-      @buildLineGraph(@el, @collection)
+      @buildGraph(@el, @collection, type)
 
     id: "graph"
 
@@ -198,7 +193,7 @@ module.exports = App.module 'ArtistsApp.Show',
     onRender: ->
       @ui.typeSelect
         .find("option[value='#{@graphType}']").attr("selected", true)
-      @[@graphType]()
+      @graph(@graphType)
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/artists/show/templates/empty"
@@ -237,7 +232,9 @@ module.exports = App.module 'ArtistsApp.Show',
     template: "modules/artists/show/templates/artistItem"
     initialize: ->
       @collection = @model.get "appearancesCollection"
+      # console.log @collection
       # @collection.initializeFilters()
+      # @collection.resetFilters()
 
 
     itemView: Show.Appearance
@@ -309,17 +306,26 @@ module.exports = App.module 'ArtistsApp.Show',
       "click @ui.clear" : "clearFilters"
 
     collections: []
+    initialize: ->
+      subCollection = "appearancesCollection"
+      @collections.push model.get subCollection for model in @collection.models
+
+      _.each @collections, (collection, i) ->
+        collection.initializeFilters()
+
+
 
     onRender: ->
-      subCollection = "appearancesCollection"
+      # subCollection = "appearancesCollection"
       filters = []
       bigList = {}
-      @collections.push model.get subCollection for model in @collection.models
+      # @collections.push model.get subCollection for model in @collection.models
 
       # console.log @collections
 
       _.each @collections, (collection, i) ->
-        collection.initializeFilters()
+        # collection.initializeFilters()
+
         filters[i] = collection.getFilterLists()
       # console.log filters
       filterFacets = Object.keys(filters[0])

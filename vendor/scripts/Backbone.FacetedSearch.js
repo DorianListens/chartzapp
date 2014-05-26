@@ -8,15 +8,18 @@
 
 Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 
-	filterFacets: [],
+	filterFacets : [],
 
-	filters: [],
+	filters : [],
 
-	filterLists: {},
+	filterLists : {},
 
-	wholeCollection: {},
+	wholeCollection : {},
 
-	options:{},
+	options : {},
+	// initialize: function() {
+	// 	console.trace(this);
+	// },
 
 	initializeFilters: function(options) {
 		var self = this;
@@ -25,6 +28,8 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 			this.options = options;
 		}
 		_.defaults(this.options, {silent:false});
+
+		this.filters = []
 
 		if (this.wholeCollection.length !== 0) {
 			this.wholeCollection = this.clone();
@@ -147,7 +152,6 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 
 	initializeFilterLists: function() {
 		var self = this;
-
 
 		_.each(this.filterFacets, function(facet) {
 			// Fixes nested collections having filter lists overwritten
