@@ -252,102 +252,102 @@ module.exports = (el, collection, slug = "") ->
     output
 
   draw = (url) ->
-    d3.json url, (error, data) ->
-      # ids = []
-      # data.forEach (d) ->
-      #   ids.push d._id
+    # d3.json url, (error, data) ->
+    # ids = []
+    # data.forEach (d) ->
+    #   ids.push d._id
 
-      # stations = data
-      stations = parse(collection)
+    # stations = data
+    stations = parse(collection)
 
 
-      stations.forEach (d) ->
-        d.appearances.forEach (c) ->
-          c.date = parseDate c.week
+    stations.forEach (d) ->
+      d.appearances.forEach (c) ->
+        c.date = parseDate c.week
 
-      x.domain [
-        d3.min(stations, (c) ->
-          d3.min c.appearances, (v) ->
-            v.date
+    x.domain [
+      d3.min(stations, (c) ->
+        d3.min c.appearances, (v) ->
+          v.date
 
-        )
-        d3.max(stations, (c) ->
-          d3.max c.appearances, (v) ->
-            v.date
+      )
+      d3.max(stations, (c) ->
+        d3.max c.appearances, (v) ->
+          v.date
 
-        )
-      ]
-      y.domain [1, 30]
-      svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-      svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text "Position"
-      station = svg.selectAll(".station")
-        .data(stations)
-        .enter()
-        .append("g")
-        .attr("class", (d) ->
-          return "station #{d._id}")
-      station.append("path")
-        .attr("class", "line")
-        .attr "d", (d) ->
-          d.appearances.sort((a,b) -> return a.date-b.date)
-          line d.appearances
-        .style "stroke", (d, i) ->
-            color d._id
-        .on("mouseover", highlight)
-        .on("mouseout", mouseout)
-      circle = station.selectAll('circle')
-        .data( (d, i) ->
-          d.appearances.forEach (c) ->
-            c._id = d._id
-          return d.appearances)
-        .enter().append("circle")
-        .attr("class", (d) -> return "dot #{d._id} #{d.week}")
-        .style "fill", (d, i) ->
+      )
+    ]
+    y.domain [1, 30]
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text "Position"
+    station = svg.selectAll(".station")
+      .data(stations)
+      .enter()
+      .append("g")
+      .attr("class", (d) ->
+        return "station #{d._id}")
+    station.append("path")
+      .attr("class", "line")
+      .attr "d", (d) ->
+        d.appearances.sort((a,b) -> return a.date-b.date)
+        line d.appearances
+      .style "stroke", (d, i) ->
           color d._id
-        .attr("r", 5)
-        .attr "cx", (d) ->
-          x d.date
-        .attr "cy", (d) ->
-          y d.position
-        .on("mouseover", highlightCircle)
-        .on "mouseout", mouseoutCircle
+      .on("mouseover", highlight)
+      .on("mouseout", mouseout)
+    circle = station.selectAll('circle')
+      .data( (d, i) ->
+        d.appearances.forEach (c) ->
+          c._id = d._id
+        return d.appearances)
+      .enter().append("circle")
+      .attr("class", (d) -> return "dot #{d._id} #{d.week}")
+      .style "fill", (d, i) ->
+        color d._id
+      .attr("r", 5)
+      .attr "cx", (d) ->
+        x d.date
+      .attr "cy", (d) ->
+        y d.position
+      .on("mouseover", highlightCircle)
+      .on "mouseout", mouseoutCircle
 
-      legend = svg.selectAll(".legend")
-        .data(color.domain().slice().reverse())
-        .enter().append("g")
-        .attr("class", (d) -> return "legend #{d}")
-        .attr "transform", (d, i) ->
-          if i < 20
-            "translate(0," + i * 20 + ")"
-          else if i >= 20
-            "translate(75," + (i - 20) * 20 + ")"
+    legend = svg.selectAll(".legend")
+      .data(color.domain().slice().reverse())
+      .enter().append("g")
+      .attr("class", (d) -> return "legend #{d}")
+      .attr "transform", (d, i) ->
+        if i < 20
+          "translate(0," + i * 20 + ")"
+        else if i >= 20
+          "translate(75," + (i - 20) * 20 + ")"
 
-      legend.append("rect")
-        .attr("x", width - 10)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style "fill", color
-      legend.append("text")
-        .attr("x", width - 15)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text (d) ->
-          d.toUpperCase()
-      legend.on("mouseover", highlightLegend)
-        .on("mouseout", mouseoutLegend)
-      return
+    legend.append("rect")
+      .attr("x", width - 10)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style "fill", color
+    legend.append("text")
+      .attr("x", width - 15)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text (d) ->
+        d.toUpperCase()
+    legend.on("mouseover", highlightLegend)
+      .on("mouseout", mouseoutLegend)
+    return
   draw(url)
 
     # station.append("text").datum((d) ->

@@ -14303,3 +14303,6 @@
 {"name":"newrelic","hostname":"DSMBBP.local","pid":90088,"level":30,"msg":"Starting New Relic for Node.js connection process.","time":"2014-05-26T04:53:51.950Z","v":0}
 {"name":"newrelic","hostname":"DSMBBP.local","pid":90088,"component":"new_relic_response","level":30,"msg":"Reporting to: https://rpm.newrelic.com/accounts/670013/applications/2906546","time":"2014-05-26T04:53:53.545Z","v":0}
 {"name":"newrelic","hostname":"DSMBBP.local","pid":90088,"component":"collector_api","level":30,"msg":"Connected to collector-120.newrelic.com:443 with agent run ID 754528280.","time":"2014-05-26T04:53:53.545Z","v":0}
+{"name":"newrelic","hostname":"DSMBBP.local","pid":90158,"level":30,"msg":"Starting New Relic for Node.js connection process.","time":"2014-05-26T04:55:14.591Z","v":0}
+{"name":"newrelic","hostname":"DSMBBP.local","pid":90158,"component":"new_relic_response","level":30,"msg":"Reporting to: https://rpm.newrelic.com/accounts/670013/applications/2906546","time":"2014-05-26T04:55:16.087Z","v":0}
+{"name":"newrelic","hostname":"DSMBBP.local","pid":90158,"component":"collector_api","level":30,"msg":"Connected to collector-120.newrelic.com:443 with agent run ID 754529449.","time":"2014-05-26T04:55:16.087Z","v":0}

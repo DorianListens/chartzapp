@@ -107,117 +107,117 @@ module.exports = (el, collection, slug = "") ->
 
   # parse(collection)
   draw = (url) ->
-    d3.json url, (error, data) ->
+    # d3.json url, (error, data) ->
 
-      # stations = data
-      stations = parse(collection)
-      color.domain stations
-      barWidth = width / stations.length
+    # stations = data
+    stations = parse(collection)
+    color.domain stations
+    barWidth = width / stations.length
 
-      stations.forEach (d) ->
-        d.appearances.forEach (c) ->
-          c.date = parseDate c.week
+    stations.forEach (d) ->
+      d.appearances.forEach (c) ->
+        c.date = parseDate c.week
 
-      x.domain [
-        0
-        stations.length
-      ]
-      y.domain [
-        0
-        d3.max(stations, (c) ->
-          c.appearances.length
+    x.domain [
+      0
+      stations.length
+    ]
+    y.domain [
+      0
+      d3.max(stations, (c) ->
+        c.appearances.length
+      )
+    ]
+    # svg.append("g")
+    #   .attr("class", "x axis")
+    #   .attr("transform", "translate(0," + height + ")")
+    #   .call(xAxis)
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text "# of Appearances"
+
+    mouseover = (d, i) ->
+      d3.selectAll("g rect")
+        .transition()
+        .duration(100)
+        .style("opacity", 0.2)
+      d3.select("g .#{d._id} > rect")
+        .transition()
+        .duration(100)
+        .style("opacity", 1)
+      d3.select("g .#{d._id} > text")
+        .transition()
+        .duration(100)
+        .style("font-weight", "bold")
+      showData(d)
+
+    mouseout = ->
+      d3.selectAll("g rect")
+        .transition()
+        .duration(100)
+        .style("opacity", 1)
+      d3.selectAll("g text")
+        .transition()
+        .duration(100)
+        .style("font-weight", "normal")
+      $(".tip").fadeOut(50).remove()
+
+    # click = (d) ->
+    #   artist = d.attributes.artist
+    #   view.trigger("click:album:circle", artist)
+
+    showData = (d) ->
+      $("#graph").append("<div class='tip'></div>")
+      chartTip = d3.select(".tip")
+      chartTip.style("left", width - 100 + "px" )
+        .style("top", 50 + "px")
+        .style("background", color d._id)
+      $(".tip")
+        .html("""
+        #{d._id.toUpperCase()} <br />
+        Total Appearances: #{d.appearances.length}<br />
+        Highest Position: #{d3.min(d.appearances, (c) ->
+          return c.position )}<br />
+        First: #{d3.min(d.appearances, (c) ->
+          return c.week )}<br />
+        Most Recent: #{d3.max(d.appearances, (c) ->
+          return c.week )}
+        """
         )
-      ]
-      # svg.append("g")
-      #   .attr("class", "x axis")
-      #   .attr("transform", "translate(0," + height + ")")
-      #   .call(xAxis)
-      svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-        .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text "# of Appearances"
-
-      mouseover = (d, i) ->
-        d3.selectAll("g rect")
-          .transition()
-          .duration(100)
-          .style("opacity", 0.2)
-        d3.select("g .#{d._id} > rect")
-          .transition()
-          .duration(100)
-          .style("opacity", 1)
-        d3.select("g .#{d._id} > text")
-          .transition()
-          .duration(100)
-          .style("font-weight", "bold")
-        showData(d)
-
-      mouseout = ->
-        d3.selectAll("g rect")
-          .transition()
-          .duration(100)
-          .style("opacity", 1)
-        d3.selectAll("g text")
-          .transition()
-          .duration(100)
-          .style("font-weight", "normal")
-        $(".tip").fadeOut(50).remove()
-
-      # click = (d) ->
-      #   artist = d.attributes.artist
-      #   view.trigger("click:album:circle", artist)
-
-      showData = (d) ->
-        $("#graph").append("<div class='tip'></div>")
-        chartTip = d3.select(".tip")
-        chartTip.style("left", width - 100 + "px" )
-          .style("top", 50 + "px")
-          .style("background", color d._id)
-        $(".tip")
-          .html("""
-          #{d._id.toUpperCase()} <br />
-          Total Appearances: #{d.appearances.length}<br />
-          Highest Position: #{d3.min(d.appearances, (c) ->
-            return c.position )}<br />
-          First: #{d3.min(d.appearances, (c) ->
-            return c.week )}<br />
-          Most Recent: #{d3.max(d.appearances, (c) ->
-            return c.week )}
-          """
-          )
-        $(".tip").fadeIn(100)
+      $(".tip").fadeIn(100)
 
 
-      station = svg.selectAll(".station")
-        .data(stations)
-        .enter()
-        .append("g")
-        .attr("transform", (d, i) ->
-          return "translate(" + i * barWidth + ",0 )")
-        .attr("class", (d) ->
-          return "station #{d._id}")
-      station.append("rect")
-        .attr("class", "bar")
-        .attr("width", barWidth - 1)
-        .attr("height", (d) ->
-          return height - y d.appearances.length)
-        .attr("y", (d) -> return 3 + y d.appearances.length)
-        .style "fill", (d, i) ->
-          color d._id
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-      station.append("text")
-        .attr("y", barWidth / 2 - barWidth)
-        .attr("x", (d) -> return height)
-        .attr("dx", ".75em")
-        .text( (d) -> return d._id.toUpperCase() )
-        .attr("transform", "rotate(90)")
+    station = svg.selectAll(".station")
+      .data(stations)
+      .enter()
+      .append("g")
+      .attr("transform", (d, i) ->
+        return "translate(" + i * barWidth + ",0 )")
+      .attr("class", (d) ->
+        return "station #{d._id}")
+    station.append("rect")
+      .attr("class", "bar")
+      .attr("width", barWidth - 1)
+      .attr("height", (d) ->
+        return height - y d.appearances.length)
+      .attr("y", (d) -> return 3 + y d.appearances.length)
+      .style "fill", (d, i) ->
+        color d._id
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout)
+    station.append("text")
+      .attr("y", barWidth / 2 - barWidth)
+      .attr("x", (d) -> return height)
+      .attr("dx", ".75em")
+      .text( (d) -> return d._id.toUpperCase() )
+      .attr("transform", "rotate(90)")
 
 
-      return
+    return
   draw(url)
