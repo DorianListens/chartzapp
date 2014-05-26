@@ -1,13 +1,13 @@
 App = require "application"
 module.exports = (el, collection, slug = "") ->
-  nameString = collection.url.split('/')
-  nameString = nameString[3]
-  # console.log "/api/artistgraph/#{nameString}"
-  # console.log slug if slug
-  if slug
-    url = "/api/albumgraph/#{slug}"
-  else
-    url = "/api/artistgraph/#{nameString}"
+  # nameString = collection.url.split('/')
+  # nameString = nameString[3]
+  # # console.log "/api/artistgraph/#{nameString}"
+  # # console.log slug if slug
+  # if slug
+  #   url = "/api/albumgraph/#{slug}"
+  # else
+  #   url = "/api/artistgraph/#{nameString}"
 
   margin =
     top: 20
@@ -220,4 +220,4 @@ module.exports = (el, collection, slug = "") ->
 
 
     return
-  draw(url)
+  draw()

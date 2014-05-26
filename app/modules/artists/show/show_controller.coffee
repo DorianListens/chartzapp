@@ -10,7 +10,6 @@ module.exports = App.module 'ArtistsApp.Show',
 
     initialize: (opts) ->
       @opts = opts
-      # graph "/api/artists/#{opts.artist}"
       artist = App.request "artist:entities", opts.artist
 
       @layout = @getLayoutView()
@@ -58,16 +57,6 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showGraph: (artist) ->
       graphView = @getGraphView artist
-      # @listenTo graphView, "change:graph:type", (type, slug) ->
-      #   slug = @slug if @slug
-      #   switch type
-      #     when "bar"
-      #       graphView.barGraph slug
-      #     when "multiline"
-      #       graphView.lineGraph slug
-
-      App.vent.on "change:album:graph", (slug) ->
-        graphView.render()
       @show graphView,
         region: @layout.graphRegion
         loading: true
@@ -100,7 +89,6 @@ module.exports = App.module 'ArtistsApp.Show',
           artist.resetFilters()
         else
           @slug = slug
-          App.vent.trigger "change:album:graph", slug
           artist.resetAndAddFilter
             slug: slug
 
@@ -177,27 +165,22 @@ module.exports = App.module 'ArtistsApp.Show',
       "Appearances By Station" : "bar"
       "Appearances By Station Over Time" : "line"
     select: (e) ->
-      nameString = @collection.url.split('/')
-      nameString = nameString[3]
-      # @graph("/api/artistgraph/#{nameString}")
-      # console.log @ui.typeSelect.val()
+      e.preventDefault()
       @graphType = @ui.typeSelect.val()
-      # console.log @graphType
       @[@graphType]()
-      # @trigger 'change:graph:type', @selectOptions[@ui.typeSelect.val()]
 
     buildBarGraph: require "modules/artists/show/barGraph"
     buildLineGraph: require "modules/artists/show/graph"
 
     graphType: "bar"
 
-    bar: (slug) ->
+    bar:  ->
       d3.select("svg").remove()
-      @buildBarGraph(@el, @collection, slug)
+      @buildBarGraph(@el, @collection)
 
-    line: (slug) ->
+    line: ->
       d3.select("svg").remove()
-      @buildLineGraph(@el, @collection, slug)
+      @buildLineGraph(@el, @collection)
 
     id: "graph"
 
@@ -209,10 +192,10 @@ module.exports = App.module 'ArtistsApp.Show',
       _.each @collections, (appearances) =>
         @listenTo appearances, "filter", =>
           @render()
+      @listenTo @collection, "filter", =>
+        @render()
 
     onRender: ->
-      nameString = @collection.url.split('/')
-      nameString = nameString[3]
       @ui.typeSelect
         .find("option[value='#{@graphType}']").attr("selected", true)
       @[@graphType]()
