@@ -268,7 +268,7 @@ module.exports = (el, collection, graph) ->
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
-        .attr("dy", ".71em")
+        .attr("dy", "-3em")
         .style("text-anchor", "end")
         .text "Position"
       station = svg.selectAll(".station")
@@ -364,7 +364,7 @@ module.exports = (el, collection, graph) ->
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
-        .attr("dy", ".71em")
+        .attr("dy", "-3em")
         .style("text-anchor", "end")
         .text "# of Appearances"
 

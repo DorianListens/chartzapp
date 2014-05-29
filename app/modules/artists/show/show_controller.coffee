@@ -137,7 +137,7 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Title extends Marionette.ItemView
     template: "modules/artists/show/templates/title"
-    className: "panel"
+    # className: "panel"
     events:
       "click #popStation" : "popStation"
     popStation: (e) ->
@@ -145,14 +145,25 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Panel extends Marionette.ItemView
     template: "modules/artists/show/templates/panel"
+    className: ""
     events:
-      "click a" : "showGraph"
+      "click a.albumlink" : "showGraph"
+      "click a.button" : "showFilters"
 
     showGraph: (e) ->
       e.preventDefault()
       $(e.target).parent().parent().find('.active').removeClass("active")
       $(e.target).parent("dd").toggleClass("active")
       @trigger 'click:albumButton', e.target.id
+
+    showFilters: (e) ->
+      e.preventDefault()
+      if $("#filters").hasClass("hide")
+        $("#filters").slideDown().toggleClass("hide")
+        $(e.target).text("Hide Filters")
+      else
+        $("#filters").slideUp().toggleClass("hide")
+        $(e.target).text("Show Filters")
 
   class Show.Graph extends Marionette.ItemView
     template: "modules/artists/show/templates/graph"
@@ -253,7 +264,7 @@ module.exports = App.module 'ArtistsApp.Show',
     onRender: ->
       @$el.find(".chosen-select").chosen()
       # console.log @collection.getFilterLists()
-      @$("th")
+      @$("[column]")
       .append($("<i>"))
       .closest("th")
       .find("i")

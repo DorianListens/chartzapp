@@ -1,7 +1,50 @@
-<dl class="sub-nav">
-<dt>Albums:</dt>
-<dd class="active"><a href="#" id="cz_all">All</a></dd>
-{{#each items}}
-<dd><a href="#" id="{{this.slug}}">{{this.album}}</a></dd>
-{{/each}}
-</ul>
+<a class="button tiny right">Show Filters</a>
+<dl class="album-sub-nav">
+  <dt>Albums:</dt>
+  <dd class="active"><a href="#" class="albumlink" id="cz_all">All</a></dd>
+  {{#each items}}
+  <dd><a href="#" id="{{this.slug}}" class="albumlink">{{this.album}}</a></dd>
+  {{/each}}
+</dl>
+
+<!-- <form>
+  <div class="row">
+    <div class="small-2 columns">
+      <label for="position" class="right inline">Position</label>
+    </div>
+    <div class="small-4 columns">
+      <select class="chosen-select" id="position" data-placeholder="Position" multiple>
+      </select>
+    </div>
+    <div class="small-2 columns">
+      <label for="station" class="right inline">Station</label>
+    </div>
+    <div class="small-4 columns">
+      <select class="chosen-select" id="station" data-placeholder="Station" multiple>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-2 columns">
+      <label for="week" class="right inline">Week</label>
+    </div>
+    <div class="small-4 columns">
+      <select class="chosen-select" id="week" data-placeholder="Week" multiple>
+      </select>
+    </div>
+    <div class="small-2 columns">
+      <label for="graph" class="right inline">Visualizer</label>
+    </div>
+    <div class="small-4 columns">
+      <select id="type-select">
+        <option value="bar">Appearances By Station</option>
+        <option value="line">Appearances By Station Over Time</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-1 column right">
+      <a class="button tiny secondary right" id="clearFilters" href="#">Clear</a>
+    </div>
+  </div>
+</form> -->
