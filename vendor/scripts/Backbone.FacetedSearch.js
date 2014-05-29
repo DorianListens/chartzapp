@@ -17,9 +17,6 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 	wholeCollection : {},
 
 	options : {},
-	// initialize: function() {
-	// 	console.trace(this);
-	// },
 
 	initializeFilters: function(options) {
 		var self = this;
@@ -28,8 +25,6 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 			this.options = options;
 		}
 		_.defaults(this.options, {silent:false});
-
-		this.filters = []
 
 		if (this.wholeCollection.length !== 0) {
 			this.wholeCollection = this.clone();

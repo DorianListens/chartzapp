@@ -252,7 +252,7 @@ module.exports = App.module 'ArtistsApp.Show',
 
     onRender: ->
       @$el.find(".chosen-select").chosen()
-      # @collection.initializeFilters()
+      # console.log @collection.getFilterLists()
       @$("th")
       .append($("<i>"))
       .closest("th")
@@ -313,8 +313,6 @@ module.exports = App.module 'ArtistsApp.Show',
       _.each @collections, (collection, i) ->
         collection.initializeFilters()
 
-
-
     onRender: ->
       # subCollection = "appearancesCollection"
       filters = []
@@ -325,8 +323,8 @@ module.exports = App.module 'ArtistsApp.Show',
 
       _.each @collections, (collection, i) ->
         # collection.initializeFilters()
-
         filters[i] = collection.getFilterLists()
+      #   console.log filters
       # console.log filters
       filterFacets = Object.keys(filters[0])
       _.each filterFacets, (facet) ->
@@ -336,6 +334,7 @@ module.exports = App.module 'ArtistsApp.Show',
           bigList[facet].push filterSet[facet]
       _.each filterFacets, (facet) ->
         bigList[facet] = _.uniq( _.flatten _.union bigList[facet])
+      # console.log bigList
       _.each bigList, (bigSet, facet) =>
         _.each bigSet, (value) =>
           @$el.find("##{facet}").append("""

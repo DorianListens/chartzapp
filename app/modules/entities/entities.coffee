@@ -127,8 +127,8 @@ module.exports = App.module "Entities",
   class Entities.Appearance extends Backbone.Model
 
   class Entities.Appearances extends Backbone.FacetedSearchCollection
+
     model: Entities.Appearance
-    # filters: []
     filterFacets: ["station", 'position', 'week']
     sortAttr: "week"
     sortDir: -1

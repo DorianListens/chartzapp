@@ -1,4 +1,5 @@
 App = require "application"
+
 module.exports = (el, collection, graph) ->
 
   margin =
@@ -21,18 +22,7 @@ module.exports = (el, collection, graph) ->
     height
   ])
 
-  # Colour setup
-  color = d3.scale.category20()
-  color2 = d3.scale.category20b()
-  color3 = d3.scale.category20c()
-  fullRange = color.range()
-  cRange = color2.range()
-  cRange.forEach (c) ->
-    fullRange.push c
-  c3Range = color3.range()
-  c3Range.forEach (c) ->
-    fullRange.push c
-  color.range(fullRange)
+  color = require 'colorList'
 
   # Axis
   xAxis = d3.svg.axis()
@@ -145,17 +135,17 @@ module.exports = (el, collection, graph) ->
       .transition()
       .duration(100)
       .style("opacity", 0.2)
-    d3.selectAll("g .#{d} path")
+    d3.selectAll("g .#{d._id} path")
       .transition()
       .duration(100)
       .style("stroke-width", "10px")
       .style("opacity", 1)
-    d3.selectAll("g .#{d} circle")
+    d3.selectAll("g .#{d._id} circle")
       .transition()
       .duration(100)
       .attr("r", "10")
       .style("opacity", 1)
-    d3.selectAll(".#{d} circle")
+    d3.selectAll(".#{d._id} circle")
       .forEach (d) ->
         d.forEach (c, i) ->
           showTips(d, c, i)
@@ -196,7 +186,7 @@ module.exports = (el, collection, graph) ->
       .style("opacity", 1)
       .style("stroke-width", "1.5px")
       .attr("r", 5)
-    d3.selectAll("g .#{d} circle")
+    d3.selectAll("g .#{d._id} circle")
       .transition()
       .duration(100)
       .attr("r", 5)
@@ -247,6 +237,8 @@ module.exports = (el, collection, graph) ->
   draw = (graph) ->
 
     stations = parse(collection)
+    # color.domain stations
+
 
 
     stations.forEach (d) ->
@@ -256,15 +248,13 @@ module.exports = (el, collection, graph) ->
     if graph is "line"
 
       x.domain [
-        d3.min(stations, (c) ->
+        d3.min stations, (c) ->
           d3.min c.appearances, (v) ->
             v.date
 
-        )
         d3.max(stations, (c) ->
           d3.max c.appearances, (v) ->
             v.date
-
         )
       ]
       y.domain [1, 30]
@@ -314,7 +304,7 @@ module.exports = (el, collection, graph) ->
         .on "mouseout", mouseoutCircle
 
       legend = svg.selectAll(".legend")
-        .data(color.domain().slice().reverse())
+        .data(stations)
         .enter().append("g")
         .attr("class", (d) -> return "legend #{d}")
         .attr "transform", (d, i) ->
@@ -327,19 +317,20 @@ module.exports = (el, collection, graph) ->
         .attr("x", width - 10)
         .attr("width", 18)
         .attr("height", 18)
-        .style "fill", color
+        .style("fill", (d) ->
+          return color(d._id)
+          )
       legend.append("text")
         .attr("x", width - 15)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text (d) ->
-          d.toUpperCase()
+          d._id.toUpperCase()
       legend.on("mouseover", highlightLegend)
         .on("mouseout", mouseoutLegend)
       return
     else if graph is "bar"
-      color.domain stations
       barWidth = width / stations.length
       x = d3.scale.linear().range([
         0
@@ -456,11 +447,3 @@ module.exports = (el, collection, graph) ->
 
       return
   draw(graph)
-
-    # station.append("text").datum((d) ->
-    #   name: d._id
-    #   value: d.appearances[0]
-    # ).attr("transform", (d) ->
-    #   "translate(" + x(d.value.week) + "," + y(d.value.position) + ")"
-    # ).attr("x", 3).attr("dy", ".35em").text (d) ->
-    #   d.name
