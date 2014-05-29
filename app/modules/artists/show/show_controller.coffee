@@ -167,7 +167,7 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Graph extends Marionette.ItemView
     template: "modules/artists/show/templates/graph"
-    className: 'panel'
+    # className: 'panel'
     ui:
       "typeSelect" : "#type-select"
     events:

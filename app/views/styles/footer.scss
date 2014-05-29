@@ -1,4 +1,11 @@
-#push, #footer		{  height: 80px;  }
-#footer				{  background-color: #F5F5F5;
-	p				{  margin: 20px 0; text-align: center;  }
+#push, #footer		{  min-height: 80px;  }
+#footer				{  background-color: #333;
+	p				{
+		margin: 20px 0;
+		text-align: center;
+		color: #fff;
+	  }
+		.main-title {
+			text-align: center;
+		}
 }

@@ -14,7 +14,7 @@ module.exports = App.module 'LandingApp.Show',
       @listenTo @layout, 'show', =>
         @showChart()
         @showList(stations)
-        @showSearch(stations)
+        # @showSearch(stations)
 
       @listenTo @layout, 'change:time', (time) =>
         search = {}
@@ -158,7 +158,7 @@ module.exports = App.module 'LandingApp.Show',
 
   class Show.Graph extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/graph"
-    className: 'panel'
+    # className: 'panel'
     buildGraph: require "modules/landing/showLanding/landingGraph"
 
     graph: ->
@@ -171,7 +171,7 @@ module.exports = App.module 'LandingApp.Show',
 
   class Show.StationList extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/stationList"
-    className: "panel small-12 columns"
+    className: " small-12 columns"
     events:
       'click a' : 'clickStation'
     clickStation: (e) ->

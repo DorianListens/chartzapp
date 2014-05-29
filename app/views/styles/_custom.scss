@@ -22,13 +22,49 @@
   );
   font-size: $h2-font-size;
   font-family: $header-font-family;
+  text-shadow: 1px 1px 1px #333;
 
 }
-
+h1.main-title {
+  font-size: rem-calc(80);
+  line-height: rem-calc(160);
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
+}
 h1.artist-title {
   font-size: rem-calc(70);
+  // line-height: rem-calc(140);
+  margin-bottom: rem-calc(20);
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
 }
+
 .album-sub-nav {
   @include sub-nav();
   display: inline-block;
+}
+.postfix i {
+  font-size: rem-calc(30);
+}
+.title-row {
+  @include grid-row();
+  max-width: 100%;
+  background: $primary-color;
+  padding-top: rem-calc(20);
+  padding-bottom: rem-calc(20);
+}
+.graph-row {
+  @include grid-row();
+  max-width: 100%;
+  background: $secondary-color;
+  padding-top: rem-calc(20);
+  padding-bottom: rem-calc(20);
+}
+.panel-row {
+  @include grid-row();
+  max-width: 100%;
+  background: #fff;
+
+  padding-top: rem-calc(20);
+  // padding-bottom: rem-calc(20);
 }

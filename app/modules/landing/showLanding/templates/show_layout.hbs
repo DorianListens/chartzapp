@@ -1,31 +1,34 @@
-<div class='row'>
+<div class='title-row'>
+  <div class="row">
   <div id="title_region" class="small-12 columns">
-    <div class="panel">
-      <h1>ChartZapp!</h1>
+    <!-- <div class="panel"> -->
+      <h1 class="main-title">ChartZapp!</h1>
     </div>
   </div>
 </div>
-<div class='row'>
+<div class='panel-row'>
+  <div class="row">
   <div id="blurb_region" class="small-12 columns">
-    <div data-alert class="alert-box">
+    <!-- <div data-alert class="alert-box">
       <p>Hi! Thanks for visiting! ChartZapp is currently in an extremely "Alpha" state, so be wary.</p>
         <p>Thanks for trying it out!</P>
       <a href="#" class="close">&times;</a>
-    </div>
-    <p>This is ChartZapp, a new way of analysing Canadian Campus Radio Charts.</p>
+    </div> -->
+    <p class="lead">This is ChartZapp, a new way of analysing Canadian Campus Radio Charts.</p>
     <p>All the data has been lovingly scraped from
     <a href="http://www.earshot-online.com/" target="blank">!Earshot Online</a></p>
   </div>
 </div>
+</div>
 <div class="row">
   <div id="search_region" class="small-12 large-10 large-centered columns"></div>
 </div>
-<div class="row">
+<div class="graph-row">
   <div id="graph-region" class="small-12 columns"></div>
 </div>
-<div class="row">
+<div class="panel-row">
   <div class="small-12 columns">
-    <div class="panel">
+    <!-- <div class="panel"> -->
       <div class="row">
         <div class="small-4 columns">
           <h3 class="">Top 50 albums so far</h3>
@@ -38,15 +41,22 @@
           </select>
         </div>
         <div class="small-4 columns">
-          <input id="custom-range" type="text" placeholder="Custom Date Range">
+          <div class="row collapse">
+            <div class="small-10 columns">
+              <input id="custom-range" type="text" placeholder="Custom Date Range"></input>
+            </div>
+            <div class="small-2 columns">
+              <span class="postfix radius"><i id="custom-range" class="fi-calendar"></i></span>
+            </div>
+          </div>
         </div>
-      </div>
+      <!-- </div> -->
     </div>
   </div>
 </div>
-<div class="row">
-  <div id="table_region" class=""></div>
+<div class="graph-row">
+  <div id="table_region" class="row"></div>
 </div>
-<div class="row">
-  <div id="list_region" class="small-12 columns"></div>
+<div class="panel-row">
+  <div id="list_region" class="row"></div>
 </div>
