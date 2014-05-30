@@ -4,4 +4,6 @@ public
 db
 .plan
 .sass-cache
+newrelic.js
 newrelic_agent.log
+.gauth.coffee

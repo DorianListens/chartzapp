@@ -15,6 +15,20 @@ tuesify = (date) ->
   theTues = moment(theTues)
   theTues.format('YYYY-MM-DD')
 
+potentialWeeks = (date1, date2) ->
+  date1 = moment date1
+  date2 = moment date2
+  if _.isEqual(date1, date2)
+    return 1
+  count = 0
+
+  while (date1 <= date2)
+    count++
+    date1 = moment(date1.day(9))
+
+  return count
+
+
 mode = (array) ->
   return null  if array.length is 0
   modeMap = {}
@@ -174,10 +188,23 @@ module.exports = App.module "Entities",
     filterFacets: ["album", "artist", "appearances"]
 
   class Entities.Topx extends Backbone.Model
+    initialize: ->
+      @set
+        startDate: @collection.startDate
+        endDate: @collection.endDate
+        potential: @collection.potential
+        percentage: parseInt(
+          @collection.weeks.length / @collection.potential * 1000
+          )
 
   class Entities.TopxCollection extends Backbone.Collection
     model: Entities.Topx
     parse: (response) ->
+      weeks = []
+      stations = []
+      totalAlbums = response.length
+      response = response.filter (v, i, a) ->
+        return v if v._id.isNull is false
       for item in response
         do (item) ->
           item.artist = item._id.artist
@@ -186,22 +213,32 @@ module.exports = App.module "Entities",
           item.slug = item._id.slug
           item.isNull = item._id.isNull
           theCount = 0
+          item.stations = []
           for obj in item.appearances
             do (obj) ->
               points = 0
               points = 31-(parseInt obj.position)
               theCount += points
+              weeks.push obj.week
+              stations.push obj.station
+              item.stations.push obj.station
+          item.stations = _.uniq item.stations
           item.frontPoints = theCount
+          item.totalAlbums = totalAlbums
+      weeks.sort()
+      @weeks = _.uniq weeks, true
+      @stations = _.uniq stations
+      for item in response
+        do (item) =>
+          item.totalWeeks = @weeks
+          item.totalStations = @stations.length
       response = response.sort (a, b) ->
         a = parseInt a.frontPoints
         b = parseInt b.frontPoints
         return 0 if a is b
         if a > b then -1 else 1
 
-      response = response.filter (v, i, a) ->
-        return v if v.isNull is false
-
-      response = response.slice(0, 50)
+      response = response.slice(0, @number)
       for item in response
         do (item) ->
           item.rank = response.indexOf(item) + 1
@@ -229,8 +266,12 @@ module.exports = App.module "Entities",
   API =
     getTopx: (search) ->
       d = new Date()
+      number = 25
+      number = search.number if search.number
+
       topxCollection = new Entities.TopxCollection
-      station = search.station
+      topxCollection.number = number
+      station = search.station.toUpperCase() if search.station
       topxCollection.station = station
       startDate = "2014-01-01"
       if search.startDate then startDate = search.startDate
@@ -238,6 +279,7 @@ module.exports = App.module "Entities",
       if search.endDate then endDate = search.endDate
       startDate = tuesify startDate
       endDate = tuesify endDate
+      # potentialWeeks =
       if station and startDate and endDate
         searchUrl = "/api/top/#{station}/#{startDate}/#{endDate}"
         if startDate is endDate
@@ -262,6 +304,9 @@ module.exports = App.module "Entities",
       topxCollection.desc = desc
       topxCollection.week = week if week
       topxCollection.url = searchUrl
+      topxCollection.startDate = startDate
+      topxCollection.endDate = endDate
+      topxCollection.potential = potentialWeeks(startDate, endDate)
       topxCollection.fetch
         reset: true
       topxCollection
@@ -290,6 +335,7 @@ module.exports = App.module "Entities",
 
     getArtist: (artist) ->
       artists = new Entities.ArtistCollection
+      artists.artist = artist
       artist = encodeURIComponent(artist)
       artists.url = "/api/artists/#{artist}"
       artists.fetch
@@ -301,8 +347,9 @@ module.exports = App.module "Entities",
         { name: "Home", path: 'home', icon: 'fi-home' }
         # { name: "Charts", path: 'chart' }
         # { name: "Top 50", path: 'topx'}
-        { name: "Artists", path: 'artist', icon: "fi-music"}
-        { name: "Stations", path: 'station', icon: 'fi-align-left' }
+        { name: "Artists", path: 'artist', icon: "fi-results-demographics"}
+        { name: "Stations", path: 'station', icon: 'fi-results' }
+        { name: "FAQ", path: 'faq', icon: 'fi-info' }
         # { name: "Date", path: 'date' }
         # { name: "Label", path: "label"}
       ]

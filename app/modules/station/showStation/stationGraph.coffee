@@ -3,9 +3,9 @@ module.exports = (el, collection, view) ->
 
   margin =
     top: 100
-    right: 120
+    right: 100
     bottom: 50
-    left: 50
+    left: 100
 
   # width = 960 - margin.left - margin.right
 
@@ -17,10 +17,9 @@ module.exports = (el, collection, view) ->
   ])
   x = d3.scale.linear().range([
     0
-    width - 100
+    width
   ])
-  # color = d3.scale.category20()
-  color = require 'colorList'
+  color = d3.scale.category10()
   xAxis = d3.svg.axis()
     .scale(x)
     # .tickPadding(10)
@@ -37,10 +36,13 @@ module.exports = (el, collection, view) ->
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + (margin.left + 20) + "," + margin.top + ")")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
   albums = collection.models
-  # albums = albums.slice(0,25)
+  albums = albums.slice(0,10)
+
+
+  barWidth = width / albums.length
 
   rScale = d3.scale.linear()
   rScale.domain(
@@ -54,53 +56,45 @@ module.exports = (el, collection, view) ->
 
   y.domain [
     d3.max(albums, (c) ->
-      c.attributes.appearances.length
+      c.attributes.frontPoints
     )
     d3.min(albums, (c) ->
-      c.attributes.appearances.length
-    )
+      c.attributes.frontPoints #appearances.length
+    ) - 10
   ]
-  x.domain(
-    d3.extent(albums, (c) ->
-      c.attributes.frontPoints
-      )
-    )
-  # x.domain(
-  #   d3.extent(albums (c) ->
-  #     c.attributes.frontPoints)
-  #   )#[0, 11]
+  x.domain [0, 11]
 
-  svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
+  # svg.append("g")
+  #   .attr("class", "x axis")
+  #   .attr("transform", "translate(0," + height + ")")
+  #   .call(xAxis)
   unless albums.length is 0
     svg.append("g")
       .attr("class", "y axis")
-      .attr("transform", "translate(-10,0)")
+      # .attr("transform", "translate(-20,0)")
       .call(yAxis)
       .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
+      .attr("y", 4)
+      .attr("dy", "-4em")
       .style("text-anchor", "end")
-      .text "# of Appearances"
+      .text "Chartscore"
 
-  # color.domain albums
+  color.domain albums
 
   mouseover = (d, i) ->
-    d3.selectAll("g circle")
+    d3.selectAll("g rect")
       .transition()
       .duration(100)
       .style("opacity", 0.2)
-    d3.select("g .#{d.attributes.slug}")
+    d3.select("g .#{d.attributes.slug} > rect")
       .transition()
       .duration(100)
       .style("opacity", 1)
     showData(@, d)
 
   mouseout = ->
-    d3.selectAll("g circle")
+    d3.selectAll("g rect")
       .transition()
       .duration(100)
       .style("opacity", 1)
@@ -110,20 +104,19 @@ module.exports = (el, collection, view) ->
     artist = d.attributes.artist
     view.trigger("click:album:circle", artist)
 
-  showData = (circle, d) ->
-    coord = d3.mouse(circle)
+  showData = (i, d) ->
+
     $("#graph").append("<div class='tip'></div>")
     chartTip = d3.select(".tip")
-    chartTip.style("left", 150 + "px" )
+    chartTip.style("left", width - 150 + "px" )
       .style("top", 50 + "px")
-      .style("background", color d.attributes.rank)
+      .style("background", color d.cid)
     $(".tip")
       .html("""
-      ##{d.attributes.rank}: #{d.attributes.artist} <br />
+      #{d.attributes.artist} <br />
       #{d.attributes.album}<br />
       Total Appearances: #{d.attributes.appearances.length}<br />
-      Chartscore: #{d.attributes.frontPoints}<br />
-      Appeared on #{d.attributes.stations.length} / #{d.attributes.totalStations} stations
+      Chartscore: #{d.attributes.frontPoints}
       """
       )
     $(".tip").fadeIn(100)
@@ -153,11 +146,10 @@ module.exports = (el, collection, view) ->
         # .css("background", "#000")
         .html("""
       <br />
-      This graph displays the top albums for all stations over the selected time range.<br />
-      The X-Axis and the Radius of each circle is determined by the album's Chartscore.<br />
-      The Y-Axis is determined by the album's total number of appearances.<br />
-      <br />
-      Mouseover any circle for more information.<br />
+      This graph displays the top 10 albums on #{collection.station} over the selected time range.<br />
+      The X-Axis is determined by the album's rank.<br />
+      The Y-Axis is determined by the album's Chartscore.<br />
+      Mouseover any bar for more information.<br />
       <br />
       (Click anywhere to hide)
       <br />
@@ -176,28 +168,34 @@ module.exports = (el, collection, view) ->
 
   $(el).find("svg").on("click", hideInfo)
 
-  albumCircles = svg.selectAll("circle")
+  album = svg.selectAll(".album")
     .data(albums)
-    .enter().append("circle")
-    .attr("fill", (d) ->
-      color d.attributes.rank)
-    .attr("class", (d) -> return "dot #{d.attributes.slug}")
-    .attr("cy", (d) ->
-      num = d.attributes.appearances.length
-      y num)
-    .attr("cx", (d, i) ->
-      x d.attributes.frontPoints)
-    .attr("r", (d) ->
-      rScale d.attributes.frontPoints
-      )
+    .enter()
+    .append("g")
+    .attr("transform", (d, i) ->
+      return "translate(" + i * barWidth + ",0 )")
+    .attr("class", (d) ->
+      return "album #{d.attributes.slug}")
+  album.append("rect")
+    .attr("class", "bar")
+    .attr("width", barWidth - 1)
+    .attr("height", (d) ->
+      return height - y d.attributes.frontPoints) # appearances.length)
+    .attr("y", (d) -> return 3 + y d.attributes.frontPoints) #appearances.length)
+    .style "fill", (d, i) ->
+      color d.cid
+    # .on("mouseover", mouseover)
+    # .on("mouseout", mouseout)
+  album.append("text")
+    .attr("y", height + 20)# barWidth / 2 - barWidth)
+    .attr("x", (d) -> return (barWidth / 2) - 10)#height)
+    # .attr("dx", ".75em")
+    .text( (d, i) -> return "##{i + 1}")
+    # .attr("transform", "rotate(90)")
 
-
-  albumCircles.on("mouseover", mouseover)
+  album.on("mouseover", mouseover)
     .on("mouseout", mouseout)
     .on("click", click)
-
-
-
 
   if albums.length is 0
     showEmpty()

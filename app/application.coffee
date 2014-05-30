@@ -53,7 +53,9 @@ Date::yyyymmdd = ->
   yyyy = @getFullYear().toString()
   mm = (@getMonth() + 1).toString() # getMonth() is zero-based
   dd = @getDate().toString()
-  yyyy + "-" + ((if mm[1] then mm else "0" + mm[0])) + "-" + ((if dd[1] then dd else "0" + dd[0]))
+  yyyy + "-" +
+    ((if mm[1] then mm else "0" + mm[0])) + "-" +
+    ((if dd[1] then dd else "0" + dd[0]))
 
 
 require 'controllers/baseController'
@@ -61,10 +63,11 @@ require 'modules/entities/entities'
 require 'components/loading/loading'
 require 'modules/header/header_app'
 require 'modules/footer/footer_app'
-require 'modules/chart/chart_app'
+# require 'modules/chart/chart_app'
+require 'modules/about/about_app'
 require 'modules/artists/artists_app'
 require 'modules/station/station_app'
-require 'modules/date/date_app'
-require 'modules/label/label_app'
-require 'modules/topx/topx_app'
+# require 'modules/date/date_app'
+# require 'modules/label/label_app'
+# require 'modules/topx/topx_app'
 require 'modules/landing/landing_app'

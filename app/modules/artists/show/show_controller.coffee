@@ -18,7 +18,8 @@ module.exports = App.module 'ArtistsApp.Show',
         @mainView(artist)
 
       @show @layout,
-        loading: true
+        region: App.mainRegion
+        loading: false
 
 
     mainView: (artist) =>
@@ -31,19 +32,19 @@ module.exports = App.module 'ArtistsApp.Show',
       # artists = App.request 'artist:entities', search
       App.execute "when:fetched", artist, =>
         # console.log artist
-        artist.countPoints()
+        # artist.countPoints()
         $(document).foundation()
-        artist.initializeFilters()
+        # artist.initializeFilters()
         if artist.length is 0
           @showEmpty()
-        else
-          artistsView = @getArtistsView artist
-          @show artistsView,
-            region: @layout.tableRegion
-            loading: true
-          @showPanel(artist)
-          @showTitle(artist)
-          @showGraph(artist)
+        # else
+      artistsView = @getArtistsView artist
+      @show artistsView,
+        region: @layout.tableRegion
+        loading: true
+      @showPanel(artist)
+      @showTitle(artist)
+      @showGraph(artist)
 
 
     showTitle: (artist) ->
@@ -57,6 +58,9 @@ module.exports = App.module 'ArtistsApp.Show',
 
     showGraph: (artist) ->
       graphView = @getGraphView artist
+      @listenTo graphView, 'click:station:item', (station) ->
+        station = encodeURIComponent(station)
+        App.navigate "station/#{station}", trigger: true
       @show graphView,
         region: @layout.graphRegion
         loading: true
@@ -186,7 +190,7 @@ module.exports = App.module 'ArtistsApp.Show',
 
     graph: (type) ->
       d3.select("svg").remove()
-      @buildGraph(@el, @collection, type)
+      @buildGraph(@el, @collection, type, @)
 
     id: "graph"
 
@@ -318,40 +322,75 @@ module.exports = App.module 'ArtistsApp.Show',
 
     collections: []
     initialize: ->
-      subCollection = "appearancesCollection"
-      @collections.push model.get subCollection for model in @collection.models
+      @filters = []
+      @bigList = {}
 
-      _.each @collections, (collection, i) ->
-        collection.initializeFilters()
+      subCollection = "appearancesCollection"
+
+      # console.log model for model in @collection.models
+
+      # _.each @collections, (collection, i) ->
+      #   collection.initializeFilters()
+        # console.log collection
+
+      App.execute "when:fetched", @collection, =>
+        @collection.countPoints()
+        $(document).foundation()
+        @collection.initializeFilters()
+        @collections.push model.get subCollection for model in @collection.models
+
+        _.each @collections, (collection, i) =>
+          collection.initializeFilters()
+          @filters[i] = collection.getFilterLists()
+        #   console.log filters
+        # console.log filters
+        # filterFacets = Object.keys(filters[0])
+        # _.each filterFacets, (facet) ->
+        #   bigList[facet] = []
+        # _.each filters, (filterSet) ->
+        #   _.each filterFacets, (facet, i) ->
+        #     bigList[facet].push filterSet[facet]
+        # _.each filterFacets, (facet) ->
+        #   bigList[facet] = _.uniq( _.flatten _.union bigList[facet])
+        # # console.log bigList
+        # _.each bigList, (bigSet, facet) =>
+        #   _.each bigSet, (value) =>
+        #     @$el.find("##{facet}").append("""
+        #       <option value='#{value}'>#{value.toUpperCase()}</option>
+        #       """).attr("disabled", false)
+        # console.log bigList
+        # @$el.find(".chosen-select").chosen().trigger("chosen:updated")
+
 
     onRender: ->
+      # @collection.initializeFilters()
       # subCollection = "appearancesCollection"
-      filters = []
-      bigList = {}
+      # filters = []
+      # bigList = {}
       # @collections.push model.get subCollection for model in @collection.models
 
       # console.log @collections
 
-      _.each @collections, (collection, i) ->
-        # collection.initializeFilters()
-        filters[i] = collection.getFilterLists()
-      #   console.log filters
+      # _.each @collections, (collection, i) ->
+      #   # collection.initializeFilters()
+      #   filters[i] = collection.getFilterLists()
+      # #   console.log filters
       # console.log filters
-      filterFacets = Object.keys(filters[0])
-      _.each filterFacets, (facet) ->
-        bigList[facet] = []
-      _.each filters, (filterSet) ->
-        _.each filterFacets, (facet, i) ->
-          bigList[facet].push filterSet[facet]
-      _.each filterFacets, (facet) ->
-        bigList[facet] = _.uniq( _.flatten _.union bigList[facet])
+      filterFacets = Object.keys(@filters[0])
+      _.each filterFacets, (facet) =>
+        @bigList[facet] = []
+      _.each @filters, (filterSet) =>
+        _.each filterFacets, (facet, i) =>
+          @bigList[facet].push filterSet[facet]
+      _.each filterFacets, (facet) =>
+        @bigList[facet] = _.uniq( _.flatten _.union @bigList[facet])
       # console.log bigList
-      _.each bigList, (bigSet, facet) =>
+      _.each @bigList, (bigSet, facet) =>
         _.each bigSet, (value) =>
           @$el.find("##{facet}").append("""
             <option value='#{value}'>#{value.toUpperCase()}</option>
             """).attr("disabled", false)
-      # console.log bigList
+      # # console.log bigList
       @$el.find(".chosen-select").chosen().trigger("chosen:updated")
 
     submit: (e, params) ->

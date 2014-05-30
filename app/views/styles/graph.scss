@@ -26,18 +26,26 @@
   padding: 5px;
   color: #fff;
   text-shadow: 1px 1px 1px #000;
-    // -1px -1px 0 #000,
-
-    // -1px 1px 0 #000,
-    // 1px 1px 0 #000;
   border-radius: 4px;
   position: absolute;
   width: auto;
   line-height: 2;
   text-align: center;
-  border-color: #000;
-  border: 1px;
   opacity: 0.9;
   font-weight: bold;
   font-size: larger;
+  background: #d04526;
+}
+
+.infobox {
+  float : right;
+  position: absolute;
+  right: 1.25rem;
+  top: 0px;
+  color : #fff;
+  text-shadow: 1px 1px 1px #000;
+  font-weight: bold;
+  font-size: 30px;
+  text-align: center;
+  background: #aaa;
 }

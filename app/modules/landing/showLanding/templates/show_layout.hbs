@@ -14,7 +14,7 @@
         <p>Thanks for trying it out!</P>
       <a href="#" class="close">&times;</a>
     </div> -->
-    <p class="lead">This is ChartZapp, a new way of analysing Canadian Campus Radio Charts.</p>
+    <p class="lead">This is ChartZapp, a new way of analysing Canadian Campus-Community Radio Charts.</p>
     <p>All the data has been lovingly scraped from
     <a href="http://www.earshot-online.com/" target="blank">!Earshot Online</a></p>
   </div>
@@ -31,7 +31,17 @@
     <!-- <div class="panel"> -->
       <div class="row">
         <div class="small-4 columns">
-          <h3 class="">Top 50 albums so far</h3>
+          <div class="row collapse">
+            <div class="small-2 columns">
+              <span class="prefix radius">Top</span>
+            </div>
+            <div class="small-8 columns">
+              <input id="number" type="number" placeholder="25"></input>
+            </div>
+            <div class="small-2 columns">
+              <span class="postfix radius"><i class="fi-record"></i></span>
+            </div>
+          </div>
         </div>
         <div class="small-4 columns">
           <select id="time-select">

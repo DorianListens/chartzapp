@@ -1,3 +1,32 @@
+<div id="feedback" class="reveal-modal small" data-reveal>
+  <h2>Thanks for trying out ChartZapp!</h2>
+  <p class="lead">The project is currently under active development,
+    and I'd love to hear your thoughts about it!</p>
+    <div class="hide" id="alert-container">
+      <div data-alert id="success" class="hide alert-box success radius">
+        Thanks for your feedback!
+        <a href="#" class="close">&times;</a>
+      </div>
+    </div>
+  <form id="feedback-form" data-abide="ajax">
+    <div class="name-field">
+      <input type="text" placeholder="Name" id="name" name="name" required></input>
+      <small class="error">Please enter your name</small>
+    </div>
+    <div class="email-field">
+      <input type="email" placeholder="Email" id="email" name="email" required></input>
+      <small class="error">I can't respond without your email!</small>
+    </div>
+    <div class="message-field">
+      <textarea id="message" placeholder="Thoughts..." rows="10" name="message" required></textarea>
+      <small class="error">A message is kind of the point...</small>
+    </div>
+    <button id="form-submit" type="submit">Submit</button>
+    <a class="button secondary" id="clear">Clear</a>
+  </form>
+  <a class="close-reveal-modal">&#215;</a>
+</div>
+
 <nav class="top-bar" data-topbar>
   <ul class="title-area">
     <li class="name"><h1><a id="home">ChartZapp!</a></h1></li>
@@ -5,6 +34,9 @@
   </ul>
   <section class="top-bar-section">
     <ul class="right links">
+      <li class="right">
+        <a href="#" data-reveal-id="feedback"><i class="fi-mail"></i> Feedback</a>
+      </li>
     </ul>
   </section>
 </nav>

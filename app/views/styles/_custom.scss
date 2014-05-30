@@ -80,11 +80,33 @@ h1.artist-title {
   @include grid-row();
   max-width: 100%;
   background: #fff;
-
   padding-top: rem-calc(20);
   // padding-bottom: rem-calc(20);
 }
 a.dl {
   font-family: $header-font-family;
   font-size: rem-calc(20);
+}
+#footer i {
+  color: $primary-color;
+  font-size: rem-calc(20);
+}
+.tiny i {
+  font-size: rem-calc(20);
+}
+
+#faqicon > i {
+  font-size: rem-calc(200);
+  color: $primary-color;
+  opacity: 0.2;
+  text-shadow: 2px 2px 2px #000;
+  // text-align: center;
+}
+
+#about-page {
+  .panel-row, .graph-row {
+  padding-top: rem-calc(50);
+  padding-bottom: rem-calc(50);
+  }
+
 }

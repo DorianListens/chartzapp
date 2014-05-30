@@ -5,13 +5,13 @@ module.exports = App.module 'LandingApp',
 
   class LandingApp.Router extends Marionette.AppRouter
     appRoutes:
-      "home" : "listLanding"
+      "home" : "landing"
 
   LandingApp.startWithParent = false
   LandingApp.Show = require 'modules/landing/showLanding/showLanding_controller'
 
   API =
-    listLanding: ->
+    landing: ->
       new LandingApp.Show.Controller
         region: App.mainRegion
       $(document).foundation()

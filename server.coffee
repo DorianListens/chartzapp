@@ -18,69 +18,9 @@ moment = require 'moment'
 mongo = require 'mongodb'
 mongoose = require 'mongoose'
 later = require 'later'
+nodemailer = require 'nodemailer'
 
 stationArray = require './stationList'
-stationArray1 = [
-  'CAPR'
-  'CFBU'
-  'CFBX'
-  'CFCR'
-  'CFMH'
-  'CFMU'
-  'CFOU'
-  'CFRC'
-  'CFRE'
-  'CFRO'
-]
-stationArray2 = [
-  'CFRU'
-  'CFUR'
-  'CFUV'
-  'CFXU'
-  'CHLY'
-  'CHMA'
-  'CHMR'
-  'CHOQ'
-  'CHRW'
-]
-stationArray3 = [
-  'CHRY'
-  'CHSR'
-  'CHUO'
-  'CHYZ'
-  'CICK'
-  'CILU'
-  'CIOI'
-  'CISM'
-  'CITR'
-]
-stationArray4 = [
-  'CIUT'
-  'CIVL'
-  'CJAM'
-  'CJLO'
-  'CJLY'
-  'CJMQ'
-  'CJSF'
-  'CJSR'
-  'CJSW'
-]
-stationArray5 = [
-  'CJUM'
-  'CKCU'
-  'CKDU'
-  'CKLU'
-  'CKMS'
-  'CKUA'
-  'CKUT'
-  'CKUW'
-  'CKXU'
-  'CSCR'
-  'RADL'
-  'SCOP'
-]
-
-
 
 
 # Setup Database ##################################################
@@ -153,17 +93,10 @@ albumSchema.pre 'save', (next) ->
 
 # Set current position to whatever is on top of the "appearances" stack
 
-albumSchema.post 'init', ->
-  self = @
-  self.currentPos = @appearances[0].position
-
 # albumSchema.post 'init', ->
 #   self = @
-#   self.artistLower = self.artist.toLowerCase()
-#   self.albumLower = self.album.toLowerCase()
-#   self.labelLower = self.label.toLowerCase()
-#   self.save()
-#
+#   self.currentPos = @appearances[0].position
+
 # Set current points on every load ###
 
 albumSchema.post 'init', ->
@@ -173,7 +106,7 @@ albumSchema.post 'init', ->
   pointSum = 0
   for appearance in @appearances
     do (appearance) ->
-      pointSum += (31 - parseInt(appearance.position))
+      pointSum += (31 - +appearance.position)
   self.points = pointSum
 
 # Add text search -- Not ready for production
@@ -203,6 +136,7 @@ exports.startServer = (port, path, callback) ->
   port = process.env.PORT || port
   app.listen port
   console.log 'Listening on port: '+port
+  app.use(express.bodyParser())
   # require('./routes')(app)
 
 # Routes #####################################################################
@@ -551,20 +485,37 @@ exports.startServer = (port, path, callback) ->
   app.get "/api/chart/:station/:date", (req, res) ->
     theDate = tuesify(req.params.date)
     newChart = getChart(req.params.station.toLowerCase(), theDate, res)
-  #
-  # app.get "/api/fixOught", (req, res) ->
-  #   Album.find {artist : "Ought"}, (err, resp) ->
-  #     doc = resp[0].appearances.id("535ff9383adac38549626140")
-  #     doc.remove()
-  #     resp[0].save()
-  #     # resp[0].label = "Constellation"
-  #     # resp[0].save()
-  #     res.send resp
 
   app.get "/api/nulls", (req, res) ->
     Album.find {isNull: true}, (err, resp) ->
       console.error err if err
       res.send resp
+
+  app.post "/api/feedback", (req, res) ->
+    console.log req.body
+    auth = require './.gauth'
+    # create reusable transport method (opens pool of SMTP connections)
+    smtpTransport = nodemailer.createTransport("SMTP", auth())
+
+    # setup e-mail data with unicode symbols
+    mailOptions =
+      from: "#{req.body.name}"
+      replyTo: "#{req.body.email}" # sender address
+      to: "dorian.scheidt@gmail.com" # list of receivers
+      subject: "Chartzapp Feedback Form" # Subject line
+      text: "#{req.body.message} \n\n - #{req.body.name} - #{req.body.email}" # plaintext body
+
+    # send mail with defined transport object
+    smtpTransport.sendMail mailOptions, (error, response) ->
+      console.error error if error
+      console.log "Message sent: " + response.message
+
+    res.end()
+
+
+    # if you don't want to use this transport object anymore, uncomment following line
+    smtpTransport.close() # shut down the connection pool, no more messages
+
 
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'

@@ -1,10 +1,10 @@
 App = require "application"
 
-module.exports = (el, collection, graph) ->
+module.exports = (el, collection, graph, view) ->
 
   margin =
     top: 20
-    right: 120
+    right: 50#120
     bottom: 50
     left: 50
 
@@ -15,7 +15,7 @@ module.exports = (el, collection, graph) ->
   parseDate = d3.time.format("%Y-%m-%d").parse
   x = d3.time.scale().range([
     0
-    width - 75
+    width - 140
   ])
   y = d3.scale.linear().range([
     0
@@ -65,6 +65,10 @@ module.exports = (el, collection, graph) ->
     draw(graph)
 
   $(window).on("resize", resize)
+
+  click = (d) ->
+    station = d._id
+    view.trigger("click:station:item", station)
 
   highlight = (d, i) ->
     d3.selectAll("g path, circle")
@@ -239,6 +243,31 @@ module.exports = (el, collection, graph) ->
     stations = parse(collection)
     # color.domain stations
 
+    showInfo = ->
+      if $(el).find(".info").length isnt 0
+        $(".info").remove()
+      else
+        $(el).append("<div class='tip text-center info'></div>").find(".tip")
+          .css("width", width + margin.left + margin.right + "px")
+          .css("margin", "auto")
+          .css("top", height / 2 + "px")
+          # .css("background", "#000")
+          .html(infostring)
+          .on("click", hideInfo)
+          .fadeIn(100)
+
+    hideInfo = ->
+      $(el).find(".info").fadeOut(100)
+      $(".info").remove()
+
+    if $(el).find(".infobox").length isnt 0
+      $(".infobox").remove()
+    $(el).prepend("<div class='button tiny radius infobox'></div>").find(".infobox")
+      .html("<i class='fi-info large'></i>")
+      .on("click", showInfo)
+
+    $(el).find("svg").on("click", hideInfo)
+
 
 
     stations.forEach (d) ->
@@ -246,7 +275,17 @@ module.exports = (el, collection, graph) ->
         c.date = parseDate c.week
 
     if graph is "line"
-
+      infostring = """
+    <br />
+    This graph displays all appearances of #{collection.artist} over the selected time range, organized by station.<br />
+    The X-Axis is determined by the date of the appearance.<br />
+    The Y-Axis is determined by the album's position.<br />
+    Mouseover any dot or line for more information.<br />
+    <br />
+    (Click anywhere to hide)
+    <br />
+    <br />
+    """
       x.domain [
         d3.min stations, (c) ->
           d3.min c.appearances, (v) ->
@@ -301,7 +340,9 @@ module.exports = (el, collection, graph) ->
         .attr "cy", (d) ->
           y d.position
         .on("mouseover", highlightCircle)
+        .on("click", click)
         .on "mouseout", mouseoutCircle
+
 
       legend = svg.selectAll(".legend")
         .data(stations)
@@ -309,9 +350,9 @@ module.exports = (el, collection, graph) ->
         .attr("class", (d) -> return "legend #{d}")
         .attr "transform", (d, i) ->
           if i < 20
-            "translate(0," + i * 20 + ")"
+            "translate(-70," + i * 20 + ")"
           else if i >= 20
-            "translate(75," + (i - 20) * 20 + ")"
+            "translate(5," + (i - 20) * 20 + ")"
 
       legend.append("rect")
         .attr("x", width - 10)
@@ -331,6 +372,19 @@ module.exports = (el, collection, graph) ->
         .on("mouseout", mouseoutLegend)
       return
     else if graph is "bar"
+      infostring = """
+    <br />
+    This graph displays the number of appearances of #{collection.artist}
+    over the selected time range, organized by station.<br />
+    The X-Axis is determined by the station.<br />
+    The Y-Axis is determined by the number of appearances.<br />
+    Mouseover any bar for more information.<br />
+    <br />
+    (Click anywhere to hide)
+    <br />
+    <br />
+    """
+      margin.right = margin.left
       barWidth = width / stations.length
       x = d3.scale.linear().range([
         0
@@ -437,6 +491,7 @@ module.exports = (el, collection, graph) ->
           color d._id
         .on("mouseover", mouseover)
         .on("mouseout", mouseout)
+        .on("click", click)
       station.append("text")
         .attr("y", barWidth / 2 - barWidth)
         .attr("x", (d) -> return height)

@@ -1,5 +1,4 @@
 App = require "application"
-TopxApp = require "modules/landing/landing_app"
 Controllers = require "controllers/baseController"
 
 module.exports = App.module 'LandingApp.Show',
@@ -10,6 +9,9 @@ module.exports = App.module 'LandingApp.Show',
     initialize: (opts) ->
       @layout = @getLayoutView()
       stations = App.request "stations:entities"
+      @startDate = ''
+      @endDate = ''
+      @request = ''
 
       @listenTo @layout, 'show', =>
         @showChart()
@@ -19,14 +21,27 @@ module.exports = App.module 'LandingApp.Show',
       @listenTo @layout, 'change:time', (time) =>
         search = {}
         search.request = time
+        @request = time
         @showChart(search)
 
       @listenTo @layout, 'change:range', (time) =>
         search = {}
         search.request = 1
+        @request = ''
         search.startDate = time.date1
+        @startDate = search.startDate
         search.endDate = time.date2
+        @endDate = search.endDate
         @showChart(search)
+      @listenTo @layout, 'change:number', (number) =>
+        search = {}
+        search.request = 1
+        search.request = @request if @request
+        search.number = number
+        search.startDate = @startDate
+        search.endDate = @endDate
+        @showChart(search)
+
 
       @show @layout,
         loading: true
@@ -112,8 +127,14 @@ module.exports = App.module 'LandingApp.Show',
     ui:
       "timeSelect" : "#time-select"
       "range" : "#custom-range"
+      "number" : "#number"
     events:
       "change @ui.timeSelect" : "select"
+      "change @ui.number" : "changeNumber"
+
+    changeNumber: (e) ->
+      @trigger 'change:number', @ui.number.val()
+
     select: (e) ->
       @trigger 'change:time', @ui.timeSelect.val()
 

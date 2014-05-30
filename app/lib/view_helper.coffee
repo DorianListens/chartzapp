@@ -4,7 +4,7 @@ Handlebars.registerHelper 'pick', (val, options) ->
   return options.hash[val]
 
 Handlebars.registerHelper 'toUpper', (str) ->
-  return str.toUpperCase()
+  return str.toUpperCase() if str
 
 Handlebars.registerHelper 'json', (context) ->
   return JSON.stringify context

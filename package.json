@@ -42,7 +42,8 @@
     "mongoose-text-search": "0.0.2",
     "newrelic": "~1.5.2",
     "node-schedule": "~0.1.13",
-    "later": "~1.1.6"
+    "later": "~1.1.6",
+    "nodemailer": "~0.6.5"
   },
   "main": "server.coffee",
   "directories": {

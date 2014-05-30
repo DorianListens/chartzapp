@@ -9,7 +9,9 @@ module.exports = App.module 'StationApp.Show',
 
     initialize: (opts) ->
       @opts = opts
+      @opts.loadingType = "spinner"
       @layout = @getLayoutView()
+      @initStation = App.request 'topx:entities', opts
       station = App.request 'topx:entities', opts
       @stations = App.request 'stations:entities'
 
@@ -37,23 +39,30 @@ module.exports = App.module 'StationApp.Show',
       @showStation station
 
     showStation: (station) ->
-      App.execute "when:fetched", station, =>
-        if station.length is 0
-          @showEmpty @stations
+
+      # App.execute "when:fetched", station, =>
+      #   # console.log station
+      #   if station.length is 0
+      #     @showEmpty @stations
+      #     @showTitle @initStation
+          # console.log @initStation
 
       stationView = @getStationView station
-      topThreeView = @getTopThreeView station
       @showPanel()
-      @showTitle(@opts)
-      @show topThreeView,
-        region: @layout.topRegion
-        loading: true
+      @showGraph station
+      # if station.length is 0 then @showTitle(@initStation) else @showTitle(station)
+      @showTitle station
+      App.execute "when:fetched", station, =>
+        if station.length is 0
+          @showTitle @initStation
 
       @show stationView,
         region: @layout.tableRegion
-        loading: true
+        loading:
+          loadingType: @opts.loadingType
 
       @listenTo stationView, 'click:week', (req) =>
+        @opts.loadingType = "opacity"
         currentWeek = moment(req.week)
         now = moment()
         switch req.dir
@@ -72,16 +81,26 @@ module.exports = App.module 'StationApp.Show',
         newWeek = App.request 'topx:entities', search
         @showStation newWeek
 
-        # newWeek = App.request 'topx:entities', opts
-        # @showStation newWeek
 
-
-    showTitle: (opts) ->
-      opts.station = "Pick a Station" unless opts.station
-      stationTitle = new App.Entities.Station opts
-      titleView = @getTitleView stationTitle
+    showTitle: (station) ->
+      # opts.station = "Pick a Station" unless opts.station
+      # stationTitle = new App.Entities.Station opts
+      titleView = @getTitleView station#stationTitle
       @show titleView,
         region: @layout.titleRegion
+        loading:
+          loadingType: @opts.loadingType
+
+
+    showGraph: (station) ->
+      graphView = @getGraphView station
+      @listenTo graphView, 'click:album:circle', (d) ->
+        App.navigate "/artist/#{encodeURIComponent d}", trigger: true
+
+      @show graphView,
+        region: @layout.graphRegion
+        loading:
+          loadingType: @opts.loadingType
 
     showPanel: ->
       panelView = @getPanelView()
@@ -89,11 +108,14 @@ module.exports = App.module 'StationApp.Show',
         region: @layout.panelRegion
 
       @listenTo panelView, 'click:mostRecent', (station) =>
+        @opts.loadingType = "opacity"
         @showRecent @opts.station
       @listenTo panelView, 'click:thisYear', (station) =>
+        @opts.loadingType = "opacity"
         station = App.request "topx:entities", @opts
         @showStation station
       @listenTo panelView, 'click:other', (search) =>
+        @opts.loadingType = "opacity"
         search.station = @opts.station
         station = App.request 'topx:entities', search
         @showStation station
@@ -117,13 +139,13 @@ module.exports = App.module 'StationApp.Show',
         App.navigate "station/#{search.station}", trigger: true
 
 
-    getTopThreeView: (station) ->
-      new Show.TopThree
-        collection: station
+    # getTopThreeView: (station) ->
+    #   new Show.TopThree
+    #     collection: station
 
     getTitleView: (station) ->
       new Show.Title
-        model: station
+        collection: station
 
     getEmptyView: (stations) ->
       new Show.EmptyView
@@ -141,6 +163,10 @@ module.exports = App.module 'StationApp.Show',
     getPanelView: ->
       new Show.Panel
 
+    getGraphView: (station) ->
+      new Show.Graph
+        collection: station
+
     getLayoutView: ->
       new Show.Layout
 
@@ -153,6 +179,7 @@ module.exports = App.module 'StationApp.Show',
 
     regions:
       titleRegion: "#title-region"
+      graphRegion: "#graph-region"
       panelRegion: "#panel-region"
       topRegion: "#topthree-region"
       tableRegion: "#table-region"
@@ -204,6 +231,20 @@ module.exports = App.module 'StationApp.Show',
   class Show.Title extends Marionette.ItemView
     template: "modules/station/showStation/templates/title"
     # className: "panel"
+
+  class Show.Graph extends Marionette.ItemView
+    template: "modules/station/showStation/templates/graph"
+    # className: 'panel'
+    buildGraph: require "modules/station/showStation/stationGraph"
+
+    graph: ->
+      d3.select("svg").remove()
+      @buildGraph(@el, @collection, @)
+
+    id: "graph"
+    onRender: ->
+      @graph()
+
 
   class Show.TopItem extends Marionette.ItemView
     template: "modules/station/showStation/templates/topItem"

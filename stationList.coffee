@@ -49,3 +49,63 @@ module.exports = [
   'RADL'
   'SCOP'
 ]
+
+stationArray1 = [
+  'CAPR'
+  'CFBU'
+  'CFBX'
+  'CFCR'
+  'CFMH'
+  'CFMU'
+  'CFOU'
+  'CFRC'
+  'CFRE'
+  'CFRO'
+]
+stationArray2 = [
+  'CFRU'
+  'CFUR'
+  'CFUV'
+  'CFXU'
+  'CHLY'
+  'CHMA'
+  'CHMR'
+  'CHOQ'
+  'CHRW'
+]
+stationArray3 = [
+  'CHRY'
+  'CHSR'
+  'CHUO'
+  'CHYZ'
+  'CICK'
+  'CILU'
+  'CIOI'
+  'CISM'
+  'CITR'
+]
+stationArray4 = [
+  'CIUT'
+  'CIVL'
+  'CJAM'
+  'CJLO'
+  'CJLY'
+  'CJMQ'
+  'CJSF'
+  'CJSR'
+  'CJSW'
+]
+stationArray5 = [
+  'CJUM'
+  'CKCU'
+  'CKDU'
+  'CKLU'
+  'CKMS'
+  'CKUA'
+  'CKUT'
+  'CKUW'
+  'CKXU'
+  'CSCR'
+  'RADL'
+  'SCOP'
+]
