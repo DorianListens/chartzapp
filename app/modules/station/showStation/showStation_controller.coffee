@@ -203,7 +203,7 @@ module.exports = App.module 'StationApp.Show',
 
   class Show.Title extends Marionette.ItemView
     template: "modules/station/showStation/templates/title"
-    className: "panel"
+    # className: "panel"
 
   class Show.TopItem extends Marionette.ItemView
     template: "modules/station/showStation/templates/topItem"
