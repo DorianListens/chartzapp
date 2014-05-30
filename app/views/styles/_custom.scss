@@ -26,8 +26,13 @@
 
 }
 h1.main-title {
-  font-size: rem-calc(80);
-  line-height: rem-calc(160);
+  font-size: rem-calc(70);
+  line-height: rem-calc(140);
+  @media only screen and (min-width: 40.063em) {
+    font-size: rem-calc(80);
+    line-height: rem-calc(160);
+  }
+
   color: #fff;
   text-shadow: 1px 1px 1px #000;
 }
@@ -35,6 +40,17 @@ h1.artist-title {
   font-size: rem-calc(70);
   // line-height: rem-calc(140);
   margin-bottom: rem-calc(20);
+  color: #fff;
+  text-shadow: 1px 1px 1px #000;
+}
+.footer-title {
+  font-size: rem-calc(70);
+  line-height: rem-calc(140);
+  @media only screen and (min-width: 40.063em) {
+    font-size: rem-calc(80);
+    line-height: rem-calc(160);
+  }
+  text-align: center;
   color: #fff;
   text-shadow: 1px 1px 1px #000;
 }
@@ -67,4 +83,8 @@ h1.artist-title {
 
   padding-top: rem-calc(20);
   // padding-bottom: rem-calc(20);
+}
+a.dl {
+  font-family: $header-font-family;
+  font-size: rem-calc(20);
 }
