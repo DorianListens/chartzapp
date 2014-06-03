@@ -8,15 +8,28 @@
 
 Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 
-	filterFacets : [],
-
-	filters : [],
-
-	filterLists : {},
-
-	wholeCollection : {},
-
 	options : {},
+
+	constructor: function() {
+		if (!this.filterFacets) {
+
+			this.filterFacets = [];
+
+		} else {
+
+			this.filterFacets = this.filterFacets;
+		}
+
+		this.filters = [];
+
+		this.filterLists = {};
+
+		if (!this.wholeCollection) {
+
+			this.wholeCollection = {};
+		}
+		Backbone.Collection.apply(this, arguments);
+	},
 
 	initializeFilters: function(options) {
 		var self = this;
@@ -26,9 +39,8 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 		}
 		_.defaults(this.options, {silent:false});
 
-		if (this.wholeCollection.length !== 0) {
-			this.wholeCollection = this.clone();
-		}
+		this.wholeCollection = this.clone();
+
 		if (this.filterFacets.length !== 0) {
 			this.initializeFilterLists();
 		}
@@ -149,12 +161,9 @@ Backbone.FacetedSearchCollection = Backbone.Collection.extend({
 		var self = this;
 
 		_.each(this.filterFacets, function(facet) {
-			// Fixes nested collections having filter lists overwritten
-			if (self.filterLists[facet]) {
-				self.filterLists[facet].push(self.makeFilterList(facet, self));
-			} else {
+
 				self.filterLists[facet] = self.makeFilterList(facet, self);
-			}
+
 		});
 
 		return this.filterLists;

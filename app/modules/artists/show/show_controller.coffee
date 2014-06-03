@@ -171,7 +171,6 @@ module.exports = App.module 'ArtistsApp.Show',
 
   class Show.Graph extends Marionette.ItemView
     template: "modules/artists/show/templates/graph"
-    # className: 'panel'
     ui:
       "typeSelect" : "#type-select"
     events:
@@ -197,13 +196,16 @@ module.exports = App.module 'ArtistsApp.Show',
     collections: []
 
     initialize: ->
-      _.each @collection.models, (model) =>
-        @collections.push model.get "appearancesCollection"
-      _.each @collections, (appearances) =>
-        @listenTo appearances, "filter", =>
+      App.execute "when:fetched", @collection, =>
+        _.each @collection.models, (model) =>
+          @collections.push model.get "appearancesCollection"
+        _.each @collections, (appearances) =>
+          @listenTo appearances, "filter", =>
+            # console.log "appearances filter"
+            @render()
+        @listenTo @collection, "filter", =>
+          # console.log "collection filter"
           @render()
-      @listenTo @collection, "filter", =>
-        @render()
 
     onRender: ->
       @ui.typeSelect
@@ -342,40 +344,8 @@ module.exports = App.module 'ArtistsApp.Show',
         _.each @collections, (collection, i) =>
           collection.initializeFilters()
           @filters[i] = collection.getFilterLists()
-        #   console.log filters
-        # console.log filters
-        # filterFacets = Object.keys(filters[0])
-        # _.each filterFacets, (facet) ->
-        #   bigList[facet] = []
-        # _.each filters, (filterSet) ->
-        #   _.each filterFacets, (facet, i) ->
-        #     bigList[facet].push filterSet[facet]
-        # _.each filterFacets, (facet) ->
-        #   bigList[facet] = _.uniq( _.flatten _.union bigList[facet])
-        # # console.log bigList
-        # _.each bigList, (bigSet, facet) =>
-        #   _.each bigSet, (value) =>
-        #     @$el.find("##{facet}").append("""
-        #       <option value='#{value}'>#{value.toUpperCase()}</option>
-        #       """).attr("disabled", false)
-        # console.log bigList
-        # @$el.find(".chosen-select").chosen().trigger("chosen:updated")
-
 
     onRender: ->
-      # @collection.initializeFilters()
-      # subCollection = "appearancesCollection"
-      # filters = []
-      # bigList = {}
-      # @collections.push model.get subCollection for model in @collection.models
-
-      # console.log @collections
-
-      # _.each @collections, (collection, i) ->
-      #   # collection.initializeFilters()
-      #   filters[i] = collection.getFilterLists()
-      # #   console.log filters
-      # console.log filters
       filterFacets = Object.keys(@filters[0])
       _.each filterFacets, (facet) =>
         @bigList[facet] = []
@@ -392,6 +362,8 @@ module.exports = App.module 'ArtistsApp.Show',
             """).attr("disabled", false)
       # # console.log bigList
       @$el.find(".chosen-select").chosen().trigger("chosen:updated")
+      @collection.on "filter", =>
+        @makeFilterLists()
 
     submit: (e, params) ->
       e.preventDefault()
@@ -417,6 +389,15 @@ module.exports = App.module 'ArtistsApp.Show',
       _.each @collections, (collection) ->
         collection.removeFilter filter
       @updateFilters filter
+
+    makeFilterLists: ->
+      @$el.find("option").attr("disabled", true)
+      _.each @collection.models, (model) =>
+        filterList = model.attributes.appearancesCollection.initializeFilterLists()
+        _.each filterList, (values, facet) =>
+          _.each values, (value) =>
+            @$el.find("option[value='#{value}']").attr("disabled", false)
+      @$el.find(".chosen-select").chosen().trigger("chosen:updated")
 
     updateFilters: (filter) ->
       filterFacet = Object.keys filter
