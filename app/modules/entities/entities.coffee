@@ -287,17 +287,17 @@ module.exports = App.module "Entities",
           week = startDate
         else
           desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
-      else if search.request is "This Month"
-        # console.log d
-        searchUrl = "/api/topall/2014-04-04/#{d.yyyymmdd()}"
-        desc = "Top Albums this Month"
-      else if search.request is "This Week"
-        searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
-        week = d.yyyymmdd()
-        # console.log week
-      else if search.request is "This Year"
-        searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
-        desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
+      # else if search.request is "This Month"
+      #   # console.log d
+      #   searchUrl = "/api/topall/2014-04-04/#{d.yyyymmdd()}"
+      #   desc = "Top Albums this Month"
+      # else if search.request is "This Week"
+      #   searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
+      #   week = d.yyyymmdd()
+      #   # console.log week
+      # else if search.request is "This Year"
+      #   searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
+      #   desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
       else
         searchUrl = "/api/topall/#{startDate}/#{endDate}"
         desc = "Top Albums between #{startDate} and #{endDate}"

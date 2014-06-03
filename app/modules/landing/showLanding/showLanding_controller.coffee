@@ -126,7 +126,8 @@ module.exports = App.module 'LandingApp.Show',
     id: "landing-page"
     ui:
       "timeSelect" : "#time-select"
-      "range" : "#custom-range"
+      "range" : "input#custom-range"
+      "icon" : "i#custom-range"
       "number" : "#number"
     events:
       "change @ui.timeSelect" : "select"
@@ -147,16 +148,20 @@ module.exports = App.module 'LandingApp.Show',
       listRegion: "#list_region"
 
     onRender: ->
+
+      @ui.icon.on "click", (e) =>
+        e.stopPropagation()
+        @ui.range.click()
       @ui.range.dateRangePicker(
         startDate: "2014-01-01"
         endDate: moment()
+        batchMode: 'week'
         shortcuts:
           'prev' : ['week','month','year']
           'prev-days': [7, 14]
           'next-days': false
           'next' : false
         ).bind 'datepicker-change', (event,obj) =>
-          console.log "datepicker-change"
           @trigger 'change:range', obj
 
 
