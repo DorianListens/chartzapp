@@ -329,12 +329,6 @@ module.exports = App.module 'ArtistsApp.Show',
 
       subCollection = "appearancesCollection"
 
-      # console.log model for model in @collection.models
-
-      # _.each @collections, (collection, i) ->
-      #   collection.initializeFilters()
-        # console.log collection
-
       App.execute "when:fetched", @collection, =>
         @collection.countPoints()
         $(document).foundation()
@@ -354,6 +348,15 @@ module.exports = App.module 'ArtistsApp.Show',
           @bigList[facet].push filterSet[facet]
       _.each filterFacets, (facet) =>
         @bigList[facet] = _.uniq( _.flatten _.union @bigList[facet])
+        @bigList[facet].sort (a, b) ->
+          if a is b then return 0
+          if facet is "position"
+            if +a > +b then 1 else -1
+          else if facet is "week"
+            if moment(a) > moment(b) then 1 else -1
+          else
+            if a > b then 1 else -1
+
       # console.log bigList
       _.each @bigList, (bigSet, facet) =>
         _.each bigSet, (value) =>

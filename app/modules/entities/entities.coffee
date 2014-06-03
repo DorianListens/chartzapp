@@ -288,6 +288,7 @@ module.exports = App.module "Entities",
         else
           desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
       else if search.request is "This Month"
+        # console.log d
         searchUrl = "/api/topall/2014-04-04/#{d.yyyymmdd()}"
         desc = "Top Albums this Month"
       else if search.request is "This Week"
@@ -355,9 +356,6 @@ module.exports = App.module "Entities",
       ]
 
     getCharts: (station = null, date = null) ->
-      # console.log 'getCharts'
-      # console.log station
-      # console.log date
       date = tuesify date if date
       if station is null and date is null
         chartsUrl = '/api/db/wholething'
