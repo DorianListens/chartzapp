@@ -138,13 +138,12 @@ exports.startServer = (port, path, callback) ->
   app.use(express.bodyParser())
 
   # Setup Mailer
-
-  gauth = require './.gauth'
   if process.env.G_USER?
     auth =
       user: process.env.G_USER
       pass: process.env.G_PASS
   else
+    gauth = require './.gauth'
     auth = gauth()
   # create reusable transport method (opens pool of SMTP connections)
   smtpTransport = nodemailer.createTransport("SMTP", auth)
