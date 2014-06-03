@@ -128,7 +128,6 @@ Album = mongoose.model 'Album', albumSchema
 app = express()
 app.use(express.static __dirname+'/public')
 
-
 # Export the server to Brunch
 
 exports.startServer = (port, path, callback) ->
@@ -137,6 +136,19 @@ exports.startServer = (port, path, callback) ->
   app.listen port
   console.log 'Listening on port: '+port
   app.use(express.bodyParser())
+
+  # Setup Mailer
+
+  gauth = require './.gauth'
+  if process.env.G_USER?
+    auth =
+      user: process.env.G_USER
+      pass: process.env.G_PASS
+  else
+    auth = gauth()
+  # create reusable transport method (opens pool of SMTP connections)
+  smtpTransport = nodemailer.createTransport("SMTP", auth)
+
   # require('./routes')(app)
 
 # Routes #####################################################################
@@ -492,10 +504,8 @@ exports.startServer = (port, path, callback) ->
       res.send resp
 
   app.post "/api/feedback", (req, res) ->
-    console.log req.body
-    auth = require './.gauth'
-    # create reusable transport method (opens pool of SMTP connections)
-    smtpTransport = nodemailer.createTransport("SMTP", auth())
+    # console.log req.body
+
 
     # setup e-mail data with unicode symbols
     mailOptions =
@@ -508,13 +518,14 @@ exports.startServer = (port, path, callback) ->
     # send mail with defined transport object
     smtpTransport.sendMail mailOptions, (error, response) ->
       console.error error if error
-      console.log "Message sent: " + response.message
+      console.log "Message sent: ", response.message
+      res.send response
 
-    res.end()
+      res.end()
 
 
     # if you don't want to use this transport object anymore, uncomment following line
-    smtpTransport.close() # shut down the connection pool, no more messages
+    # smtpTransport.close() # shut down the connection pool, no more messages
 
 
   app.get '/', (req, res) ->

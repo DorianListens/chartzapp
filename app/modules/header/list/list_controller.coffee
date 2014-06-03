@@ -32,16 +32,20 @@ module.exports = App.module 'HeaderApp.List',
           $("form")[0].reset())
         $("#feedback-form").on("invalid", ->
           invalid_fields = $(this).find("[data-invalid]")
-        ).on "valid", (e) ->
-          e.preventDefault()
-          $.post "/api/feedback", $("#feedback-form").serialize(), (data) ->
-            $("input, textarea").val('')
-            $("div#alert-container").fadeIn('slow').removeClass("hide")
+        ).on "valid", Foundation.utils.debounce((e) =>
+          @send(e)
+        , 300, true)
       $(document).on 'close', '#feedback', ->
-        $("div#alert-container").addClass("hide")
+        $("div#alert-container").fadeOut()
         $("form div").removeClass("error")
         $("form label").removeClass("error")
         $("form")[0].reset()
+
+    send: (e) ->
+      e.preventDefault()
+      $.post "/api/feedback", $("#feedback-form").serialize(), (data) ->
+        $("input, textarea").val('')
+        $("div#alert-container").fadeIn('slow').removeClass("hide")
 
     home: (e) ->
       e.preventDefault()
