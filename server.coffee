@@ -19,6 +19,7 @@ mongo = require 'mongodb'
 mongoose = require 'mongoose'
 later = require 'later'
 nodemailer = require 'nodemailer'
+_ = require 'underscore'
 
 stationArray = require './stationList'
 
@@ -35,6 +36,22 @@ db.once "open", ->
 
 # Define schema
 Schema = mongoose.Schema
+
+stationSchema = new Schema
+  name:
+    index: true
+    type: String
+  content: String
+  website: String
+  fullName: String
+  frequency: String
+  email: [String]
+  streetAddress: String
+  city: String
+  postalCode: String
+  fax: String
+  province: String
+
 
 appearanceSchema = new Schema
   week: String
@@ -122,6 +139,8 @@ albumSchema.post 'init', ->
 # instantiate the schema
 
 Album = mongoose.model 'Album', albumSchema
+
+Station = mongoose.model 'Station', stationSchema
 
 # Instantiate the Application
 
@@ -323,6 +342,21 @@ exports.startServer = (port, path, callback) ->
       else
         res.send results
 
+  # app.get '/api/setations/data'
+  app.get '/api/stations/data/:station?', (req, res) ->
+    station = if req.params.station then req.params.station.toUpperCase() else null
+    console.log "requesting stations", station if station
+
+    if !station
+      Station.find (err, info) ->
+        console.error err if err
+        res.send info
+    else
+      Station.find { "name" : station }, (err, info) ->
+        console.error err if err
+        res.send info
+
+
   # Get all charts for a given station for a given date range
 
   app.get "/api/station/:station/:startDate/:endDate", (req, res) ->
@@ -344,6 +378,10 @@ exports.startServer = (port, path, callback) ->
     { $sort: {"_id.date" : -1}},
     (err, results) ->
       res.send results
+
+
+
+
 
   # Get top albums for a given station for a given date range
 
@@ -403,40 +441,8 @@ exports.startServer = (port, path, callback) ->
   app.get "/api/artists/:artist", (req, res) ->
     theArtist = req.params.artist.toLowerCase()
     Album.find { "artistLower" : theArtist }, (err, results) ->
-    # Album.find { artist_l: req.params.artist.toLowerCase() }, (err, results) ->
       console.log err if err
       res.send results
-
-  # Specially formatted JSON for d3 Graphs
-
-  # app.get "/api/artistgraph/:artist", (req, res) ->
-  #   theArtist = req.params.artist.toLowerCase()
-  #   Album.aggregate {$match: {"artistLower" : theArtist}},
-  #   { $unwind: "$appearances"},
-  #   { $group:
-  #     {_id: "$appearances.station"
-  #       # {station: "$appearances.station"}
-  #     appearances:
-  #       {$push :
-  #         {position: "$appearances.position"
-  #         week: "$appearances.week"}}}},
-  #   (err, results) ->
-  #     console.error if err
-  #     res.send results
-  #
-  # app.get "/api/albumgraph/:slug", (req, res) ->
-  #   Album.aggregate {$match: {"slug" : req.params.slug}},
-  #   { $unwind: "$appearances"},
-  #   { $group:
-  #     {_id: "$appearances.station"
-  #       # {station: "$appearances.station"}
-  #     appearances:
-  #       {$push :
-  #         {position: "$appearances.position"
-  #         week: "$appearances.week"}}}},
-  #   (err, results) ->
-  #     console.error if err
-  #     res.send results
 
   # Get all entries for a given label
 
@@ -497,14 +503,13 @@ exports.startServer = (port, path, callback) ->
     theDate = tuesify(req.params.date)
     newChart = getChart(req.params.station.toLowerCase(), theDate, res)
 
+
   app.get "/api/nulls", (req, res) ->
     Album.find {isNull: true}, (err, resp) ->
       console.error err if err
       res.send resp
 
   app.post "/api/feedback", (req, res) ->
-    # console.log req.body
-
 
     # setup e-mail data with unicode symbols
     mailOptions =
@@ -526,6 +531,16 @@ exports.startServer = (port, path, callback) ->
     # if you don't want to use this transport object anymore, uncomment following line
     # smtpTransport.close() # shut down the connection pool, no more messages
 
+  # app.get "/server/crawl/stations", (req, res) ->
+  #   res.send "Okay, crawling stations!"
+  #   getStations()
+
+  app.get "/server/parse/stations", (req, res) ->
+    res.send "Okay, here goes the parsing!"
+    Station.find (err, results) ->
+      console.error err if err
+      # res.send results
+      parseStations(results)
 
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
@@ -579,6 +594,87 @@ Array::last = ->
 
 # Crawler ###################################################################
 
+parseStations = (stations) ->
+  console.log "parsing"
+  _.each stations, (station, i) ->
+
+    if station.name is "CHOQ"
+      station.city = "Montreal"
+    #   station.streetAddress = "C.P.8888, succ. Centre-Ville,"
+    #   station.save()
+    # if station.name is "RADL"
+    # #   station.streetAddress = "75 University Ave W,"
+    # #   # station.province = "ON"
+    #   station.city = "Waterloo"
+    # #   # station.postalCode = "N2L 3C5"
+    # #   station.save()
+    # else if station.name is "SCOP"
+    #   station.city = "Toronto"
+    # #   station.streetAddress = "55 Gould St.,"
+    # #   # station.province = "ON"
+    # #   # station.postalCode = "M5B 1E9"
+    #
+    else if station.name is "CHYZ"
+      station.city = "Québec"
+      station.streetAddress += " Université Laval,"
+    # # #   # station.province = "QC"
+    #   station.save()
+    # station.save()
+    # city = station.city unless station.city is undefined
+    # if city
+    #   cityArray = city.split(',') unless city.charAt[0] is "H"
+    #   console.log cityArray
+    #   station.province = cityArray[1] if cityArray[1]
+    #   station.save()
+
+
+    # addressLines = []
+    # $ = cheerio.load(station.content)
+    # # console.log $.children()
+    # $(".halfColumn").first().filter((index) ->
+    #   _.each this[0].children, (item, it) ->
+    #     if item.type is "text"
+    #       if item.data.replace(/(\r\n|\n|\r)/g, "").trim() isnt ''
+    #         addressLines.push item.data.replace(/(\r\n|\n|\r)/g, "").trim()
+    #   if this.type is 'tag' then return true else return
+    #   )
+    # # station.fullName = addressLines[0]
+    # # station.streetAddress = addressLines[1]
+    # station.city = addressLines[2]
+    # station.postalCode = addressLines[3]
+    # station.fax = addressLines[4] if addressLines[4]
+    # else
+    #   station.city = station.city.split(",")[0].trim()
+
+    # station.city = station.city.trim()
+    # station.province = station.province.trim()
+    station.save()
+    #
+    #   # console.log a, i
+    # console.log station.name, station.city, station.province, station.streetAddress, station.postalCode
+    #
+
+# getStations = ->
+#   console.log "getStations"
+
+  # stationParse = (body) ->
+  #   $ = cheerio.load(body)
+  #   found = []
+  #   _.each stationArray, (station) ->
+  #     content = $("a[name=#{station}]").closest(".section-box")
+  #     newStation = new Station
+  #       name: station
+  #       content: content
+  #     newStation.save (err, theStation) ->
+  #       console.error err if err
+  #       console.log "Saved #{station} to the DB!"
+  #       console.log theStation
+  #
+  #   deferred found
+
+  # stationsUrl = "http://www.earshot-online.com/stations.cfm#CKUA"
+  # deferredRequest(stationsUrl).then(stationParse).done (station_response) ->
+  #   console.log "response", station_response
 # Go get a chart!
 
 getChart = (station, week, res, opts = {}) ->

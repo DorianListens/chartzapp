@@ -109,3 +109,55 @@ stationArray5 = [
   'RADL'
   'SCOP'
 ]
+
+# new Entities.Stations [
+#   {name:'CAPR'}
+#   {name:'CFBU'}
+#   {name:'CFBX'}
+#   {name:'CFCR'}
+#   {name:'CFMH'}
+#   {name:'CFMU'}
+#   {name:'CFOU'}
+#   {name:'CFRC'}
+#   {name:'CFRE'}
+#   {name:'CFRO'}
+#   {name:'CFRU'}
+#   {name:'CFUR'}
+#   {name:'CFUV'}
+#   {name:'CFXU'}
+#   {name:'CHLY'}
+#   {name:'CHMA'}
+#   {name:'CHMR'}
+#   {name:'CHOQ'}
+#   {name:'CHRW'}
+#   {name:'CHRY'}
+#   {name:'CHSR'}
+#   {name:'CHUO'}
+#   {name:'CHYZ'}
+#   {name:'CICK'}
+#   {name:'CILU'}
+#   {name:'CIOI'}
+#   {name:'CISM'}
+#   {name:'CITR'}
+#   {name:'CIUT'}
+#   {name:'CIVL'}
+#   {name:'CJAM'}
+#   {name:'CJLO'}
+#   {name:'CJLY'}
+#   {name:'CJMQ'}
+#   {name:'CJSF'}
+#   {name:'CJSR'}
+#   {name:'CJSW'}
+#   {name:'CJUM'}
+#   {name:'CKCU'}
+#   {name:'CKDU'}
+#   {name:'CKLU'}
+#   {name:'CKMS'}
+#   {name:'CKUA'}
+#   {name:'CKUT'}
+#   {name:'CKUW'}
+#   {name:'CKXU'}
+#   {name:'CSCR'}
+#   {name:'RADL'}
+#   {name:'SCOP'}
+# ]

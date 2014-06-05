@@ -178,8 +178,9 @@ module.exports = App.module "Entities",
 
   class Entities.Station extends Backbone.Model
 
-  class Entities.Stations extends Backbone.Collection
+  class Entities.Stations extends Backbone.FacetedSearchCollection
     model: Entities.Station
+    filterFacets: ['name','province','city']
 
   class Entities.Label extends Backbone.Model
 
@@ -374,58 +375,15 @@ module.exports = App.module "Entities",
         reset: true
       charts
 
-    getStations: ->
-      new Entities.Stations [
-        {name:'CAPR'}
-        {name:'CFBU'}
-        {name:'CFBX'}
-        {name:'CFCR'}
-        {name:'CFMH'}
-        {name:'CFMU'}
-        {name:'CFOU'}
-        {name:'CFRC'}
-        {name:'CFRE'}
-        {name:'CFRO'}
-        {name:'CFRU'}
-        {name:'CFUR'}
-        {name:'CFUV'}
-        {name:'CFXU'}
-        {name:'CHLY'}
-        {name:'CHMA'}
-        {name:'CHMR'}
-        {name:'CHOQ'}
-        {name:'CHRW'}
-        {name:'CHRY'}
-        {name:'CHSR'}
-        {name:'CHUO'}
-        {name:'CHYZ'}
-        {name:'CICK'}
-        {name:'CILU'}
-        {name:'CIOI'}
-        {name:'CISM'}
-        {name:'CITR'}
-        {name:'CIUT'}
-        {name:'CIVL'}
-        {name:'CJAM'}
-        {name:'CJLO'}
-        {name:'CJLY'}
-        {name:'CJMQ'}
-        {name:'CJSF'}
-        {name:'CJSR'}
-        {name:'CJSW'}
-        {name:'CJUM'}
-        {name:'CKCU'}
-        {name:'CKDU'}
-        {name:'CKLU'}
-        {name:'CKMS'}
-        {name:'CKUA'}
-        {name:'CKUT'}
-        {name:'CKUW'}
-        {name:'CKXU'}
-        {name:'CSCR'}
-        {name:'RADL'}
-        {name:'SCOP'}
-      ]
+    getStations: (station) ->
+      stations = new Entities.Stations
+      if station
+        stations.url = "api/stations/data/#{station}"
+      else
+        stations.url = "api/stations/data/"
+      stations.fetch
+        reset: true
+      stations
 
 
   App.reqres.setHandler "header:entities", ->

@@ -14,6 +14,8 @@ module.exports = App.module 'StationApp.Show',
       @initStation = App.request 'topx:entities', opts
       station = App.request 'topx:entities', opts
       @stations = App.request 'stations:entities'
+      App.execute "when:fetched", @stations, =>
+        @stations.initializeFilters()
 
       @listenTo @layout, 'show', =>
 
@@ -133,6 +135,7 @@ module.exports = App.module 'StationApp.Show',
       startView = @getStartView stations
       @show startView,
         region: @layout.tableRegion
+        loading: true
       $(".chosen-select").chosen()
 
       @listenTo startView, 'pick:station', (search) ->
@@ -246,25 +249,25 @@ module.exports = App.module 'StationApp.Show',
       @graph()
 
 
-  class Show.TopItem extends Marionette.ItemView
-    template: "modules/station/showStation/templates/topItem"
-    className: "large-4 columns top-three-item radius"
-    attributes:
-      "data-equalizer-watch" : ''
-    events:
-      'click a' : 'clickArtist'
-
-    clickArtist: (e) ->
-      App.navigate "artist/#{e.target.text}", trigger: true
-
-  class Show.TopThree extends Marionette.CompositeView
-    template: "modules/station/showStation/templates/topthree"
-    itemView: Show.TopItem
-    itemViewContainer: "#topthree"
-    className: "small-12 columns"
-    onBeforeRender: ->
-      @collection = @collection.clone()
-      @collection.models = @collection.models.slice(0,3)
+  # class Show.TopItem extends Marionette.ItemView
+  #   template: "modules/station/showStation/templates/topItem"
+  #   className: "large-4 columns top-three-item radius"
+  #   attributes:
+  #     "data-equalizer-watch" : ''
+  #   events:
+  #     'click a' : 'clickArtist'
+  #
+  #   clickArtist: (e) ->
+  #     App.navigate "artist/#{e.target.text}", trigger: true
+  #
+  # class Show.TopThree extends Marionette.CompositeView
+  #   template: "modules/station/showStation/templates/topthree"
+  #   itemView: Show.TopItem
+  #   itemViewContainer: "#topthree"
+  #   className: "small-12 columns"
+  #   onBeforeRender: ->
+  #     @collection = @collection.clone()
+  #     @collection.models = @collection.models.slice(0,3)
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/station/showStation/templates/empty"
@@ -285,8 +288,19 @@ module.exports = App.module 'StationApp.Show',
       search.station = $.trim @ui.stationPicker.val()
       @trigger 'pick:station', search
 
-  class Show.StartView extends Marionette.ItemView
+  class Show.SingleStation extends Marionette.ItemView
+    template: "modules/station/showStation/templates/singleStation"
+    className: "row"
+    events:
+      "click" : "nav"
+    nav: (e) ->
+      e.preventDefault()
+      @trigger 'pick:station', @model.get 'name'
+
+  class Show.StartView extends Marionette.CompositeView
+    itemView: Show.SingleStation
     template: "modules/station/showStation/templates/start"
+    itemViewContainer: "#stations"
     ui:
       'stationPicker' : '#station-select'
 
