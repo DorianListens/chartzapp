@@ -181,6 +181,27 @@ module.exports = App.module "Entities",
   class Entities.Stations extends Backbone.FacetedSearchCollection
     model: Entities.Station
     filterFacets: ['name','province','city']
+    sortAttr: "postalCode"
+    sortDir: -1
+    sortCharts: (attr) ->
+      @sortAttr = attr
+      @sort()
+      @trigger "reset"
+
+    comparator: (a, b) ->
+      if @sortAttr is 'position'
+        a = +a.get(@sortAttr)
+        b = +b.get(@sortAttr)
+      else
+        a = a.get(@sortAttr)
+        b = b.get(@sortAttr)
+
+      return 0 if a is b
+
+      if @sortDir is 1
+        if a > b then 1 else -1
+      else
+        if a > b then -1 else 1
 
   class Entities.Label extends Backbone.Model
 
@@ -190,13 +211,17 @@ module.exports = App.module "Entities",
 
   class Entities.Topx extends Backbone.Model
     initialize: ->
+      # info = App.request 'stations:entities', @collection.station
       @set
+        info: @collection.info
         startDate: @collection.startDate
         endDate: @collection.endDate
         potential: @collection.potential
         percentage: parseInt(
           @collection.weeks.length / @collection.potential * 1000
           )
+      # App.execute "when:fetched", info, ->
+      #   console.log "info fetched"
 
   class Entities.TopxCollection extends Backbone.Collection
     model: Entities.Topx
@@ -273,6 +298,8 @@ module.exports = App.module "Entities",
       topxCollection = new Entities.TopxCollection
       topxCollection.number = number
       station = search.station.toUpperCase() if search.station
+      if station
+        topxCollection.info = App.request "stations:entities", station
       topxCollection.station = station
       startDate = "2014-01-01"
       if search.startDate then startDate = search.startDate
@@ -395,8 +422,8 @@ module.exports = App.module "Entities",
   App.reqres.setHandler 'chart:entities', (station, date) ->
     API.getCharts station, date
 
-  App.reqres.setHandler 'stations:entities', ->
-    API.getStations()
+  App.reqres.setHandler 'stations:entities', (station) ->
+    API.getStations station
 
   App.reqres.setHandler 'station:entities', (station) ->
     API.getStation station

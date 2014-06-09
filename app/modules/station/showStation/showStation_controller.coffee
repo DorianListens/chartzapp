@@ -1,6 +1,7 @@
 App = require "application"
 StationApp = require "modules/station/station_app"
 Controllers = require "controllers/baseController"
+colorList = require 'colorList'
 
 module.exports = App.module 'StationApp.Show',
 (Show, App, Backbone, Marionette, $, _) ->
@@ -16,6 +17,7 @@ module.exports = App.module 'StationApp.Show',
       @stations = App.request 'stations:entities'
       App.execute "when:fetched", @stations, =>
         @stations.initializeFilters()
+        # console.log @stations
 
       @listenTo @layout, 'show', =>
 
@@ -132,6 +134,21 @@ module.exports = App.module 'StationApp.Show',
         App.navigate "station/#{search.station}", trigger: true
 
     showStart: (stations) ->
+      startTitle = @getStartTitle stations
+
+      startPanel = @getStartPanel stations
+      graphView = @getGraphView stations
+      @show graphView,
+        region: @layout.graphRegion
+        loading: true
+      # graphView.map()
+      @show startTitle,
+        region: @layout.titleRegion
+        loading: true
+
+      @show startPanel,
+        region: @layout.panelRegion
+        loading: true
       startView = @getStartView stations
       @show startView,
         region: @layout.tableRegion
@@ -140,6 +157,9 @@ module.exports = App.module 'StationApp.Show',
 
       @listenTo startView, 'pick:station', (search) ->
         App.navigate "station/#{search.station}", trigger: true
+
+      @listenTo startView, 'itemview:pick:station', (item, search) ->
+        App.navigate "station/#{search}", trigger: true
 
 
     # getTopThreeView: (station) ->
@@ -166,6 +186,14 @@ module.exports = App.module 'StationApp.Show',
     getPanelView: ->
       new Show.Panel
 
+    getStartPanel: (stations) ->
+      new Show.StartPanel
+        collection: stations
+
+    getStartTitle: (stations) ->
+      new Show.StartTitle
+        collection: stations
+
     getGraphView: (station) ->
       new Show.Graph
         collection: station
@@ -186,6 +214,8 @@ module.exports = App.module 'StationApp.Show',
       panelRegion: "#panel-region"
       topRegion: "#topthree-region"
       tableRegion: "#table-region"
+
+
 
   class Show.Panel extends Marionette.ItemView
     template: "modules/station/showStation/templates/panel"
@@ -239,35 +269,27 @@ module.exports = App.module 'StationApp.Show',
     template: "modules/station/showStation/templates/graph"
     # className: 'panel'
     buildGraph: require "modules/station/showStation/stationGraph"
+    buildMap: require 'modules/station/showStation/stationMap'
 
     graph: ->
       d3.select("svg").remove()
       @buildGraph(@el, @collection, @)
 
+    mapGraph: ->
+      @buildMap(@el, @collection, @)
+
     id: "graph"
+    initialize: ->
+      @collection.on 'filter', =>
+        @render()
     onRender: ->
-      @graph()
+      # console.log @collection
+      if @collection.station
+        @graph()
+      else
+        @mapGraph()
 
 
-  # class Show.TopItem extends Marionette.ItemView
-  #   template: "modules/station/showStation/templates/topItem"
-  #   className: "large-4 columns top-three-item radius"
-  #   attributes:
-  #     "data-equalizer-watch" : ''
-  #   events:
-  #     'click a' : 'clickArtist'
-  #
-  #   clickArtist: (e) ->
-  #     App.navigate "artist/#{e.target.text}", trigger: true
-  #
-  # class Show.TopThree extends Marionette.CompositeView
-  #   template: "modules/station/showStation/templates/topthree"
-  #   itemView: Show.TopItem
-  #   itemViewContainer: "#topthree"
-  #   className: "small-12 columns"
-  #   onBeforeRender: ->
-  #     @collection = @collection.clone()
-  #     @collection.models = @collection.models.slice(0,3)
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/station/showStation/templates/empty"
@@ -288,14 +310,80 @@ module.exports = App.module 'StationApp.Show',
       search.station = $.trim @ui.stationPicker.val()
       @trigger 'pick:station', search
 
+  class Show.StartTitle extends Marionette.ItemView
+    template: "modules/station/showStation/templates/startTitle"
+    onRender: ->
+      @collection.on "filter", =>
+        @render()
+
+  class Show.StartPanel extends Marionette.ItemView
+    template: "modules/station/showStation/templates/startPanel"
+    onRender: ->
+      @collection.on 'filter', =>
+        @updateFilters _.last @collection.filters
+      list = @collection.getFilterLists()
+      _.each list, (filters, facet) =>
+        _.each filters, (filter) =>
+          @$el.find("##{facet}").append("""
+          <option value="#{filter}">#{filter}</option>
+          """)
+      @$el.find(".chosen-select").chosen().trigger('chosen:updated')
+    events:
+      'change .chosen-select' : 'submit'
+      'click #clearFilters' : 'clearFilters'
+    submit: (e, params) ->
+      e.preventDefault()
+      filter = {}
+      facet = e.target.id
+      value = if params.selected then params.selected else params.deselected
+      filter[facet] = value
+      if params.selected then @addFilter filter else @removeFilter filter
+    addFilter: (filter) ->
+      @collection.addFilter filter
+      # @updateFilters filter
+    removeFilter: (filter) ->
+      @collection.removeFilter filter
+      # @updateFilters filter
+    updateFilters: (filter) ->
+      if filter
+        filterFacet = Object.keys filter
+        @$el.find("option").attr("disabled", true)
+        @$el.find("option[value='#{filter[filterFacet]}']").attr("selected", true)
+        newList = @collection.getUpdatedFilterLists(filterFacet)
+        _.each newList, (filters, facet) =>
+          _.each filters, (value) =>
+            @$el.find("option[value='#{value}']").attr("disabled", false)
+        @$el.find(".chosen-select").chosen().trigger('chosen:updated')
+    clearFilters: (e) ->
+      e.preventDefault()
+      @collection.resetFilters()
+      @$el.find("option").attr("disabled", false)
+      @$el.find('option').attr("selected", false)
+      @$el.find(".chosen-select").val('[]').trigger('chosen:updated')
+    # initialize: ->
+
+
+
+
   class Show.SingleStation extends Marionette.ItemView
     template: "modules/station/showStation/templates/singleStation"
-    className: "row"
+    # tagName: "li"
     events:
       "click" : "nav"
+      "mouseover" : "hover"
+      "mouseout" : "mouseout"
+    mouseout: ->
+      $(".panel").css("opacity", 1)
+    hover: (e) ->
+      $(".panel").css("opacity", 0.5)
+      e.preventDefault()
+      $(e.target).closest(".panel").css("opacity", 1)
     nav: (e) ->
       e.preventDefault()
       @trigger 'pick:station', @model.get 'name'
+    onRender: ->
+      color = colorList @model.get 'name'
+      @$el.find('.panel').css('background', color)
 
   class Show.StartView extends Marionette.CompositeView
     itemView: Show.SingleStation

@@ -1,7 +1,7 @@
-
 <div class="row">
   <div class="small-8 columns">
     <h1 class="artist-title">{{toUpper items.0.appearances.0.station}}</h1>
+    <!-- <h2>{{items.0.info.models.0.attributes.city}}, {{items.0.info.models.0.attributes.province}}</h2> -->
   </div>
   <div class="small-4 columns">
     <h2 class="right">Charts: <span class="header-label radius">{{items.0.totalWeeks.length}}</span></h2>
@@ -11,8 +11,9 @@
 <div class="row">
   <div class="small-6 columns">
     <ul class="no-bullet">
+      <li>Location: <span class="label radius right">{{items.0.info.models.0.attributes.city}}, {{items.0.info.models.0.attributes.province}}</span></li>
       <li>Most Charted Artist: <span class="label radius right">{{items.0.artist}}</span></li>
-      <li>Most Charted Album: <a class="label radius right" id="popStation">{{items.0.album}}</a></li>
+
       <!-- <li>ChartScore: <span class="label radius right">{{items.0.totalChartScore}}</span></li> -->
     </ul>
   </div>
@@ -20,7 +21,7 @@
     <ul class="no-bullet">
       <!-- <li>Charts Submitted: <span class="label radius right">{{items.0.totalWeeks.length}}</span></li> -->
       <li>Albums Charted: <span class="label radius right">{{items.0.totalAlbums}}</span></li>
-
+      <li>Most Charted Album: <a class="label radius right" id="popStation">{{items.0.album}}</a></li>
     </ul>
   </div>
 </div>

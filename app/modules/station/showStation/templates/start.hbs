@@ -1,15 +1,2 @@
-<div class="panel large-12 columns">
-  <h3>Pick a station to get started!</h3>
-  <form id="stationForm">
-  <div class="station-select">
-    <select width="100%" form-id="#stationForm" data-placeholder="Choose a Station..." class="chosen-select" id="station-select">
-      <option value=""></option>
-      {{#each items}}
-        <option value="{{this.name}}">{{this.name}}</option>
-      {{/each}}
-    </select>
-  </div>
-  <button id="pickStation" type="submit" class="small">Go!</button>
-</form>
-</div>
-<div id="stations"></div>
+
+<ul class="small-block-grid-2 medium-block-grid-3" id="stations"></ul>

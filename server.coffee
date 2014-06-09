@@ -51,6 +51,7 @@ stationSchema = new Schema
   postalCode: String
   fax: String
   province: String
+  totalCharts = String
 
 
 appearanceSchema = new Schema
@@ -82,6 +83,39 @@ albumSchema = new Schema
     appearanceSchema
     index: true
   ]
+
+# stationSchema.post 'init', ->
+#   station = @name.toLowerCase()
+#   self = @
+#   console.log station
+#   Album.aggregate { $unwind: "$appearances" },
+#   { $match: { "appearances.station" : station}},
+#   { $group:
+#     { _id:
+#       {week: "$appearances.week"
+#       station: "$appearances.station"}
+#     albums:
+#       { $addToSet :
+#         {artist: "$artist"
+#         album: "$album"
+#         position: "$appearances.position"
+#         label: "$label"}}}},
+#   $sort: { "_id.week" : -1}, (err, results) ->
+#     console.log err if err
+#     if results.length is 0
+#       console.log 'no results'
+#     else
+#       count = 0
+#       _.each results, (week) ->
+#         count++
+#         console.log week._id.week
+#       console.log count
+#
+#       self.totalCharts = count
+#       console.log self
+#       self.save()
+
+
 
 # Setup slugs and lowercases on save
 
@@ -345,7 +379,7 @@ exports.startServer = (port, path, callback) ->
   # app.get '/api/setations/data'
   app.get '/api/stations/data/:station?', (req, res) ->
     station = if req.params.station then req.params.station.toUpperCase() else null
-    console.log "requesting stations", station if station
+    # console.log "requesting stations", station if station
 
     if !station
       Station.find (err, info) ->
@@ -541,6 +575,9 @@ exports.startServer = (port, path, callback) ->
       console.error err if err
       # res.send results
       parseStations(results)
+
+  app.get '/canada.json', (req, res) ->
+    res.sendfile './canada.json'
 
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
