@@ -208,9 +208,10 @@ module.exports = App.module 'ArtistsApp.Show',
           @render()
 
     onRender: ->
-      @ui.typeSelect
-        .find("option[value='#{@graphType}']").attr("selected", true)
-      @graph(@graphType)
+      if matchMedia(Foundation.media_queries['medium']).matches
+        @ui.typeSelect
+          .find("option[value='#{@graphType}']").attr("selected", true)
+        @graph(@graphType)
 
   class Show.Empty extends Marionette.ItemView
     template: "modules/artists/show/templates/empty"

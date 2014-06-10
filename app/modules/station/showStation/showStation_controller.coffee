@@ -283,12 +283,12 @@ module.exports = App.module 'StationApp.Show',
       @collection.on 'filter', =>
         @render()
     onRender: ->
+      if matchMedia(Foundation.media_queries['medium']).matches
       # console.log @collection
-      if @collection.station
-        @graph()
-      else
-        @mapGraph()
-
+        if @collection.station
+          @graph()
+        else
+          @mapGraph()
 
 
   class Show.Empty extends Marionette.ItemView

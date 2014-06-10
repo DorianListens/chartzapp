@@ -193,7 +193,8 @@ module.exports = App.module 'LandingApp.Show',
 
     id: "graph"
     onRender: ->
-      @graph()
+      if matchMedia(Foundation.media_queries['medium']).matches
+        @graph()
 
   class Show.StationList extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/stationList"
