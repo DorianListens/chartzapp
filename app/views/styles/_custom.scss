@@ -26,7 +26,7 @@
 
 }
 h1.main-title {
-  font-size: rem-calc(65);
+  font-size: rem-calc(60);
   line-height: rem-calc(140);
   @media only screen and (min-width: 40.063em) {
     font-size: rem-calc(80);
@@ -37,7 +37,7 @@ h1.main-title {
   text-shadow: 1px 1px 1px #000;
 }
 h1.artist-title {
-  font-size: rem-calc(50);
+  font-size: rem-calc(45);
   // line-height: rem-calc(140);
   @media only screen and (min-width: 40.063em) {
     font-size: rem-calc(70);
