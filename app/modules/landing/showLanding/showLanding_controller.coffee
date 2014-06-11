@@ -32,6 +32,7 @@ module.exports = App.module 'LandingApp.Show',
         @startDate = search.startDate
         search.endDate = time.date2
         @endDate = search.endDate
+        ga 'send', 'event', 'change:date', "#{search.startDate} - #{search.endDate}"
         @showChart(search)
       @listenTo @layout, 'change:number', (number) =>
         search = {}
@@ -40,6 +41,7 @@ module.exports = App.module 'LandingApp.Show',
         search.number = number
         search.startDate = @startDate
         search.endDate = @endDate
+        ga 'send', 'event', 'change:number', "#{search.number}"
         @showChart(search)
 
 

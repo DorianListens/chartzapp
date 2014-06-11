@@ -25,13 +25,16 @@ module.exports = App.module 'HeaderApp.List',
 
     onRender: ->
       $(document).on 'open', '#feedback', =>
+        ga 'send', 'event', 'click', 'open feedback'
         $("a#clear").on("click", (e) ->
+          ga 'send', 'event', 'click', 'clear feedback'
           $("input, textarea").val('')
           $("form div").removeClass("error")
           $("form label").removeClass("error")
           $("form")[0].reset())
         $("#feedback-form").on("invalid", ->
           invalid_fields = $(this).find("[data-invalid]")
+          ga 'send', 'event', 'form', 'feedback form invalid'
         ).on "valid", Foundation.utils.debounce((e) =>
           @send(e)
         , 300, true)
@@ -44,6 +47,7 @@ module.exports = App.module 'HeaderApp.List',
     send: (e) ->
       e.preventDefault()
       $.post "/api/feedback", $("#feedback-form").serialize(), (data) ->
+        ga 'send', 'event', 'submit', 'submit feedback'
         $("input, textarea").val('')
         $("div#alert-container").fadeIn('slow').removeClass("hide")
 
