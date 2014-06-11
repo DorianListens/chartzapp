@@ -292,7 +292,7 @@ module.exports = App.module "Entities",
   API =
     getTopx: (search) ->
       d = new Date()
-      number = 25
+      number = 30
       number = search.number if search.number
 
       topxCollection = new Entities.TopxCollection

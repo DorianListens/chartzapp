@@ -826,7 +826,7 @@ getChart = (station, week, res, opts = {}) ->
               console.error err if err
               console.log "saved #{record.artist} - #{record.album} to the db for the first time"
               count++
-              console.log count
+              # console.log count
               if count is 30
                 dbQuery()
           else
@@ -896,7 +896,7 @@ autoCrawlTrue = ->
   return autoCrawl(true)
 
 # sched = later.parse.recur()
-#   .on(15).hour().on(9).minute().on(3).dayOfWeek()
+#   .on(22).hour().on(42).minute().on(3).dayOfWeek()
 #
 # sched2 = later.parse.recur()
 #   .on(14).hour().on(6).dayOfWeek()
