@@ -8,24 +8,6 @@ module.exports = App.module 'AboutApp.Show',
 
     initialize: (opts) ->
       @layout = @getLayoutView()
-      # stations = App.request "stations:entities"
-      #
-      # @listenTo @layout, 'show', =>
-      #   @showChart()
-      #   @showList(stations)
-      #   # @showSearch(stations)
-      #
-      # @listenTo @layout, 'change:time', (time) =>
-      #   search = {}
-      #   search.request = time
-      #   @showChart(search)
-      #
-      # @listenTo @layout, 'change:range', (time) =>
-      #   search = {}
-      #   search.request = 1
-      #   search.startDate = time.date1
-      #   search.endDate = time.date2
-      #   @showChart(search)
 
       @show @layout,
         loading: true

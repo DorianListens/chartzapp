@@ -1,6 +1,6 @@
 App = require "application"
 
-module.exports = (el, collection, graph, view) ->
+module.exports = (el, collection, graph, view, info) ->
 
   margin =
     top: 20
@@ -27,19 +27,13 @@ module.exports = (el, collection, graph, view) ->
   # Axis
   xAxis = d3.svg.axis()
     .scale(x)
-    # .tickPadding(10)
-    # .tickSize(-height, -height)
     .orient("bottom")
   yAxis = d3.svg.axis()
     .scale(y)
     # .tickPadding(10)
     # .tickSize(-width, -width)
     .orient("left")
-  line = d3.svg.line().x((d) ->
-    x d.date
-  ).y((d) ->
-    y d.position
-  )
+
   svg = d3.select(el)
     .append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -224,11 +218,14 @@ module.exports = (el, collection, graph, view) ->
           stations[ap.attributes.station].appearances.push
             position: ap.attributes.position
             week: ap.attributes.week
+            score: 31 - ap.attributes.position
         else stations[ap.attributes.station] =
           appearances: [
             position: ap.attributes.position
             week: ap.attributes.week
+            score: 31 - ap.attributes.position
           ]
+
     # console.log stations
     names = Object.keys stations
     _.each names, (name) ->
@@ -236,11 +233,51 @@ module.exports = (el, collection, graph, view) ->
         _id: name
         appearances: stations[name].appearances
     # console.log output
+    output.sort (a, b) ->
+      # console.log info
+      stationA = info.findWhere
+        name: a._id.toUpperCase()
+
+      stationB = info.findWhere
+        name: b._id.toUpperCase()
+      # console.log stationA
+      a = stationA.get "postalCode"
+      b = stationB.get "postalCode"
+
+      return 0 if a is b
+      if a > b then -1 else 1
+
+  parseWeeks = (collection) ->
+    output = []
+    weeks = {}
+    _.each collection.models, (model) ->
+      appearances = model.get "appearancesCollection"
+      _.each appearances.models, (ap, i) ->
+        if weeks[ap.attributes.week]
+          weeks[ap.attributes.week].appearances.push
+            station: ap.attributes.station
+            position: ap.attributes.position
+        else
+          weeks[ap.attributes.week] =
+            appearances: [
+              station: ap.attributes.station
+              position: ap.attributes.position
+            ]
+    names = Object.keys weeks
+    _.each names, (name) ->
+      output.push
+        week: name
+        appearances: weeks[name].appearances
+    # console.log output
     output
+
+
+  # graph = 'stations'
 
   draw = (graph) ->
 
     stations = parse(collection)
+
     # color.domain stations
 
     showInfo = ->
@@ -262,22 +299,181 @@ module.exports = (el, collection, graph, view) ->
 
     if $(el).find(".infobox").length isnt 0
       $(".infobox").remove()
-    $(el).prepend("<div class='button tiny radius infobox'></div>").find(".infobox")
+    $(el)
+      .prepend("<div class='button tiny radius infobox'></div>")
+      .find(".infobox")
       .html("<i class='fi-info large'></i>")
       .on("click", showInfo)
 
     $(el).find("svg").on("click", hideInfo)
 
-
-
     stations.forEach (d) ->
       d.appearances.forEach (c) ->
         c.date = parseDate c.week
 
+    if graph is "stations"
+      infostring = """
+    <br />
+    This graph displays the number of stations #{collection.artist} is charting
+    on over time.<br />
+    <br />
+    (Click anywhere to hide)
+    <br />
+    <br />
+      """
+
+      x = d3.time.scale().range([
+        0
+        width - 140
+      ])
+      y = d3.scale.linear().range([
+        0
+        height
+      ])
+
+      y2 = d3.scale.linear().range([
+        0
+        height
+      ])
+
+
+      line = d3.svg.line().x((d) ->
+        x d.week
+      ).y((d) ->
+        points = 0
+        _.each d.appearances, (a) ->
+          points += (31 - a.position)
+        y points
+      )
+
+      area = d3.svg.area()
+        .x( (d) ->
+          return x d.week)
+        .y0( (d) ->
+          return y d.y0)
+        .y1( (d) ->
+           return y d.y0 + d.y )
+
+      stack = d3.layout.stack()
+        .values (d) ->
+          d.values
+
+      weeks = parseWeeks(collection)
+
+      weeks.forEach (d) ->
+          d.week = parseDate d.week
+
+      pByW = {}
+      _.each weeks, (w) ->
+        _.each w.appearances, (a) ->
+          # console.log a.position
+          if pByW[w.week]
+            pByW[w.week] += (31 - a.position)
+          else
+            pByW[w.week] = (31 - a.position)
+
+      pArray = []
+
+      _.each pByW, (w, k) ->
+        pArray.push
+          week: k
+          score: w
+      console.log stations
+      # console.log pArray
+
+      # console.log pByW
+
+      x.domain [
+        d3.min weeks, (w) ->
+          w.week
+
+        d3.max weeks, (w) ->
+          w.week
+      ]
+      y.domain [
+        # d3.max weeks, (w) ->
+        #   w.appearances.length
+        d3.max pArray, (p) ->
+          p.score
+
+        0
+      ]
+      y2.domain [
+        d3.max weeks, (w) ->
+          w.appearances.length
+        # d3.max pArray, (p) ->
+        #   p.score
+
+        0
+      ]
+      yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+
+      y2Axis = d3.svg.axis()
+        .scale(y2)
+        .orient("right")
+
+      xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+
+      # console.log
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+      svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "-3em")
+        .style("text-anchor", "end")
+        .text "Chartscore"
+      svg.append("g")
+        .attr("class", "y2 axis")
+          .attr("transform", "translate(#{width - margin.right}, 0)")
+        .call(y2Axis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "-3em")
+        .style("text-anchor", "end")
+        .text "Number of Stations"
+      week = svg.selectAll(".week")
+        .data(weeks)
+        .enter()
+        .append("g")
+        .attr("class", (d) ->
+          return "week of #{d.week}")
+      week.append("path")
+        .attr("class", "line")
+        .attr "d", (d) ->
+          weeks.sort((a,b) -> return a.week-b.week)
+          # weeks.sort
+          line weeks
+        .style("stroke", (d) -> color d)
+        .on("mouseover", highlight)
+        .on("mouseout", mouseout)
+      week.append("circle")
+        .attr("class", (d) -> return "dot #{d.week}")
+        .style "fill", (d, i) ->
+          color d._id
+        .attr("r", 5)
+        .attr "cx", (d) ->
+          x d.week
+        .attr "cy", (d) ->
+          y2 d.appearances.length
+      station = svg.selectAll(".station")
+        .data(weeks)
+
     if graph is "line"
       infostring = """
     <br />
-    This graph displays all appearances of #{collection.artist} over the selected time range, organized by station.<br />
+    This graph displays all appearances of #{collection.artist} over the
+    selected time range, organized by station.<br />
     The X-Axis is determined by the date of the appearance.<br />
     The Y-Axis is determined by the album's position.<br />
     Mouseover any dot or line for more information.<br />
@@ -286,6 +482,11 @@ module.exports = (el, collection, graph, view) ->
     <br />
     <br />
     """
+      line = d3.svg.line().x((d) ->
+        x d.date
+      ).y((d) ->
+        y d.position
+      )
       x.domain [
         d3.min stations, (c) ->
           d3.min c.appearances, (v) ->

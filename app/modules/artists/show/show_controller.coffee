@@ -189,13 +189,15 @@ module.exports = App.module 'ArtistsApp.Show',
 
     graph: (type) ->
       d3.select("svg").remove()
-      @buildGraph(@el, @collection, type, @)
+      App.execute "when:fetched", @stations, =>
+        @buildGraph(@el, @collection, type, @, @stations)
 
     id: "graph"
 
     collections: []
 
     initialize: ->
+      @stations = App.request "stations:entities"
       App.execute "when:fetched", @collection, =>
         _.each @collection.models, (model) =>
           @collections.push model.get "appearancesCollection"
