@@ -374,13 +374,9 @@ module.exports = App.module "Entities",
     getHeaders: ->
       new Entities.HeaderCollection [
         { name: "Home", path: 'home', icon: 'fi-home' }
-        # { name: "Charts", path: 'chart' }
-        # { name: "Top 50", path: 'topx'}
-        { name: "Artists", path: 'artist', icon: "fi-results-demographics"}
         { name: "Stations", path: 'station', icon: 'fi-results' }
+        { name: "Artists", path: 'artist', icon: "fi-results-demographics"}
         { name: "FAQ", path: 'faq', icon: 'fi-info' }
-        # { name: "Date", path: 'date' }
-        # { name: "Label", path: "label"}
       ]
 
     getCharts: (station = null, date = null) ->
