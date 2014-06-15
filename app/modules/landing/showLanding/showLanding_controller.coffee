@@ -28,10 +28,11 @@ module.exports = App.module 'LandingApp.Show',
         search = {}
         search.request = 1
         @request = ''
-        search.startDate = time.date1
+        search.startDate = moment time.date1
         @startDate = search.startDate
-        search.endDate = time.date2
+        search.endDate = moment time.date2
         @endDate = search.endDate
+        # console.log search
         string = "#{search.startDate.format 'YYYY-MM-DD'} - #{search.endDate.format 'YYYY-MM-DD'}"
         ga 'send', 'event', 'change:date', string
         @showChart(search)
@@ -165,6 +166,7 @@ module.exports = App.module 'LandingApp.Show',
           'next-days': false
           'next' : false
         ).bind 'datepicker-change', (event,obj) =>
+          console.log obj
           @trigger 'change:range', obj
 
 

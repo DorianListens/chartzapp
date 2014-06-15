@@ -214,7 +214,7 @@ module.exports = (el, collection, view) ->
         $(el).append("<div class='tip text-center info'></div>").find(".tip")
           .css("width", width + margin.left + margin.right + "px")
           .css("margin", "auto")
-          .css("top", height / 2 + "px")
+          .css("top", height / 3 + "px")
           # .css("background", "#000")
           .html("""
         <br />
