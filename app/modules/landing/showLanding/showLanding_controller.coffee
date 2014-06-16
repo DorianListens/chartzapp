@@ -211,8 +211,14 @@ module.exports = App.module 'LandingApp.Show',
       'click a' : 'clickStation'
     clickStation: (e) ->
       e.preventDefault()
-      App.navigate "station/#{e.target.text}",
-        trigger:true
+      console.log $(e.target).hasClass("button")
+      if $(e.target).hasClass("button")
+        App.navigate "station/",
+          trigger:true
+
+      else
+        App.navigate "station/#{e.target.text}",
+          trigger:true
 
   class Show.ChartItem extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/chartItem"
