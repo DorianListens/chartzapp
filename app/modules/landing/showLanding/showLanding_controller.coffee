@@ -12,6 +12,7 @@ module.exports = App.module 'LandingApp.Show',
       @startDate = ''
       @endDate = ''
       @request = ''
+      @number = 30
 
       @listenTo @layout, 'show', =>
         @showChart()
@@ -28,6 +29,7 @@ module.exports = App.module 'LandingApp.Show',
         search = {}
         search.request = 1
         @request = ''
+        search.number = @number
         search.startDate = moment time.date1
         @startDate = search.startDate
         search.endDate = moment time.date2
@@ -40,6 +42,7 @@ module.exports = App.module 'LandingApp.Show',
         search = {}
         search.request = 1
         search.request = @request if @request
+        @number = number
         search.number = number
         search.startDate = @startDate
         search.endDate = @endDate
