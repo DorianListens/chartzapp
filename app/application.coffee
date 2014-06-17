@@ -8,7 +8,10 @@ class Application extends Backbone.Marionette.Application
 
     @on "initialize:after", (options) ->
       @startHistory()
-      @navigate(@rootRoute, trigger: true) unless @getCurrentRoute()
+      @navigate(@rootRoute,
+        trigger: true
+        init: true
+        ) unless @getCurrentRoute()
       # Freeze the object
       Object.freeze? this
 
