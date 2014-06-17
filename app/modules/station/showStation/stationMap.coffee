@@ -15,23 +15,26 @@ module.exports = (el, collection, view) ->
   colorBox =
     BC: ['#8ad08c', '#80c47e', '#77b972', '#6fad66', '#67a25b', '#609651', '#598b48', '#52803e', '#4c7436', '#45692e']
     AB: ['#ebe06e', '#e4da74', '#ddd479', '#d7ce7d', '#d0c881']
-    SK: ['#e3a667']
-    MB: ['#cc9f61', '#b5945a', '#9e8752',  '#877949']
+    SK: ['#e7DEB2']
+    MB: ['#cc9f61', '#ca6400', '#9e8752',  '#877949']
     ON: ['#eba294', '#e99d8f', '#e7988a', '#e59386', '#e38e81', '#e1897d', '#df8478', '#dd8074', '#db7b70', '#d9766c', '#d77167', '#d66c63', '#d4675f', '#d2625b', '#d05d57', '#ce5853', '#cc5450', '#ca4f4c', '#c84a48', '#c64544']
     QC: ['#d768db', '#c566d1', '#b564c6', '#a562bc', '#975fb1', '#8a5ca7', '#7d589c', '#725592', '#675187', '#5c4c7d']
     NS: ['#20a3fe', '#40c8fe', '#60e4fd', '#7ff8fd', '#9ffcf5']
     NB: ['#0165e4', '#025bc9', '#0351ae', '#044593', '#043a78']
     NF: ['#22fc32', '#4efa44', '#7ff765', '#a7f585', '#c6f2a5']
 
+  colorBox.BC.reverse()
+  colorBox.ON.reverse()
 
   d3.json "canada.json", (error, canada) ->
     return console.error(error)  if error
     subunits = topojson.feature(canada, canada.objects.prov)
-
+    #
     sByC = {}
     sByP = {}
     cities = []
     provinces = []
+    collection.sort()
     collection.each (model) ->
       cities.push model.get 'city'
       provinces.push model.get 'province'
@@ -52,7 +55,7 @@ module.exports = (el, collection, view) ->
 
     # _.each cities, (city) ->
     #
-
+    # 
     # _.each provinces, (province) ->
     #   if province is "NL" then province = "NF"
     #   console.log province, colorBox[province], sByP[province]
@@ -67,12 +70,12 @@ module.exports = (el, collection, view) ->
     #   _.each prov, (color, station) ->
     #     stationColors[station] = color
     #
-    # # console.log stationColors
+    # console.log stationColors
     # _.each cities, (city) ->
     #   fS = sByC[city][0]
     #   cityColors[city] = stationColors[fS]
     #
-    # # console.log cityColors
+    # console.log cityColors
 
 
 
