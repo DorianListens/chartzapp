@@ -764,7 +764,7 @@ getChart = (station, week, res, opts = {}) ->
         foundDate = $(item).find("td em strong").text().trim()
         console.log "Found date is #{foundDate}"
         newMoment = moment(foundDate, "dddd, MMMM D, YYYY")
-        console.log "week is #{week}"
+        # console.log "week is #{week}"
         theDate = newMoment.format('YYYY-MM-DD')
         if week isnt theDate
           week = theDate
@@ -788,8 +788,16 @@ getChart = (station, week, res, opts = {}) ->
   addToDb = (chart_array) ->
     count = 0
     console.log "adding to DB"
+    nulls = []
+    newAlbums = []
+    oldAlbums = []
+    reCrawls = []
+
     unless opts.noNull
       if chart_array.length is 0
+        nulls.push
+          week: week
+          station: station
         newAlbum = new Album
           isNull: true
           appearances: [
@@ -824,13 +832,16 @@ getChart = (station, week, res, opts = {}) ->
                 ]
             newAlbum.save (err, newAlbum) ->
               console.error err if err
-              console.log "saved #{record.artist} - #{record.album} to the db for the first time"
+              newAlbums.push
+                artist: record.artist
+                album: record.album
+              # console.log "saved #{record.artist} - #{record.album} to the db for the first time"
               count++
               # console.log count
               if count is 30
                 dbQuery()
           else
-            console.log "Found #{record.artist} - #{record.album} in the db"
+            # console.log "Found #{record.artist} - #{record.album} in the db"
             if results.appearances.length > 0
               alreadyAdded = false
               for appear in results.appearances
@@ -840,17 +851,30 @@ getChart = (station, week, res, opts = {}) ->
               if alreadyAdded isnt true
                 results.appearances.push appearance
                 results.save()
-                console.log "Appearance added to the db"
+                oldAlbums.push
+                  artist: record.artist
+                  album: record.album
+                # console.log "Appearance added to the db"
                 count++
-                console.log count
+                # console.log count
                 if count is 30
                   dbQuery()
               else
-                console.log "Already added this appearance to the db"
+                reCrawls.push
+                  album: record.album
+                  artist: record.artist
+                # console.log "Already added this appearance to the db"
                 count++
-                console.log count
+                # console.log count
                 if count is 30
                   dbQuery()
+    if count is 30
+      console.log """
+      Finished Crawling #{station} for #{week}
+      Added #{newAlbums.length} new albums, \n
+      Updated #{oldAlbums.length} old albums \n
+      Made #{reCrawls.length} reCrawls
+      """
 
   dbQuery()
 
@@ -895,15 +919,15 @@ autoCrawl = (options = false) ->
 autoCrawlTrue = ->
   return autoCrawl(true)
 
-# sched = later.parse.recur()
-#   .on(22).hour().on(42).minute().on(3).dayOfWeek()
+sched = later.parse.recur()
+  .on(0).hour().on(13).minute().on().dayOfWeek()
 #
 # sched2 = later.parse.recur()
 #   .on(14).hour().on(6).dayOfWeek()
 #
-# later.date.localTime()
+later.date.localTime()
 #
-# timer = later.setInterval(autoCrawl, sched)
+timer = later.setInterval(autoCrawl, sched)
 # timer2 = later.setInterval(autoCrawlTrue, sched2)
 
 # theNext = later.schedule(sched2).next(5)

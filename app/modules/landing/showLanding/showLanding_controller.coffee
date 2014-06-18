@@ -169,7 +169,6 @@ module.exports = App.module 'LandingApp.Show',
           'next-days': false
           'next' : false
         ).bind 'datepicker-change', (event,obj) =>
-          console.log obj
           @trigger 'change:range', obj
 
 
@@ -211,7 +210,6 @@ module.exports = App.module 'LandingApp.Show',
       'click a' : 'clickStation'
     clickStation: (e) ->
       e.preventDefault()
-      console.log $(e.target).hasClass("button")
       if $(e.target).hasClass("button")
         App.navigate "station/",
           trigger:true
