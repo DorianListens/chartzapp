@@ -920,7 +920,7 @@ autoCrawlTrue = ->
   return autoCrawl(true)
 
 sched = later.parse.recur()
-  .on(4).hour().on(35).minute().on(3).dayOfWeek()
+  .on(4).hour().on(45).minute().on(4).dayOfWeek()
 #
 # sched2 = later.parse.recur()
 #   .on(14).hour().on(6).dayOfWeek()
