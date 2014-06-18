@@ -37,52 +37,55 @@ db.once "open", ->
 # Define schema
 Schema = mongoose.Schema
 
-stationSchema = new Schema
-  name:
-    index: true
-    type: String
-  content: String
-  website: String
-  fullName: String
-  frequency: String
-  email: [String]
-  streetAddress: String
-  city: String
-  postalCode: String
-  fax: String
-  province: String
-  totalCharts = String
+Album = require './server/models/album'
+Station = require './server/models/station'
+
+# stationSchema = new Schema
+#   name:
+#     index: true
+#     type: String
+#   content: String
+#   website: String
+#   fullName: String
+#   frequency: String
+#   email: [String]
+#   streetAddress: String
+#   city: String
+#   postalCode: String
+#   fax: String
+#   province: String
+#   totalCharts = String
 
 
-appearanceSchema = new Schema
-  week: String
-  station: String
-  position: String
-
-albumSchema = new Schema
-  slug: String
-  isNull:
-    type: Boolean
-    default: false
-  artist: String
-  artistLower:
-    type: String
-    lowercase: true
-    index: true
-  album: String
-  albumLower: String
-  label: String
-  labelLower:
-    type: String
-    index: true
-    lowercase: true
-  points: Number
-  totalPoints: Number
-  currentPos: Number
-  appearances: [
-    appearanceSchema
-    index: true
-  ]
+# appearanceSchema = new Schema
+#   week: String
+#   station: String
+#   position: String
+#
+# albumSchema = new Schema
+#   slug: String
+#   isNull:
+#     type: Boolean
+#     default: false
+#   artist: String
+#   artistLower:
+#     type: String
+#     lowercase: true
+#     index: true
+#   album: String
+#   albumLower: String
+#   label: String
+#   labelLower:
+#     type: String
+#     index: true
+#     lowercase: true
+#   points: Number
+#   totalPoints: Number
+#   currentPos: Number
+#   appearances: [
+#     appearanceSchema
+#     index: true
+#   ]
 
 # stationSchema.post 'init', ->
 #   station = @name.toLowerCase()
@@ -117,48 +120,48 @@ albumSchema = new Schema
 
 
 
-# Setup slugs and lowercases on save
-
-albumSchema.pre 'save', (next) ->
-  self = @
-  self.artistLower = self.artist.toLowerCase() unless self.isNull
-  self.albumLower = self.album.toLowerCase() unless self.isNull
-  self.labelLower = self.label.toLowerCase() unless self.isNull
-  slugText = "#{self.artist} #{self.album}"
-  self.slug = slugify slugText
-  next()
-
-
-# Recalculate "total points" on every save
-
-albumSchema.pre 'save', (next) ->
-  self = @
-  if self.totalPoints is undefined
-    self.totalPoints = 0
-  pointSum = 0
-  for appearance in @appearances
-    do (appearance) ->
-      pointSum += (31 - parseInt(appearance.position))
-  self.totalPoints = pointSum
-  next()
-
-# Set current position to whatever is on top of the "appearances" stack
-
+# # Setup slugs and lowercases on save
+#
+# albumSchema.pre 'save', (next) ->
+#   self = @
+#   self.artistLower = self.artist.toLowerCase() unless self.isNull
+#   self.albumLower = self.album.toLowerCase() unless self.isNull
+#   self.labelLower = self.label.toLowerCase() unless self.isNull
+#   slugText = "#{self.artist} #{self.album}"
+#   self.slug = slugify slugText
+#   next()
+#
+#
+# # Recalculate "total points" on every save
+#
+# albumSchema.pre 'save', (next) ->
+#   self = @
+#   if self.totalPoints is undefined
+#     self.totalPoints = 0
+#   pointSum = 0
+#   for appearance in @appearances
+#     do (appearance) ->
+#       pointSum += (31 - parseInt(appearance.position))
+#   self.totalPoints = pointSum
+#   next()
+#
+# # Set current position to whatever is on top of the "appearances" stack
+#
+# # albumSchema.post 'init', ->
+# #   self = @
+# #   self.currentPos = @appearances[0].position
+#
+# # Set current points on every load ###
+#
 # albumSchema.post 'init', ->
 #   self = @
-#   self.currentPos = @appearances[0].position
-
-# Set current points on every load ###
-
-albumSchema.post 'init', ->
-  self = @
-  if self.points is undefined
-    self.points = 0
-  pointSum = 0
-  for appearance in @appearances
-    do (appearance) ->
-      pointSum += (31 - +appearance.position)
-  self.points = pointSum
+#   if self.points is undefined
+#     self.points = 0
+#   pointSum = 0
+#   for appearance in @appearances
+#     do (appearance) ->
+#       pointSum += (31 - +appearance.position)
+#   self.points = pointSum
 
 # Add text search -- Not ready for production
 # textSearch = require 'mongoose-text-search'
@@ -172,9 +175,9 @@ albumSchema.post 'init', ->
 
 # instantiate the schema
 
-Album = mongoose.model 'Album', albumSchema
+# Album = mongoose.model 'Album', albumSchema
 
-Station = mongoose.model 'Station', stationSchema
+# Station = mongoose.model 'Station', stationSchema
 
 # Instantiate the Application
 
