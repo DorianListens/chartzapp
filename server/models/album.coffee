@@ -1,4 +1,5 @@
 mongoose = require 'mongoose'
+util = require 'util'
 Schema = mongoose.Schema
 
 appearanceSchema = new Schema
@@ -41,7 +42,7 @@ albumSchema.pre 'save', (next) ->
   self.albumLower = self.album.toLowerCase() unless self.isNull
   self.labelLower = self.label.toLowerCase() unless self.isNull
   slugText = "#{self.artist} #{self.album}"
-  self.slug = slugify slugText
+  self.slug = util.slugify slugText
   next()
 
 

@@ -21,10 +21,8 @@ class Application extends Backbone.Marionette.Application
       footerRegion: "#footer-region"
 
     @mainRegion.open = (view) ->
-      @$el.hide() # fadeOut("fast")
-      # console.log view.el.id
+      @$el.hide()
       if view.el.id isnt "loadingView"
-        # console.log view
         @$el.fadeOut("slow")
         @$el.html(view.el).css('opacity' : 0)
         @$el.show()
@@ -62,15 +60,11 @@ Date::yyyymmdd = ->
 
 
 require 'controllers/baseController'
-require 'modules/entities/entities'
+require 'entities/entities'
 require 'components/loading/loading'
 require 'modules/header/header_app'
 require 'modules/footer/footer_app'
-# require 'modules/chart/chart_app'
 require 'modules/about/about_app'
 require 'modules/artists/artists_app'
 require 'modules/station/station_app'
-# require 'modules/date/date_app'
-# require 'modules/label/label_app'
-# require 'modules/topx/topx_app'
 require 'modules/landing/landing_app'
