@@ -920,12 +920,13 @@ autoCrawlTrue = ->
   return autoCrawl(true)
 
 sched = later.parse.recur()
-  .on(0).hour().on(17).minute().on().dayOfWeek()
+  .on(4).hour().on(35).minute().on(3).dayOfWeek()
 #
 # sched2 = later.parse.recur()
 #   .on(14).hour().on(6).dayOfWeek()
 #
-later.date.localTime()
+later.date.UTC()
+# console.log "Time is ", moment()
 #
 timer = later.setInterval(autoCrawl, sched)
 # timer2 = later.setInterval(autoCrawlTrue, sched2)
