@@ -100,7 +100,6 @@ module.exports.controller = (app) ->
     weeks.push newNow
     opts = {}
     opts.noNull = req.params.noNull
-    console.log opts
     getWeek = (day, station) ->
       setTimeout ->
         crawler.getChart station, day.format("YYYY-MM-DD"), res, opts

@@ -1,4 +1,4 @@
-stationList = require 'stationList'
+stationList = require 'lib/stationList'
 
 color = d3.scale.category20c()
 color2 = d3.scale.category20b()

@@ -18,7 +18,6 @@ _ = require 'underscore'
 fs = require 'fs'
 util = require './server/util'
 
-
 # Setup Database ##################################################
 
 mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/chartz-db'
@@ -27,17 +26,12 @@ mongoose.connect mongoUri
 db = mongoose.connection
 db.on "error", console.error.bind(console, "connection error:")
 db.once "open", ->
-  console.log 'connected to the db'
+  console.log 'Database Connection Open'
 
 # Instantiate the Application
 
 app = express()
 app.use(express.static __dirname+'/public')
-
-# Define schema
-
-Album = require './server/models/album'
-Station = require './server/models/station'
 
 # Include all controllers
 
