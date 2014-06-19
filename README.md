@@ -30,3 +30,23 @@ Front-End:
 Analytics:
 * [Google Analytics](http://www.google.ca/analytics/)
 * [New Relic](http://newrelic.com/)
+
+
+## To Install
+
+
+```
+npm install -g brunch
+git clone https://github.com/DorianListens/chartzapp path/to/local
+cd path/to/local
+npm install
+brunch build
+brunch watch -server
+```
+
+Navigate to localhost:8888, and you should have yourself a local copy!
+Brunch will automatically compile yr stylesheets and js/coffee files.
+If you make any updates to the backend, you'll need to restart brunch to serve
+the new server code.
+
+Instructions for DB setup coming soon. 
