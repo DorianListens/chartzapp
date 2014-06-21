@@ -155,7 +155,7 @@ module.exports.controller = (app) ->
     (err, results) ->
       res.send results
 
-  # Get all entries for a given date range, grouped by station
+  # Get all charts for a given date range, grouped by station
 
   app.get "/api/date/:startDate/:endDate", (req, res) ->
     startDate = util.tuesify(req.params.startDate)

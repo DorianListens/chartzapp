@@ -4,6 +4,7 @@ stationArray = require './lib/stationList'
 cheerio = require 'cheerio'
 moment = require 'moment'
 util = require 'util'
+_ = require 'underscore'
 
 
 module.exports.parseStations = (stations) ->

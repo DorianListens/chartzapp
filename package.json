@@ -31,7 +31,7 @@
     "coffeelint-brunch": "~1.5.0",
     "auto-reload-brunch": "~1.7.3",
     "read-components": "~0.6.0",
-    "express": "~3.4.8",
+    "express": "~4.0.0",
     "request": "~2.34.0",
     "cheerio": "~0.13.1",
     "deferred": "~0.6.8",
@@ -44,7 +44,8 @@
     "node-schedule": "~0.1.13",
     "later": "~1.1.6",
     "nodemailer": "~0.6.5",
-    "underscore": "~1.6.0"
+    "underscore": "~1.6.0",
+    "body-parser": "~1.4.3"
   },
   "main": "server.coffee",
   "directories": {
