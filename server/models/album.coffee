@@ -55,15 +55,15 @@ albumSchema.pre 'save', (next) ->
   self.labelLower = self.label.toLowerCase() unless self.isNull
   slugText = "#{self.artist} #{self.album}"
   self.slug = util.slugify slugText
-  next()
-
-albumSchema.pre 'save', (next) ->
-  self = @
   @appearances.sort (a, b) ->
     a = moment a.week
     b = moment b.week
     return 0 if a is b
     if a > b then -1 else 1
+  next()
+
+albumSchema.pre 'save', (next) ->
+  self = @
   oldap = {}
   _.each @appearances, (ap) ->
     if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
