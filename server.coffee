@@ -53,12 +53,12 @@ crawler = require './server/crawler'
 autoCrawlTrue = ->
   return crawler.autoCrawl(true)
 
-# sched = later.parse.recur()
-#   .on(5).hour().on(15).minute().on(4).dayOfWeek()
-#
-# later.date.UTC()
-#
-# timer = later.setInterval(crawler.autoCrawl, sched)
+sched = later.parse.recur()
+  .on(5).hour().on(25).minute().on(4).dayOfWeek()
+
+later.date.UTC()
+
+timer = later.setInterval(crawler.autoCrawl, sched)
 
 # Export the server to Brunch
 

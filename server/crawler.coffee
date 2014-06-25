@@ -115,8 +115,9 @@ module.exports.getChart = (station, week, res, opts = {}) ->
     # Find the relevant table, and parse it.
 
     $("th").parents("table").find("tr").each (index, item) ->
-      if index is 1
-        foundDate = $(item).find("td em strong").text().trim()
+      # console.log index
+      if index is 0
+        foundDate = $(item).find("td em strong").first().text().trim()
         console.log "Found date is #{foundDate}"
         newMoment = moment(foundDate, "dddd, MMMM D, YYYY")
         # console.log "week is #{week}"
@@ -124,7 +125,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
         if week isnt theDate
           week = theDate
           console.log "week has been updated to #{theDate}"
-      if 3 < index < 34
+      if 2 < index < 34
         tds = $(item).find("td")
         chartPos = $(tds.eq(0)).text().trim()
         artist = tds.eq(2).text().trim()

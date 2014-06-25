@@ -1,6 +1,7 @@
 mongoose = require 'mongoose'
 Album = require '../models/album'
 crawler = require '../crawler'
+util = require '../util'
 
 module.exports.controller = (app) ->
 
@@ -123,10 +124,10 @@ module.exports.controller = (app) ->
   # Get most recent chart from a given station
 
   app.get "/api/chart/:station", (req, res) ->
-    newChart = getChart(req.params.station.toLowerCase(), "", res)
+    newChart = crawler.getChart(req.params.station.toLowerCase(), "", res)
 
   # Get a chart from any date for a given station
 
   app.get "/api/chart/:station/:date", (req, res) ->
-    theDate = tuesify(req.params.date)
-    newChart = getChart(req.params.station.toLowerCase(), theDate, res)
+    theDate = util.tuesify(req.params.date)
+    newChart = crawler.getChart(req.params.station.toLowerCase(), theDate, res)
