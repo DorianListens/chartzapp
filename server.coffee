@@ -54,7 +54,7 @@ crawler = require './server/crawler'
 # Set up automatic crawling on tuesday night
 
 sched = later.parse.recur()
-  .on(4).hour().on(45).minute().on(4).dayOfWeek()
+  .on(5).hour().on(7).minute().on(4).dayOfWeek()
 
 later.date.UTC()
 
