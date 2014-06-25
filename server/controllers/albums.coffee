@@ -18,6 +18,17 @@ module.exports.controller = (app) ->
         album.save()
       res.send "Saving all albums"
 
+  app.get "/api/save/:week", (req, res) ->
+    week = req.params.week
+    Album.find { appearances: { $elemMatch : {'week' : "#{week}" }}},
+    { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: 1},
+    (err, results) ->
+      console.error err if err
+      for result in results
+        do (result) ->
+          result.save()
+      res.send results
+
   # Get every entry for a given station from the db, grouped by week
 
   app.get "/api/albums/:station" , (req, res) ->
