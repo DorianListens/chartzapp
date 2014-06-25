@@ -24,9 +24,15 @@ module.exports.controller = (app) ->
     { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: 1},
     (err, results) ->
       console.error err if err
+      oldres = {}
       for result in results
         do (result) ->
-          result.save()
+          if (result.artist is oldres.artist) and (result.album is oldres.album) and (result.label is oldres.label)
+            result.remove()
+            console.log "removing #{result.artist} - #{result.album}"
+          else
+            result.save()
+            oldres = result
       res.send "Saving all albums which appeared on #{week}"
 
   # Get every entry for a given station from the db, grouped by week
