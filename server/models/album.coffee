@@ -68,6 +68,9 @@ albumSchema.pre 'save', (next) ->
   _.each @appearances, (ap) ->
     if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
       console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
+      if ap.week is "2014-06-24"
+        ap.remove()
+        console.log "removing"
     oldap = ap
   # _.each @appearances
   next()
