@@ -73,7 +73,8 @@ albumSchema.pre 'save', (next) ->
         if ap.week is "2014-06-24"
           ap.remove()
           console.log "removing"
-      oldap = ap
+      else
+        oldap = ap
   # _.each @appearances
   next()
 
