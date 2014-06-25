@@ -1,10 +1,12 @@
 # Crawler ###################################################################
 
+Album = require './models/album'
 stationArray = require './lib/stationList'
 cheerio = require 'cheerio'
 moment = require 'moment'
-util = require 'util'
+util = require './util'
 _ = require 'underscore'
+deferred = require 'deferred'
 
 
 module.exports.parseStations = (stations) ->
@@ -90,7 +92,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
 
       if results.length is 0
         console.log "making Earshot Crawl for #{the_url}"
-        deferredRequest(the_url).then(chartParse).done (chart_res) ->
+        util.deferredRequest(the_url).then(chartParse).done (chart_res) ->
           console.log 'Returned'
           # if chart_res.length is 0
           #   res.send chart_res #"Sorry, there is no #{station} chart for #{week}"

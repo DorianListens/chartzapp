@@ -54,7 +54,7 @@ autoCrawlTrue = ->
   return crawler.autoCrawl(true)
 
 sched = later.parse.recur()
-  .on(4).hour().on(45).minute().on(4).dayOfWeek()
+  .on(5).hour().on(15).minute().on(4).dayOfWeek()
 
 later.date.UTC()
 

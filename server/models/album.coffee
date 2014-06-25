@@ -1,5 +1,5 @@
 mongoose = require 'mongoose'
-util = require 'util'
+util = require '../util'
 Schema = mongoose.Schema
 
 appearanceSchema = new Schema
