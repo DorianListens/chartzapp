@@ -44,8 +44,8 @@ app.use bodyParser.urlencoded
 
 fs.readdirSync('./server/controllers').forEach (file) ->
   if file.substr(-7) is '.coffee'
-      route = require './server/controllers/' + file
-      route.controller app
+    route = require './server/controllers/' + file
+    route.controller app
 
 # Include the crawler
 
@@ -53,8 +53,7 @@ crawler = require './server/crawler'
 
 # Set up automatic crawling on tuesday night
 
-sched = later.parse.recur()
-  .on(4).hour().on(7).minute().on(4).dayOfWeek()
+sched = later.parse.recur().on(4).hour().on(7).minute().on(4).dayOfWeek()
 
 
 later.date.UTC()
