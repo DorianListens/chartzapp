@@ -230,7 +230,7 @@ module.exports = App.module "Entities",
       stations = []
       totalAlbums = response.length
       response = response.filter (v, i, a) ->
-        return v if v._id.isNull is false
+        return v if v._id.isNull is false and v._id.artist isnt ''
       for item in response
         do (item) ->
           item.artist = item._id.artist
