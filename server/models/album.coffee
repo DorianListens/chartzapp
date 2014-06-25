@@ -60,8 +60,8 @@ albumSchema.pre 'save', (next) ->
     bW = moment b.week
     if aW is bW
       return 0 if a.station is b.station
-      if a.station > b.station then -1 else 1
-    if aW > bW then -1 else 1
+      if a.station > b.station then 1 else -1
+    if aW > bW then 1 else -1
   next()
 
 albumSchema.pre 'save', (next) ->
