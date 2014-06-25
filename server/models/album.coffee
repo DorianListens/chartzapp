@@ -65,19 +65,19 @@ albumSchema.pre 'save', (next) ->
     if aW > bW then 1 else -1
   next()
 
-albumSchema.pre 'save', (next) ->
-  self = @
-  oldap = {}
-  _.each @appearances, (ap) ->
-    if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
-      console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
-      if ap.week is "2014-06-24"
-        ap.remove()
-        console.log "removing"
-    else
-      oldap = ap
+# albumSchema.pre 'save', (next) ->
+#   self = @
+#   oldap = {}
+#   _.each @appearances, (ap) ->
+#     if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
+#       console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
+#       if ap.week is "2014-06-24"
+#         ap.remove()
+#         console.log "removing"
+#     else
+#       oldap = ap
   # _.each @appearances
-  next()
+  # next()
 
 
 # Recalculate "total points" + first week on every save

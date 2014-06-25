@@ -1,8 +1,6 @@
 mongoose = require 'mongoose'
 Album = require '../models/album'
 util = require '../util'
-moment = require 'moment'
-_ = require 'underscore'
 
 module.exports.controller = (app) ->
 
@@ -162,26 +160,7 @@ module.exports.controller = (app) ->
       # console.log theArtist
       Album.find { "artistLower" : theArtist }, (err, results) ->
         console.error err if err
-        for result in results
-          # result.appearances.sort (a, b) ->
-          #   aW = moment a.week
-          #   bW = moment b.week
-          #   # console.log a.station
-          #   # if aW is bW
-          #   #   console.log "same week"
-          #   #   if a.station is b.station then return 0
-          #   #   if a.station > b.station then return 1 else return -1
-          #   if aW > bW then 1 else -1
-          # oldap = {}
-          # _.each result.appearances, (ap) ->
-          #   if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
-          #     console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
-          #     if ap.week is "2014-06-24"
-          #       ap.remove()
-          #       console.log "removing"
-          #   else
-          #     oldap = ap
-          result.save()
+        # for result in results
         res.send results
     else
       res.send []
