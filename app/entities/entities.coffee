@@ -318,7 +318,7 @@ module.exports = App.module "Entities",
       if station
         topxCollection.info = App.request "stations:entities", station
       topxCollection.station = station
-      startDate = "#{d.yyyymmdd()}" # "2014-01-01" #
+      startDate =  "2014-01-01" # "#{d.yyyymmdd()}" #
       if search.startDate then startDate = search.startDate
       endDate = "#{d.yyyymmdd()}"
       if search.endDate then endDate = search.endDate

@@ -56,6 +56,7 @@ module.exports = App.module 'LandingApp.Show',
       $(document).foundation()
 
     showChart: (search = {}) ->
+      search.startDate = moment() unless search.startDate
 
       topCharts = App.request 'topx:entities', search
       lCharts = topCharts.clone()
@@ -223,8 +224,8 @@ module.exports = App.module 'LandingApp.Show',
 
       @ui.icon.on "click", (e) =>
         e.stopPropagation()
-        @ui.range.click()
-        @ui.range.focus()
+        # @ui.range.click()
+        # @ui.range.focus()
       @ui.icon.dateRangePicker(
         startDate: "2014-01-01"
         endDate: moment()
@@ -237,7 +238,7 @@ module.exports = App.module 'LandingApp.Show',
         ).bind 'datepicker-change', (event,obj) =>
 
           @trigger 'change:range', obj
-          $(@ui.icon).data("dateRangePicker").close()
+          # $(@ui.icon).data("dateRangePicker").close()
 
 
 

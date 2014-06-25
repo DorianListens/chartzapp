@@ -90,7 +90,7 @@
 		if (!opt) opt = {};
 		opt = $.extend(true,
 		{
-			autoClose: false,
+			autoClose: true,
 			format: 'YYYY-MM-DD',
 			separator: ' to ',
 			language: 'auto',
@@ -857,7 +857,6 @@
 
 		function closeDatePicker()
 		{
-			console.log(box);
 			if (opt.alwaysOpen) return;
 			$(box).slideUp(200,function()
 			{

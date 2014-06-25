@@ -113,7 +113,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
     chart_array = []
 
     # Find the relevant table, and parse it.
-
+b
     $("th").parents("table").find("tr").each (index, item) ->
       if index is 1
         foundDate = $(item).find("td em strong").text().trim()
