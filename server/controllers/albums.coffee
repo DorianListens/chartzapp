@@ -24,6 +24,11 @@ module.exports.controller = (app) ->
     { totalPoints: 1, points: 1, artist: 1, album: 1, label: 1, appearances: 1},
     (err, results) ->
       console.error err if err
+      results.sort (a, b) ->
+        a = a.artist
+        b = b.artist
+        return 0 if a is b
+        if a > b return -1 else 1
       oldres = {}
       for result in results
         do (result) ->
