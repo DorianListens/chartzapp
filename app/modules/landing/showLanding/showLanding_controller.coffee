@@ -107,6 +107,25 @@ module.exports = App.module 'LandingApp.Show',
         ga 'send', 'event', 'change:date', string
         @showChart(search)
 
+      @listenTo infoView, 'click:week', (req) =>
+        # @opts.loadingType = "opacity"
+        currentWeek = moment(req.week)
+        now = moment()
+        switch req.dir
+          when "next"
+            reqWeek = currentWeek.day(9)
+            if reqWeek > now
+              reqWeek = now
+          when "prev"
+            reqWeek = currentWeek.day(-5)
+          else
+            reqWeek = currentWeek
+        search =
+          startDate : reqWeek.format("YYYY-MM-DD")
+          endDate : reqWeek.format('YYYY-MM-DD')
+        # newWeek = App.request 'topx:entities', search
+        @showChart search
+
       @show infoView,
         region: @layout.infoRegion
         loading: true
@@ -220,6 +239,16 @@ module.exports = App.module 'LandingApp.Show',
       "range" : "input#custom-range"
       "icon" : "i#custom-range"
       "number" : "#number"
+    events:
+      'click .next' : 'clickNext'
+
+    clickNext: (e) ->
+      e.preventDefault()
+      request =
+        week : $(e.target).data("week")
+        dir : e.target.id
+      @trigger 'click:week', request
+
     onRender: ->
 
       @ui.icon.on "click", (e) =>

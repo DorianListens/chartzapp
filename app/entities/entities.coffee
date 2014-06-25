@@ -348,6 +348,7 @@ module.exports = App.module "Entities",
         searchUrl = "/api/topall/#{startDate}/#{endDate}"
         if startDate is endDate
           desc = "For the week of #{startDate}"
+          week = startDate
         else
           desc = "Top Albums between #{startDate} and #{endDate}"
       # console.log searchUrl
