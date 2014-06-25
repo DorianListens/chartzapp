@@ -160,6 +160,7 @@ module.exports.controller = (app) ->
       # console.log theArtist
       Album.find { "artistLower" : theArtist }, (err, results) ->
         console.error err if err
+        results.save()
         res.send results
     else
       res.send []
