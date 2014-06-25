@@ -13,7 +13,7 @@
   fill: none;
   stroke-width: 1.5px;
 }
-#graph {
+#graph, #circles {
   font-size: small;
 }
 
@@ -52,4 +52,9 @@
 
 .selected {
   fill: #d04526;
+  opacity: 0.5!important;
+  box-shadow: 5px 5px 5px #000;
+}
+.select {
+
 }

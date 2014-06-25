@@ -11,6 +11,13 @@ module.exports.controller = (app) ->
       console.log err if err
       res.send albums
 
+  app.get "/api/saveall", (req, res) ->
+    Album.find (err, albums) ->
+      console.log err if err
+      albums.forEach (album) ->
+        album.save()
+      res.send "Saving all albums"
+
   # Get every entry for a given station from the db, grouped by week
 
   app.get "/api/albums/:station" , (req, res) ->
@@ -37,7 +44,7 @@ module.exports.controller = (app) ->
     station = req.params.station.toLowerCase()
     week = util.tuesify(req.params.date)
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
-    { artist: 1, album: 1, label: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
+    { artist: 1, album: 1, label: 1, firstWeek: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
       console.log err if err
       if results.length is 0
         console.log 'no results'
@@ -81,7 +88,8 @@ module.exports.controller = (app) ->
         album: "$album"
         slug: "$slug"
         label: "$label"
-        isNull: "$isNull"}
+        isNull: "$isNull"
+        firstWeek: "$firstWeek"}
       appearances:
         { $addToSet :
             {station: "$appearances.station"
@@ -97,6 +105,7 @@ module.exports.controller = (app) ->
   # Get top records for all stations
 
   app.get "/api/topall/:startDate/:endDate", (req, res) ->
+    # console.log req.query
     startDate = util.tuesify(req.params.startDate)
     endDate = util.tuesify(req.params.endDate)
     Album.aggregate { $unwind: "$appearances" },
@@ -107,14 +116,15 @@ module.exports.controller = (app) ->
         album: "$album"
         slug: "$slug"
         label: "$label"
-        isNull: "$isNull"}
+        isNull: "$isNull"
+        firstWeek: "$firstWeek"}
       appearances:
         { $addToSet :
             {station: "$appearances.station"
             week: "$appearances.week"
             position: "$appearances.position"}}
-      positions :
-        { $push : "$appearances.position"}
+      # positions :
+      #   { $push : "$appearances.position"}
       }},
     (err, results) ->
       console.error err if err
@@ -122,11 +132,15 @@ module.exports.controller = (app) ->
 
   # Get all entries for a given artist
 
-  app.get "/api/artists/:artist", (req, res) ->
-    theArtist = req.params.artist.toLowerCase()
-    Album.find { "artistLower" : theArtist }, (err, results) ->
-      console.error err if err
-      res.send results
+  app.get "/api/artists/:artist?", (req, res) ->
+    if req.params.artist
+      theArtist = req.params.artist.toLowerCase()
+      # console.log theArtist
+      Album.find { "artistLower" : theArtist }, (err, results) ->
+        console.error err if err
+        res.send results
+    else
+      res.send []
 
   # Get all entries for a given label
 

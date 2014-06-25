@@ -1,9 +1,10 @@
 # Crawler ###################################################################
 
+Album = require './models/album'
 stationArray = require './lib/stationList'
 cheerio = require 'cheerio'
 moment = require 'moment'
-util = require 'util'
+util = require './util'
 _ = require 'underscore'
 
 
@@ -266,3 +267,6 @@ module.exports.autoCrawl = (options = false) ->
         getStation station.toLowerCase()
 
   getAll(theArray)
+
+module.exports.autoCrawlTrue = ->
+  return module.exports.autoCrawl(true)
