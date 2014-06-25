@@ -59,8 +59,8 @@ albumSchema.pre 'save', (next) ->
     aW = moment a.week
     bW = moment b.week
     if aW is bW
-      return 0 if a.station is b.station
-      if a.station > b.station then 1 else -1
+      if a.station is b.station then return 0
+      if a.station > b.station then return 1 else return -1
     if aW > bW then 1 else -1
   next()
 
@@ -68,8 +68,6 @@ albumSchema.pre 'save', (next) ->
   self = @
   oldap = {}
   _.each @appearances, (ap) ->
-  # for ap in @appearances
-  #   do (ap) ->
     if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
       console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
       if ap.week is "2014-06-24"
