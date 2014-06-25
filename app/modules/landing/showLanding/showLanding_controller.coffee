@@ -239,6 +239,7 @@ module.exports = App.module 'LandingApp.Show',
       "range" : "input#custom-range"
       "icon" : "i#custom-range"
       "number" : "#number"
+      "text" : "#text"
     events:
       'click .next' : 'clickNext'
 
@@ -251,9 +252,9 @@ module.exports = App.module 'LandingApp.Show',
 
     onRender: ->
 
-      @ui.icon.on "click", (e) =>
+      @ui.text.on "click", (e) =>
         e.stopPropagation()
-        # @ui.range.click()
+        @ui.icon.click()
         # @ui.range.focus()
       @ui.icon.dateRangePicker(
         startDate: "2014-01-01"
