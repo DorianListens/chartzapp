@@ -56,10 +56,12 @@ albumSchema.pre 'save', (next) ->
   slugText = "#{self.artist} #{self.album}"
   self.slug = util.slugify slugText
   @appearances.sort (a, b) ->
-    a = moment a.week
-    b = moment b.week
-    return 0 if a is b
-    if a > b then 1 else -1
+    aW = moment a.week
+    bW = moment b.week
+    if aW is bW
+      return 0 if a.station is b.station
+      if a.station > b.station then -1 else 1
+    if aW > bW then -1 else 1
   next()
 
 albumSchema.pre 'save', (next) ->
