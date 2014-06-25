@@ -55,28 +55,28 @@ albumSchema.pre 'save', (next) ->
   self.labelLower = self.label.toLowerCase() unless self.isNull
   slugText = "#{self.artist} #{self.album}"
   self.slug = util.slugify slugText
-  @appearances.sort (a, b) ->
-    aW = moment a.week
-    bW = moment b.week
-    if aW is bW
-      if a.station is b.station then return 0
-      if a.station > b.station then return 1 else return -1
-    if aW > bW then 1 else -1
+  # @appearances.sort (a, b) ->
+  #   aW = moment a.week
+  #   bW = moment b.week
+  #   if aW is bW
+  #     if a.station is b.station then return 0
+  #     if a.station > b.station then return 1 else return -1
+  #   if aW > bW then 1 else -1
   next()
 
-albumSchema.pre 'save', (next) ->
-  self = @
-  oldap = {}
-  _.each @appearances, (ap) ->
-    if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
-      console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
-      if ap.week is "2014-06-24"
-        ap.remove()
-        console.log "removing"
-    else
-      oldap = ap
-  # _.each @appearances
-  next()
+# albumSchema.pre 'save', (next) ->
+#   self = @
+#   oldap = {}
+#   _.each @appearances, (ap) ->
+#     if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
+#       console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
+#       if ap.week is "2014-06-24"
+#         ap.remove()
+#         console.log "removing"
+#     else
+#       oldap = ap
+#   # _.each @appearances
+#   next()
 
 
 # Recalculate "total points" + first week on every save
