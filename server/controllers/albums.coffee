@@ -1,6 +1,8 @@
 mongoose = require 'mongoose'
 Album = require '../models/album'
 util = require '../util'
+moment = require 'moment'
+_ = require 'underscore'
 
 module.exports.controller = (app) ->
 
