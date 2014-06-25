@@ -15,7 +15,7 @@ tuesify = (date) ->
   theTues = moment(theTues)
   theTues.format('YYYY-MM-DD')
 
-potentialWeeks = (date1, date2) ->
+potentialWeeksCount = (date1, date2) ->
   date1 = moment date1
   date2 = moment date2
   if _.isEqual(date1, date2)
@@ -27,6 +27,21 @@ potentialWeeks = (date1, date2) ->
     date1 = moment(date1.day(9))
 
   return count
+
+potentialWeeks = (date1, date2) ->
+  date1 = moment date1
+  date2 = moment date2
+  if _.isEqual(date1, date2)
+    return [date1.format("YYYY-MM-DD")]
+  count = 0
+
+  weeks = []
+
+  while (date1 <= date2)
+    weeks.push date1.format("YYYY-MM-DD")# count++
+    date1 = moment(date1.day(9))
+
+  return weeks
 
 
 mode = (array) ->
@@ -223,14 +238,16 @@ module.exports = App.module "Entities",
       # App.execute "when:fetched", info, ->
       #   console.log "info fetched"
 
-  class Entities.TopxCollection extends Backbone.Collection
+  class Entities.TopxCollection extends Backbone.FacetedSearchCollection
     model: Entities.Topx
+    filterFacets: ["album", "artist", "firstWeek"]
     parse: (response) ->
       weeks = []
       stations = []
       totalAlbums = response.length
       response = response.filter (v, i, a) ->
         return v if v._id.isNull is false and v._id.artist isnt ''
+
       for item in response
         do (item) ->
           item.artist = item._id.artist
@@ -238,6 +255,7 @@ module.exports = App.module "Entities",
           item.label = item._id.label
           item.slug = item._id.slug
           item.isNull = item._id.isNull
+          item.firstWeek = item._id.firstWeek
           theCount = 0
           item.stations = []
           for obj in item.appearances
@@ -259,12 +277,12 @@ module.exports = App.module "Entities",
           item.totalWeeks = @weeks
           item.totalStations = @stations.length
       response = response.sort (a, b) ->
-        a = parseInt a.frontPoints
-        b = parseInt b.frontPoints
+        a = +a.frontPoints
+        b = +b.frontPoints
         return 0 if a is b
         if a > b then -1 else 1
 
-      response = response.slice(0, @number)
+      # response = response.slice(0, @number)
       for item in response
         do (item) ->
           item.rank = response.indexOf(item) + 1
@@ -301,7 +319,7 @@ module.exports = App.module "Entities",
       if station
         topxCollection.info = App.request "stations:entities", station
       topxCollection.station = station
-      startDate = "2014-01-01"
+      startDate =  "2014-01-01" # "#{d.yyyymmdd()}" #
       if search.startDate then startDate = search.startDate
       endDate = "#{d.yyyymmdd()}"
       if search.endDate then endDate = search.endDate
@@ -328,16 +346,22 @@ module.exports = App.module "Entities",
       #   desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
       else
         searchUrl = "/api/topall/#{startDate}/#{endDate}"
-        desc = "Top Albums between #{startDate} and #{endDate}"
+        if startDate is endDate
+          desc = "For the week of #{startDate}"
+        else
+          desc = "Top Albums between #{startDate} and #{endDate}"
       # console.log searchUrl
       topxCollection.desc = desc
       topxCollection.week = week if week
       topxCollection.url = searchUrl
       topxCollection.startDate = startDate
       topxCollection.endDate = endDate
-      topxCollection.potential = potentialWeeks(startDate, endDate)
+      topxCollection.potentialA = potentialWeeks(startDate, endDate)
+      topxCollection.potential = potentialWeeksCount(startDate, endDate)
       topxCollection.fetch
         reset: true
+        # data:
+        #   something: true
       topxCollection
 
     getLabel: (label) ->
@@ -363,10 +387,12 @@ module.exports = App.module "Entities",
       theStation
 
     getArtist: (artist) ->
+      console.log(artist) if artist
       artists = new Entities.ArtistCollection
-      artists.artist = artist
-      artist = encodeURIComponent(artist)
-      artists.url = "/api/artists/#{artist}"
+      artists.artist = artist if artist
+      artist = encodeURIComponent(artist) if artist
+      artists.url = "/api/artists/#{if artist then artist else ''}"
+      # console.log artists.url
       artists.fetch
         reset: true
       artists

@@ -45,7 +45,8 @@
     "later": "~1.1.6",
     "nodemailer": "~0.6.5",
     "underscore": "~1.6.0",
-    "body-parser": "~1.4.3"
+    "body-parser": "~1.4.3",
+    "morgan": "~1.1.1"
   },
   "main": "server.coffee",
   "directories": {

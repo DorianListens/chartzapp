@@ -1,6 +1,15 @@
+###
+#
+#
+# The Main Album Model file, defining albums and appearances.
+#
+#
+###
+
 mongoose = require 'mongoose'
 util = require '../util'
 Schema = mongoose.Schema
+moment = require 'moment'
 
 appearanceSchema = new Schema
   week: String
@@ -27,6 +36,7 @@ albumSchema = new Schema
   points: Number
   totalPoints: Number
   currentPos: Number
+  firstWeek: String
   appearances: [
     appearanceSchema
     index: true
@@ -46,16 +56,24 @@ albumSchema.pre 'save', (next) ->
   next()
 
 
-# Recalculate "total points" on every save
+# Recalculate "total points" + first week on every save
 
 albumSchema.pre 'save', (next) ->
   self = @
   if self.totalPoints is undefined
     self.totalPoints = 0
   pointSum = 0
+  weeks = []
   for appearance in @appearances
     do (appearance) ->
       pointSum += (31 - parseInt(appearance.position))
+      weeks.push appearance.week
+  weeks.sort (a, b) ->
+    a = moment(a)
+    b = moment(b)
+    return 0 if a is b
+    if a > b then 1 else -1
+  @firstWeek = weeks[0]
   self.totalPoints = pointSum
   next()
 

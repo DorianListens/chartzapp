@@ -39,15 +39,16 @@ module.exports = App.module 'LandingApp.Show',
         ga 'send', 'event', 'change:date', string
         @showChart(search)
       @listenTo @layout, 'change:number', (number) =>
-        search = {}
-        search.request = 1
-        search.request = @request if @request
+
+        # search.request = 1
+        # search.request = @request if @request
         @number = number
-        search.number = number
-        search.startDate = @startDate
-        search.endDate = @endDate
-        ga 'send', 'event', 'change:number', "#{search.number}"
-        @showChart(search)
+        topCharts.trigger "filter"
+        # search.number = number
+        # search.startDate = @startDate
+        # search.endDate = @endDate
+        # ga 'send', 'event', 'change:number', "#{search.number}"
+        @showChart(number)
 
 
       @show @layout,
@@ -55,11 +56,15 @@ module.exports = App.module 'LandingApp.Show',
       $(document).foundation()
 
     showChart: (search = {}) ->
+      search.startDate = moment() unless search.startDate
 
       topCharts = App.request 'topx:entities', search
+      lCharts = topCharts.clone()
 
-      chartView = @getChartView topCharts
+
+      chartView = @getChartView lCharts
       @showGraph topCharts
+      @showInfo topCharts
       if search.request
         @show chartView,
           region: @layout.tableRegion
@@ -70,13 +75,41 @@ module.exports = App.module 'LandingApp.Show',
           region: @layout.tableRegion
           loading: true
 
-      App.execute "when:fetched", topCharts, ->
+      App.execute "when:fetched", topCharts, =>
+        topCharts.initializeFilters()
         topCharts.sort()
+        # lCharts = topCharts.clone()
+        lCharts.initializeFilters()
+        lCharts.set(topCharts.first(@number))
         $(document).foundation()
 
-    getChartView: (topCharts) ->
-      new Show.Chart
-        collection: topCharts
+      topCharts.on "filter", ->
+        lCharts.reset(topCharts.first(@number))
+        # lCharts.sort()
+      # topCharts.on "reset", ->
+      #   lCharts.sort()
+
+
+    showInfo: (topCharts) ->
+      infoView = @getInfoView topCharts
+
+      @listenTo infoView, 'change:range', (time) =>
+        search = {}
+        search.request = 1
+        @request = ''
+        search.number = @number
+        search.startDate = moment time.date1
+        @startDate = search.startDate
+        search.endDate = moment time.date2
+        @endDate = search.endDate
+        # console.log search
+        string = "#{search.startDate.format 'YYYY-MM-DD'} - #{search.endDate.format 'YYYY-MM-DD'}"
+        ga 'send', 'event', 'change:date', string
+        @showChart(search)
+
+      @show infoView,
+        region: @layout.infoRegion
+        loading: true
 
     showSearch: (stations) ->
       searchView = @getSearchView stations
@@ -95,10 +128,22 @@ module.exports = App.module 'LandingApp.Show',
 
     showGraph: (topCharts) ->
       graphView = @getGraphView topCharts
+      circlesView = @getCirclesView topCharts
       @listenTo graphView, 'click:album:circle', (d) ->
         App.navigate "/artist/#{encodeURIComponent d}", trigger: true
+      @listenTo circlesView, 'switch:debuts', (d) ->
+        topCharts.resetFilters()
+        _.each topCharts.potentialA, (week) ->
+          topCharts.addFilter
+            firstWeek: week
+      @listenTo circlesView, 'switch:all', ->
+        topCharts.resetFilters()
+
       @show graphView,
         region: @layout.graphRegion
+        loading: true
+      @show circlesView,
+        region: @layout.circlesRegion
         loading: true
 
     showList: (stations) ->
@@ -120,9 +165,21 @@ module.exports = App.module 'LandingApp.Show',
       new Show.Graph
         collection: topCharts
 
+    getCirclesView: (topCharts) ->
+      new Show.Circles
+        collection: topCharts
+
     getListView: (stations) ->
       new Show.StationList
         collection: stations
+
+    getInfoView: (topCharts) ->
+      new Show.Info
+        model: new Backbone.Model topCharts
+
+    getChartView: (topCharts) ->
+      new Show.Chart
+        collection: topCharts
 
 
 # VIEW ######################################################################
@@ -149,27 +206,40 @@ module.exports = App.module 'LandingApp.Show',
     regions:
       titleRegion: "#title_region"
       blurbRegion: "#blurb_region"
-      searchRegion: "#search_region"
+      infoRegion: "#info-region"
       graphRegion: "#graph-region"
+      circlesRegion: "#circles-region"
       tableRegion: "#table_region"
       listRegion: "#list_region"
 
+
+  class Show.Info extends Marionette.ItemView
+    template: "modules/landing/showLanding/templates/info"
+    ui:
+      "timeSelect" : "#time-select"
+      "range" : "input#custom-range"
+      "icon" : "i#custom-range"
+      "number" : "#number"
     onRender: ->
 
       @ui.icon.on "click", (e) =>
         e.stopPropagation()
-        @ui.range.click()
-      @ui.range.dateRangePicker(
+        # @ui.range.click()
+        # @ui.range.focus()
+      @ui.icon.dateRangePicker(
         startDate: "2014-01-01"
         endDate: moment()
-        batchMode: 'week'
+        batchMode: false
         shortcuts:
           'prev' : ['week','month','year']
           'prev-days': [7, 14]
           'next-days': false
           'next' : false
         ).bind 'datepicker-change', (event,obj) =>
+
           @trigger 'change:range', obj
+          # $(@ui.icon).data("dateRangePicker").close()
+
 
 
   class Show.Search extends Marionette.ItemView
@@ -192,16 +262,44 @@ module.exports = App.module 'LandingApp.Show',
   class Show.Graph extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/graph"
     # className: 'panel'
-    buildGraph: require "modules/landing/showLanding/landingGraph"
+    buildGraph: require "modules/landing/showLanding/landingGraph" #landingGraph"
+
 
     graph: ->
-      d3.select("svg").remove()
+      # d3.select("svg").remove()
       @buildGraph(@el, @collection, @)
 
     id: "graph"
+    initialize: ->
+      @collection.on "filter", @render
+
     onRender: ->
       if matchMedia(Foundation.media_queries['medium']).matches
         @graph()
+
+  class Show.Circles extends Marionette.ItemView
+    template: "modules/landing/showLanding/templates/circles"
+    newAlbums: require 'modules/landing/showLanding/newAlbumsGraph'
+    labelsGraph: require 'modules/landing/showLanding/labelsGraph'
+    reportingGraph: require 'modules/landing/showLanding/reportingGraph'
+    className: "text-center"
+    id: "circles"
+    labels: ->
+      @$el.find("#labels").find("svg").remove()
+      @labelsGraph(@el, @collection, @)
+    initialize: ->
+      @collection.on "filter", => return @labels()
+
+    graph: ->
+      # d3.select("svg").remove()
+      @newAlbums(@el, @collection, @)
+      @labelsGraph(@el, @collection, @)
+      @reportingGraph(@el, @collection, @)
+
+    onRender: ->
+      if matchMedia(Foundation.media_queries['medium']).matches
+        @graph()
+
 
   class Show.StationList extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/stationList"
@@ -243,6 +341,8 @@ module.exports = App.module 'LandingApp.Show',
     itemViewContainer: "#thecharts"
     itemViewOptions: (model) ->
       index: @collection.indexOf(model) + 1
+    initialize: ->
+      # @collection.slice(0,50)
 
     events:
       'click th' : 'clickHeader'

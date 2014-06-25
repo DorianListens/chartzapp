@@ -113,7 +113,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
     chart_array = []
 
     # Find the relevant table, and parse it.
-
+b
     $("th").parents("table").find("tr").each (index, item) ->
       # console.log index
       if index is 0
@@ -269,3 +269,6 @@ module.exports.autoCrawl = (options = false) ->
         getStation station.toLowerCase()
 
   getAll(theArray)
+
+module.exports.autoCrawlTrue = ->
+  return module.exports.autoCrawl(true)

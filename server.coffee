@@ -18,6 +18,7 @@ later = require 'later'
 _ = require 'underscore'
 fs = require 'fs'
 util = require './server/util'
+morgan = require 'morgan'
 
 # Setup Database ##################################################
 
@@ -33,9 +34,11 @@ db.once "open", ->
 
 app = express()
 app.use(express.static __dirname+'/public')
+app.use morgan('short')
 app.use bodyParser.json()
 app.use bodyParser.urlencoded
   extended: true
+
 
 # Include all controllers
 
@@ -50,11 +53,9 @@ crawler = require './server/crawler'
 
 # Set up automatic crawling on tuesday night
 
-autoCrawlTrue = ->
-  return crawler.autoCrawl(true)
-
 sched = later.parse.recur()
-  .on(5).hour().on(25).minute().on(4).dayOfWeek()
+  .on(4).hour().on(7).minute().on(4).dayOfWeek()
+
 
 later.date.UTC()
 

@@ -53,7 +53,6 @@ module.exports = (el, collection, view) ->
     .attr("transform", "translate(" + (margin.left + 20) + "," + margin.top + ")")
 
   albums = collection.models
-  albums = albums.slice(0,30)
   # albums = _.filter albums, (album) ->
   #   album.attributes.firstWeek is tuesify collection.startDate
   # albums = albums.slice(0,25)
