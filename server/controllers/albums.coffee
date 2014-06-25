@@ -27,8 +27,8 @@ module.exports.controller = (app) ->
       results.sort (a, b) ->
         a = a.artist
         b = b.artist
-        return 0 if a is b
-        if a > b return -1 else 1
+        if a is b then return 0
+        if a > b then -1 else 1
       oldres = {}
       for result in results
         do (result) ->
