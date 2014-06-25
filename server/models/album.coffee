@@ -10,6 +10,7 @@ mongoose = require 'mongoose'
 util = require '../util'
 Schema = mongoose.Schema
 moment = require 'moment'
+_ = require 'underscore'
 
 appearanceSchema = new Schema
   week: String
@@ -48,11 +49,27 @@ albumSchema = new Schema
 
 albumSchema.pre 'save', (next) ->
   self = @
+  self.points = 0 unless self.points
   self.artistLower = self.artist.toLowerCase() unless self.isNull
   self.albumLower = self.album.toLowerCase() unless self.isNull
   self.labelLower = self.label.toLowerCase() unless self.isNull
   slugText = "#{self.artist} #{self.album}"
   self.slug = util.slugify slugText
+  next()
+
+albumSchema.pre 'save', (next) ->
+  self = @
+  @appearances.sort (a, b) ->
+    a = moment a.week
+    b = moment b.week
+    return 0 if a is b
+    if a > b then -1 else 1
+  oldap = {}
+  _.each @appearances, (ap) ->
+    if (ap.week is oldap.week) and (ap.station is oldap.station) and (ap.position is oldap.position)
+      console.log "found duplicate", ap.week, ap.station, ap.position, self.artist
+    oldap = ap
+  # _.each @appearances
   next()
 
 
@@ -81,15 +98,15 @@ albumSchema.pre 'save', (next) ->
 
 # Set current points on every load ###
 
-albumSchema.post 'init', ->
-  self = @
-  if self.points is undefined
-    self.points = 0
-  pointSum = 0
-  for appearance in @appearances
-    do (appearance) ->
-      pointSum += (31 - +appearance.position)
-  self.points = pointSum
+# albumSchema.post 'init', ->
+#   self = @
+#   if self.points is undefined
+#     self.points = 0
+#   pointSum = 0
+#   for appearance in @appearances
+#     do (appearance) ->
+#       pointSum += (31 - +appearance.position)
+#   self.points = pointSum
 
 # Instantiate
 
