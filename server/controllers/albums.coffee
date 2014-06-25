@@ -27,7 +27,7 @@ module.exports.controller = (app) ->
       for result in results
         do (result) ->
           result.save()
-      res.send results
+      res.send "Saving all albums which appeared on #{week}"
 
   # Get every entry for a given station from the db, grouped by week
 
