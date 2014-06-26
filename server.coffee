@@ -55,8 +55,9 @@ fs.readdirSync('./server/controllers').forEach (file) ->
 crawler = require './server/crawler'
 
 # Set up automatic crawling on tuesday night
+dyno = process.env.DYNO?
 
-console log $DYNO if $DYNO
+console log dyno if dyno
 
 sched = later.parse.recur().on(4).hour().on(7).minute().on(4).dayOfWeek()
 
