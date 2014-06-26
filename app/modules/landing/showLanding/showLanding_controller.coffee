@@ -152,9 +152,15 @@ module.exports = App.module 'LandingApp.Show',
         App.navigate "/artist/#{encodeURIComponent d}", trigger: true
       @listenTo circlesView, 'switch:debuts', (d) ->
         topCharts.resetFilters()
-        _.each topCharts.potentialA, (week) ->
+        newFilters = []
+        if topCharts.potentialA.length > 1
+          _.each topCharts.potentialA, (week) ->
+            newFilters.push
+              firstWeek: week
+          topCharts.addFilters newFilters
+        else
           topCharts.addFilter
-            firstWeek: week
+            firstWeek: topCharts.potentialA[0]
       @listenTo circlesView, 'switch:all', ->
         topCharts.resetFilters()
 

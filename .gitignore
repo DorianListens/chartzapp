@@ -7,3 +7,4 @@ db
 newrelic_agent.log
 .gauth.coffee
 _unused_modules
+.quotes
