@@ -5,12 +5,14 @@
 
     <h1 id="text"><i id="custom-range" class="fi-calendar fi-large"></i> {{desc}}</h1>
   </div>
+  {{#if week}}
   <div class="large-4 columns">
     <ul class="inline-list right">
       <li><a class="next" data-week="{{week}}" id="prev"><i class="fi-arrow-left"></i> Prev</a></li>
       <li><a class="next" data-week="{{week}}" id="next">Next <i class="fi-arrow-right"></i></a></li>
     </ul>
   </div>
+  {{/if}}
   <!-- <div class="large-4 columns">
     <div class="row collapse">
       <div class="small-10 columns">
