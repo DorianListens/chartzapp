@@ -56,6 +56,8 @@ crawler = require './server/crawler'
 
 # Set up automatic crawling on tuesday night
 
+console log $DYNO if $DYNO
+
 sched = later.parse.recur().on(4).hour().on(7).minute().on(4).dayOfWeek()
 
 
