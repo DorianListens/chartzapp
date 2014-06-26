@@ -55,7 +55,7 @@ fs.readdirSync('./server/controllers').forEach (file) ->
 crawler = require './server/crawler'
 
 # Set up automatic crawling on tuesday night
-dyno = process.env.DYNO?
+dyno = process.env.DYNO if process.env.DYNO?
 
 console.log dyno if dyno
 
