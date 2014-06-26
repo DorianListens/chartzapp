@@ -57,14 +57,16 @@ crawler = require './server/crawler'
 # Set up automatic crawling on tuesday night
 dyno = process.env.DYNO if process.env.DYNO?
 
-console.log dyno if dyno
-
 sched = later.parse.recur().on(4).hour().on(7).minute().on(4).dayOfWeek()
 
+sched2 = later.parse.recur().on(3).hour().on(4).minute().on(5).dayOfWeek()
+
+test = ->
+  console.log "Web 1 reporting!"
 
 later.date.UTC()
 
-timer = later.setInterval(crawler.autoCrawl, sched)
+if dyno is "web.1" then timer = later.setInterval(test, sched2)
 
 # Export the server to Brunch
 
