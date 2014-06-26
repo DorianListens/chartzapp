@@ -19,6 +19,7 @@ _ = require 'underscore'
 fs = require 'fs'
 util = require './server/util'
 morgan = require 'morgan'
+favicon = require 'serve-favicon'
 
 # Setup Database ##################################################
 
@@ -33,7 +34,9 @@ db.once "open", ->
 # Instantiate the Application
 
 app = express()
-app.use(express.static __dirname+'/public')
+app.use(favicon __dirname + '/public/favicon.ico')
+
+app.use(express.static __dirname + '/public')
 app.use morgan('short')
 app.use bodyParser.json()
 app.use bodyParser.urlencoded
