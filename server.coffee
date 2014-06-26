@@ -59,14 +59,9 @@ dyno = process.env.DYNO if process.env.DYNO?
 
 sched = later.parse.recur().on(4).hour().on(7).minute().on(4).dayOfWeek()
 
-sched2 = later.parse.recur().on(3).hour().on(4).minute().on(5).dayOfWeek()
-
-test = ->
-  console.log "Web 1 reporting!"
-
 later.date.UTC()
 
-if dyno is "web.1" then timer = later.setInterval(test, sched2)
+if dyno is "web.1" then timer = later.setInterval(crawler.autoCrawl, sched)
 
 # Export the server to Brunch
 
