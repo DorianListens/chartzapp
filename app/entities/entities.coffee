@@ -404,6 +404,7 @@ module.exports = App.module "Entities",
         { name: "Stations", path: 'station', icon: 'fi-results' }
         { name: "Artists", path: 'artist', icon: "fi-results-demographics"}
         { name: "FAQ", path: 'faq', icon: 'fi-info' }
+        { name: "Twitter", path: 'http://twitter.com/chartzapp', icon: 'fi-social-twitter' }
       ]
 
     getCharts: (station = null, date = null) ->

@@ -13,7 +13,10 @@ module.exports = App.module 'HeaderApp.List',
     nav: (e) ->
       e.preventDefault()
       route = @model.get('path')
-      App.navigate(route, trigger: true)
+      if route.substring(0, 4) is "http"
+        window.open(route) 
+      else
+        App.navigate(route, trigger: true)
 
 
   class List.Headers extends Marionette.CompositeView
