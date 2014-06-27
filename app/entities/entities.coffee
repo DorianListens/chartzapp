@@ -244,9 +244,9 @@ module.exports = App.module "Entities",
     parse: (response) ->
       weeks = []
       stations = []
-      totalAlbums = response.length
       response = response.filter (v, i, a) ->
         return v if v._id.isNull is false and v._id.artist isnt ''
+      totalAlbums = response.length
 
       for item in response
         do (item) ->
@@ -325,7 +325,10 @@ module.exports = App.module "Entities",
       if search.endDate then endDate = search.endDate
       startDate = tuesify startDate
       endDate = tuesify endDate
-      # potentialWeeks =
+      topxCollection.startDate = startDate
+      topxCollection.endDate = endDate
+      topxCollection.potentialA = potentialWeeks(startDate, endDate)
+      topxCollection.potential = potentialWeeksCount(startDate, endDate)
       if station and startDate and endDate
         searchUrl = "/api/top/#{station}/#{startDate}/#{endDate}"
         if startDate is endDate
@@ -333,32 +336,17 @@ module.exports = App.module "Entities",
           week = startDate
         else
           desc = "Top Albums on #{station} between #{startDate} and #{endDate}"
-      # else if search.request is "This Month"
-      #   # console.log d
-      #   searchUrl = "/api/topall/2014-04-04/#{d.yyyymmdd()}"
-      #   desc = "Top Albums this Month"
-      # else if search.request is "This Week"
-      #   searchUrl = "/api/topall/#{d.yyyymmdd()}/#{d.yyyymmdd()}"
-      #   week = d.yyyymmdd()
-      #   # console.log week
-      # else if search.request is "This Year"
-      #   searchUrl = "/api/topall/2014-01-01/#{d.yyyymmdd()}"
-      #   desc = "Top Albums between 2014-01-01 and #{d.yyyymmdd()}"
       else
         searchUrl = "/api/topall/#{startDate}/#{endDate}"
         if startDate is endDate
           desc = "For the week of #{startDate}"
           week = startDate
         else
-          desc = "Top Albums between #{startDate} and #{endDate}"
+          desc = "For the #{topxCollection.potential} weeks between #{startDate} and #{endDate}"
       # console.log searchUrl
       topxCollection.desc = desc
       topxCollection.week = week if week
       topxCollection.url = searchUrl
-      topxCollection.startDate = startDate
-      topxCollection.endDate = endDate
-      topxCollection.potentialA = potentialWeeks(startDate, endDate)
-      topxCollection.potential = potentialWeeksCount(startDate, endDate)
       topxCollection.fetch
         reset: true
         # data:
