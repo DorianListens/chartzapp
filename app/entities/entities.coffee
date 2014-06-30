@@ -309,7 +309,8 @@ module.exports = App.module "Entities",
 
   API =
     getTopx: (search) ->
-      d = new Date()
+      d = moment()
+      # console.log d.day()
       number = 30
       number = search.number if search.number
 
@@ -321,7 +322,7 @@ module.exports = App.module "Entities",
       topxCollection.station = station
       startDate =  "2014-01-01" # "#{d.yyyymmdd()}" #
       if search.startDate then startDate = search.startDate
-      endDate = "#{d.yyyymmdd()}"
+      endDate = "#{d.format "YYYY-MM-DD"}"
       if search.endDate then endDate = search.endDate
       startDate = tuesify startDate
       endDate = tuesify endDate

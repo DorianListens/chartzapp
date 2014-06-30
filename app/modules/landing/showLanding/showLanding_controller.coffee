@@ -56,7 +56,11 @@ module.exports = App.module 'LandingApp.Show',
       $(document).foundation()
 
     showChart: (search = {}) ->
-      search.startDate = moment() unless search.startDate
+      startDate = moment()
+      if startDate.day() is 2
+        startDate = startDate.day(-5)
+      # console.log startDate
+      search.startDate = startDate unless search.startDate
 
       topCharts = App.request 'topx:entities', search
       lCharts = topCharts.clone()
