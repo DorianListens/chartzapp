@@ -58,7 +58,8 @@ module.exports = App.module 'LandingApp.Show',
     showChart: (search = {}) ->
       startDate = moment()
       if startDate.day() is 2
-        startDate = startDate.day(-5)
+        startDate.day(-5)
+        search.endDate = startDate
       # console.log startDate
       search.startDate = startDate unless search.startDate
 
