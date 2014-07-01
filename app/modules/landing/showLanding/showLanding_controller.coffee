@@ -25,19 +25,19 @@ module.exports = App.module 'LandingApp.Show',
         @request = time
         @showChart(search)
 
-      @listenTo @layout, 'change:range', (time) =>
-        search = {}
-        search.request = 1
-        @request = ''
-        search.number = @number
-        search.startDate = moment time.date1
-        @startDate = search.startDate
-        search.endDate = moment time.date2
-        @endDate = search.endDate
-        # console.log search
-        string = "#{search.startDate.format 'YYYY-MM-DD'} - #{search.endDate.format 'YYYY-MM-DD'}"
-        ga 'send', 'event', 'change:date', string
-        @showChart(search)
+      # @listenTo @layout, 'change:range', (time) =>
+      #   search = {}
+      #   search.request = 1
+      #   @request = ''
+      #   search.number = @number
+      #   search.startDate = moment time.date1
+      #   @startDate = search.startDate
+      #   search.endDate = moment time.date2
+      #   @endDate = search.endDate
+      #   # console.log search
+      #   string = "#{search.startDate.format 'YYYY-MM-DD'} - #{search.endDate.format 'YYYY-MM-DD'}"
+      #   ga 'send', 'event', 'change:date', string
+      #   @showChart(search)
       @listenTo @layout, 'change:number', (number) =>
 
         # search.request = 1
@@ -56,10 +56,11 @@ module.exports = App.module 'LandingApp.Show',
       $(document).foundation()
 
     showChart: (search = {}) ->
+      # console.log search
       startDate = moment()
       if startDate.day() is 2
         startDate.day(-5)
-        search.endDate = startDate
+        search.endDate = startDate unless search.endDate
       # console.log startDate
       search.startDate = startDate unless search.startDate
 
@@ -107,7 +108,7 @@ module.exports = App.module 'LandingApp.Show',
         @startDate = search.startDate
         search.endDate = moment time.date2
         @endDate = search.endDate
-        # console.log search
+        console.log search
         string = "#{search.startDate.format 'YYYY-MM-DD'} - #{search.endDate.format 'YYYY-MM-DD'}"
         ga 'send', 'event', 'change:date', string
         @showChart(search)
