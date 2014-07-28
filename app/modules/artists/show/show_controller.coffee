@@ -75,6 +75,7 @@ module.exports = App.module 'ArtistsApp.Show',
         region: @layout.tableRegion
 
     showStart: ->
+      # startTitle = @getStartTitle
       startView = @getStartView()
       @listenTo startView, 'click:search', (artistVal) ->
         artistVal = encodeURIComponent(artistVal)

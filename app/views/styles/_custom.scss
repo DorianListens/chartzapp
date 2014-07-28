@@ -25,6 +25,12 @@
   text-shadow: 1px 1px 1px #333;
 
 }
+#logos a {
+  opacity: 0.5;
+  &:hover {
+    opacity: 1;
+  }
+}
 h1.main-title {
   font-size: rem-calc(60);
   line-height: rem-calc(140);
@@ -58,6 +64,10 @@ h1.artist-title {
   text-shadow: 1px 1px 1px #000;
 }
 
+#footer h4 {
+  color: #fff;
+}
+
 .album-sub-nav {
   @include sub-nav();
   display: inline-block;
@@ -86,10 +96,10 @@ h1.artist-title {
   padding-top: rem-calc(20);
   // padding-bottom: rem-calc(20);
 }
-a.dl {
-  font-family: $header-font-family;
-  font-size: rem-calc(20);
-}
+// a.dl {
+//   font-family: $header-font-family;
+//   font-size: rem-calc(20);
+// }
 #footer i {
   color: $primary-color;
   font-size: rem-calc(20);

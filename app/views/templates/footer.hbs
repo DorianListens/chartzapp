@@ -1,38 +1,23 @@
 <div id="footer">
 	<div class="container">
 		<div class='row'>
-			<div class='small-12 columns'>
+			<div class='small-12 columns text-center'>
 				<h1 class="footer-title">ChartZapp!</h1>
-				<p>Chart data crawled from
+				<h4>Chart data collected and compiled by
 					<a href="http://www.earshot-online.com/" target="blank">
 						!Earshot Online
 					</a>
-				</p>
-				<p>Made by hand with
+					and published by
+					<a href="http://www.ncra.ca/" target="blank">the NCRA</a>
+				</h4>
+				<h4>Made by hand with
 					<i class="fi-heart large"></i>
 					 in Montréal by
 					<a href="http://dorianlistens.com" class="dl" target="blank">
 						Dorian Listens
 					</a>
-				</p>
+				</h4>
 			</div>
 		</div>
 	</div>
 </div>
-<script>
-$(document).foundation({
-	abide: {
-		validators: {
-			isStation: function (el, required, parent) {
-				console.log(el.value);
-				var toCheck = el.value;
-				var stationCheck = require('stationCheck');
-				var stationList = require('stationList');
-				var valid = stationCheck(stationList, toCheck);
-				return valid
-				}
-			}
-		},
-
-});
-</script>

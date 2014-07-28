@@ -336,7 +336,6 @@ module.exports = (el, collection, graph, view, info) ->
         height
       ])
 
-
       line = d3.svg.line().x((d) ->
         x d.week
       ).y((d) ->

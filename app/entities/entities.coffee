@@ -377,7 +377,8 @@ module.exports = App.module "Entities",
       theStation
 
     getArtist: (artist) ->
-      console.log(artist) if artist
+      # console.log(artist) if artist
+      # if artist
       artists = new Entities.ArtistCollection
       artists.artist = artist if artist
       artist = encodeURIComponent(artist) if artist
