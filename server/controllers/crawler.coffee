@@ -87,9 +87,9 @@ module.exports.controller = (app) ->
 
   app.get "/server/go-get/:week/:noNull", (req, res) ->
     reqWeek = moment req.params.week
-    reqWeek = tuesify reqWeek
+    reqWeek = util.tuesify reqWeek
     newNow = moment()
-    newNow = tuesify newNow
+    newNow = util.tuesify newNow
     res.send "Geting all charts for the week of #{reqWeek}. \n Here goes!"
     newNow = moment(reqWeek)
     theArray = stationArray
