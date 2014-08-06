@@ -3,7 +3,7 @@ Album = require '../models/album'
 crawler = require '../crawler'
 util = require '../util'
 moment = require 'moment'
-stationArray = require './lib/stationList'
+stationArray = require '../lib/stationList'
 
 
 module.exports.controller = (app) ->
