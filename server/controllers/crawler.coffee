@@ -2,6 +2,7 @@ mongoose = require 'mongoose'
 Album = require '../models/album'
 crawler = require '../crawler'
 util = require '../util'
+moment = require 'moment'
 
 module.exports.controller = (app) ->
 

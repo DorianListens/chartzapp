@@ -18,6 +18,11 @@ module.exports.controller = (app) ->
         album.save()
       res.send "Saving all albums"
 
+  app.get "/api/cancon", (req, res) ->
+    Album.find { cancon: 1 }, (err, results) ->
+      console.error err if err
+      res.send results
+
   app.get "/api/save/:week", (req, res) ->
     week = req.params.week
     Album.find { appearances: { $elemMatch : {'week' : "#{week}" }}},
@@ -66,7 +71,7 @@ module.exports.controller = (app) ->
     station = req.params.station.toLowerCase()
     week = util.tuesify(req.params.date)
     Album.find { appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}},
-    { artist: 1, album: 1, label: 1, firstWeek: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
+    { artist: 1, album: 1, label: 1, firstWeek: 1, cancon: 1, appearances: { $elemMatch : {'station' : "#{station}", 'week' : "#{week}" }}}, (err, results) ->
       console.log err if err
       if results.length is 0
         console.log 'no results'

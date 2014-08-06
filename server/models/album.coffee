@@ -29,6 +29,7 @@ albumSchema = new Schema
     index: true
   album: String
   albumLower: String
+  cancon: Boolean
   label: String
   labelLower:
     type: String

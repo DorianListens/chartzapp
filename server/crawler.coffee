@@ -128,6 +128,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
       if 2 < index < 34
         tds = $(item).find("td")
         chartPos = $(tds.eq(0)).text().trim()
+        cancon = tds.eq(2).find('img[alt="CanCon"]').length
         artist = tds.eq(2).text().trim()
         album = tds.eq(3).text().trim()
         label = tds.eq(4).text().trim()
@@ -136,6 +137,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
           artist: artist
           album: album
           label: label
+          cancon: cancon
 
     deferred chart_array
 
@@ -180,6 +182,7 @@ module.exports.getChart = (station, week, res, opts = {}) ->
               albumLower: record.album.toLowerCase()
               label: record.label
               labelLower: record.label.toLowerCase()
+              cancon: record.cancon
               points: 0
               appearances: [
                   week: week
@@ -206,6 +209,8 @@ module.exports.getChart = (station, week, res, opts = {}) ->
                     alreadyAdded = true
               if alreadyAdded isnt true
                 results.appearances.push appearance
+                if results.cancon is undefined
+                  results.cancon = record.cancon
                 results.save()
                 oldAlbums.push
                   artist: record.artist
