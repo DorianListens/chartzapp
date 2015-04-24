@@ -320,9 +320,10 @@ module.exports = App.module "Entities",
       if station
         topxCollection.info = App.request "stations:entities", station
       topxCollection.station = station
-      startDate =  "2014-01-01" # "#{d.yyyymmdd()}" #
+      today = "#{d.format "YYYY-MM-DD"}"
+      startDate = today
       if search.startDate then startDate = search.startDate
-      endDate = "#{d.format "YYYY-MM-DD"}"
+      endDate = today
       if search.endDate then endDate = search.endDate
       startDate = tuesify startDate
       endDate = tuesify endDate

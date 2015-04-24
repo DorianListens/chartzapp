@@ -114,9 +114,12 @@ module.exports = App.module 'StationApp.Show',
       @listenTo panelView, 'click:mostRecent', (station) =>
         @opts.loadingType = "opacity"
         @showRecent @opts.station
-      @listenTo panelView, 'click:thisYear', (station) =>
+      @listenTo panelView, 'click:thisYear', (search ={}) =>
         @opts.loadingType = "opacity"
-        station = App.request "topx:entities", @opts
+        search.station = @opts.station
+        search.startDate = moment().subtract(1, 'years')
+        search.endDate = moment
+        station = App.request 'topx:entities', search
         @showStation station
       @listenTo panelView, 'click:other', (search) =>
         @opts.loadingType = "opacity"

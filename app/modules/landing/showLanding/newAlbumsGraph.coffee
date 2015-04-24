@@ -23,7 +23,6 @@ tuesify = (date) ->
   theTues.format('YYYY-MM-DD')
 
 module.exports = (el, collection, view) ->
-  # console.log collection
 
   margin =
     top: 50

@@ -303,12 +303,9 @@ module.exports = App.module 'LandingApp.Show',
 
   class Show.Graph extends Marionette.ItemView
     template: "modules/landing/showLanding/templates/graph"
-    # className: 'panel'
-    buildGraph: require "modules/landing/showLanding/landingGraph" #landingGraph"
-
+    buildGraph: require "modules/landing/showLanding/landingGraph"
 
     graph: ->
-      # d3.select("svg").remove()
       @buildGraph(@el, @collection, @)
 
     id: "graph"
