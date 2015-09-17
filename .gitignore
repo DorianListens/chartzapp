@@ -1,6 +1,5 @@
 node_modules
 bower_components
-public
 db
 .plan
 .sass-cache
