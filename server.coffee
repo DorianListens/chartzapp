@@ -82,6 +82,6 @@ exports.startServer = (port, path, callback) ->
 
 # Heroku ENV setup #################################################
 
-isHeroku = process.env.MONGOHQ_URL?
+isHeroku = process.env.MONGODB_URL?
 if isHeroku
   exports.startServer(5000)
