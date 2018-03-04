@@ -30,7 +30,7 @@
     "later": "^1.1.10",
     "moment": "^2.5.1",
     "mongodb": "^1.4.40",
-    "mongoose": "^3.8.40",
+    "mongoose": "^4.0.0",
     "mongoose-middleware": "^0.2.20",
     "mongoose-text-search": "0.0.2",
     "morgan": "^1.1.1",

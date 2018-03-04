@@ -23,13 +23,7 @@ favicon = require 'serve-favicon'
 
 # Setup Database ##################################################
 
-mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/chartz-db'
-mongoose.connect mongoUri
-
-db = mongoose.connection
-db.on "error", console.error.bind(console, "connection error:")
-db.once "open", ->
-  console.info 'Database Connection Open'
+mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost:27017/chartz-db'
 
 # Instantiate the Application
 
@@ -66,6 +60,12 @@ if dyno is "web.1" then timer = later.setInterval(crawler.autoCrawl, sched)
 # Export the server to Brunch
 
 exports.startServer = (port, path, callback) ->
+  mongoose.connect mongoUri
+
+  db = mongoose.connection
+  db.on "error", console.error.bind(console, "connection error:")
+  db.once "open", ->
+    console.info 'Database Connection Open'
   port = process.env.PORT || port
   app.listen port
   console.log 'ChartZapp online! Listening on port: '+port
@@ -76,6 +76,7 @@ exports.startServer = (port, path, callback) ->
     res.sendfile './public/index.html'
 
   callback()
+
 # Heroku ENV setup #################################################
 
 isHeroku = process.env.MONGOHQ_URL?
