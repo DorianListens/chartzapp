@@ -60,6 +60,8 @@ if dyno is "web.1" then timer = later.setInterval(crawler.autoCrawl, sched)
 # Export the server to Brunch
 
 exports.startServer = (port, path, callback) ->
+  console.log "Starting Chartzapp"
+  console.log "Connection to DB at: " + mongoUri
   mongoose.connect mongoUri
 
   db = mongoose.connection
