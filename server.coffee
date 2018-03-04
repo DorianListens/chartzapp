@@ -23,7 +23,7 @@ favicon = require 'serve-favicon'
 
 # Setup Database ##################################################
 
-mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost:27017/chartz-db'
+mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/chartz-db'
 
 # Instantiate the Application
 
