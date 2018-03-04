@@ -6,7 +6,7 @@ module.exports = App.module "FooterApp.Show",
 (Show, App, Backbone, Marionette, $, _) ->
 
   class Show.Footer extends Marionette.ItemView
-    template: '/views/templates/footer'
+    template: 'views/templates/footer'
 
   class Show.Controller extends App.Controllers.Base
     initialize: ->

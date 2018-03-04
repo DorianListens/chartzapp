@@ -6,7 +6,7 @@ module.exports = (el, collection, view) ->
     bottom: 50
     left: 50
 
-  color = require '/colorList'
+  color = require '../../../colorList'
 
   width = $("#graph-region").width() - margin.left - margin.right
   height = 600 - margin.top - margin.bottom

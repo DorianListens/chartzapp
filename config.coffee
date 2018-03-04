@@ -13,7 +13,6 @@ exports.config =
   #         level: "warn"
   files:
     javascripts:
-      defaultExtension: 'coffee'
       joinTo:
         'javascripts/app.js': /^app/
 
@@ -41,17 +40,15 @@ exports.config =
         ]
 
     stylesheets:
-      defaultExtension: 'scss'
       joinTo:
-        'stylesheets/app.css': /^app(\/|\\)views(\/|\\)styles(\/|\\)/
-        'stylesheets/vendor.css': /^vendor(\/|\\)styles/
-        'test/stylesheets/vendor.css': /^test(\/|\\)vendor(\/|\\)styles(\/|\\)/
+        'stylesheets/app.css': /^app/
+        'stylesheets/vendor.css': /^vendor\/styles/
       order:
         before: [
           'app/views/styles/foundation.scss'
         ]
         after: [
-          # "app/views/styles/station.scss"
+          #"app/views/styles/station.scss"
         ]
 
     templates:

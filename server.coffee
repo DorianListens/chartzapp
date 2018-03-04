@@ -75,6 +75,7 @@ exports.startServer = (port, path, callback) ->
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
 
+  callback()
 # Heroku ENV setup #################################################
 
 isHeroku = process.env.MONGOHQ_URL?
