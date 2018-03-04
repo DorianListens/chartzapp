@@ -75,7 +75,8 @@ exports.startServer = (port, path, callback) ->
   app.get '/', (req, res) ->
     res.sendfile './public/index.html'
 
-  callback()
+  if callback
+    callback()
 
 # Heroku ENV setup #################################################
 
